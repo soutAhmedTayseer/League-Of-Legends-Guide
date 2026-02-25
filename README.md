@@ -14,12 +14,22 @@ Welcome, Summoner. **Champion Codex** is an offline-first, highly responsive And
     <tr>
       <td align="center"><b>The Roster (List View)</b></td>
       <td align="center"><b>The Deep Dive (Portrait)</b></td>
-      <td align="center"><b>Tactical Vision (Landscape)</b></td>
     </tr>
     <tr>
-      <td><img src="link_to_screenshot_1.png" alt="Champion List View" width="250"/></td>
-      <td><img src="link_to_screenshot_2.png" alt="Champion Detail Portrait" width="250"/></td>
-      <td><img src="link_to_screenshot_3.png" alt="Champion Detail Landscape" width="400"/></td>
+      <td align="center">
+        <img src="https://github.com/user-attachments/assets/96243d0f-41a7-4a3e-86c6-85577823c15e" alt="Champion List View" width="250"/>
+      </td>
+      <td align="center">
+        <img src="https://github.com/user-attachments/assets/fcfd13f1-0c72-46aa-9533-868e1b55f01a" alt="Champion Detail Portrait" width="250"/>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" colspan="2"><b>Tactical Vision (Landscape)</b></td>
+    </tr>
+    <tr>
+      <td align="center" colspan="2">
+        <img src="https://github.com/user-attachments/assets/a9a2ce1b-fc08-42da-a782-999052ed626b" alt="Champion Detail Landscape" width="550"/>
+      </td>
     </tr>
   </table>
 </div>
