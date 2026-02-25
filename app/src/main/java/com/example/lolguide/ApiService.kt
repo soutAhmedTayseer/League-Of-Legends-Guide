@@ -3,10 +3,19 @@ package com.example.lolguide
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface ApiService {
-    @GET("cdn/16.1.1/data/en_US/champion.json")
+    // Existing call
+    @GET("cdn/12.6.1/data/en_US/champion.json")
     suspend fun getChampions(): ChampionResponse
+
+    // NEW API CALL FOR FEATURE 1
+    @GET("cdn/{version}/data/en_US/champion/{championId}.json")
+    suspend fun getChampionDetail(
+        @Path("version") version: String,
+        @Path("championId") championId: String
+    ): ChampionDetailResponse
 }
 
 object RetrofitClient {
