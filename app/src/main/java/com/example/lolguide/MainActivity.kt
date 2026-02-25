@@ -193,91 +193,200 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ChampionListScreen(champions: List<Champion>, onChampionClick: (Champion) -> Unit) {
     var searchQuery by remember { mutableStateOf("") }
+    var showFilters by remember { mutableStateOf(false) }
 
-    val filteredChampions = champions.filter {
-        it.name.contains(searchQuery, ignoreCase = true) || it.title.contains(
-            searchQuery,
-            ignoreCase = true
-        )
+    // --- SMART MULTI-FILTER STATES ---
+    var selectedRoles by remember { mutableStateOf(setOf<String>()) }
+    var selectedResource by remember { mutableStateOf<String?>(null) }
+    var selectedRange by remember { mutableStateOf<String?>(null) }
+
+    // Dynamically extract all available roles and resources from your loaded data
+    val availableRoles = remember(champions) { champions.flatMap { it.tags ?: emptyList() }.toSet().sorted() }
+    val availableResources = remember(champions) { champions.mapNotNull { it.partype.takeIf { p -> !p.isNullOrBlank() } }.toSet().sorted() }
+
+    // --- THE FILTERING ENGINE ---
+    val filteredChampions = champions.filter { champ ->
+        // 1. Search Filter
+        val matchesSearch = champ.name.contains(searchQuery, ignoreCase = true) ||
+                champ.title.contains(searchQuery, ignoreCase = true)
+
+        // 2. Role Filter (OR logic: Must have AT LEAST ONE of the selected roles)
+        val matchesRole = selectedRoles.isEmpty() ||
+                champ.tags?.any { it in selectedRoles } == true
+
+        // 3. Resource Filter (Exact Match)
+        val matchesResource = selectedResource == null ||
+                champ.partype.equals(selectedResource, ignoreCase = true)
+
+        // 4. Range Type Filter (Calculated from base stats)
+        val champRange = champ.stats?.attackrange ?: 0.0
+        val matchesRange = selectedRange == null ||
+                (selectedRange == "Melee" && champRange < 300.0) ||
+                (selectedRange == "Ranged" && champRange >= 300.0)
+
+        // Only show champion if it passes ALL active filters (AND logic between categories)
+        matchesSearch && matchesRole && matchesResource && matchesRange
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            placeholder = {
-                Text(
-                    "Search champions...", color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = "Search Icon",
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                focusedContainerColor = MaterialTheme.colorScheme.surface,
-                unfocusedContainerColor = MaterialTheme.colorScheme.surface
-            ),
-            shape = RoundedCornerShape(12.dp),
-            singleLine = true
-        )
-
-        LazyColumn(
-            contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)
+        // --- SEARCH BAR & FILTER TOGGLE ---
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            items(filteredChampions) { champ ->
-                val imageFileName = champ.image.full.takeIf { it.isNotEmpty() } ?: "${champ.id}.png"
-                val patchVersion = champ.version ?: "14.23.1"
-                val imageUrl =
-                    "https://ddragon.leagueoflegends.com/cdn/$patchVersion/img/champion/$imageFileName"
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Search champions...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon", tint = MaterialTheme.colorScheme.primary) },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
+                ),
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true
+            )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.surface)
-                        .clickable { onChampionClick(champ) }
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current).data(imageUrl)
-                            .crossfade(true).error(R.mipmap.ic_launcher).build(),
-                        contentDescription = "${champ.name} Icon",
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Button to open/close filters
+            IconButton(
+                onClick = { showFilters = !showFilters },
+                modifier = Modifier
+                    .background(if (showFilters || selectedRoles.isNotEmpty() || selectedResource != null || selectedRange != null) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+            ) {
+                Text("🛠️", fontSize = 20.sp) // Simple gear/filter icon
+            }
+        }
+
+        // --- EXPANDABLE FILTERS SECTION ---
+        if (showFilters) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(vertical = 8.dp)
+            ) {
+                // Role Filter (Multi-select)
+                Text("Role / Class", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 16.dp))
+                LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(availableRoles) { role ->
+                        val isSelected = role in selectedRoles
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = {
+                                selectedRoles = if (isSelected) selectedRoles - role else selectedRoles + role
+                            },
+                            label = { Text(role) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Resource Filter (Single-select)
+                Text("Resource", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 16.dp))
+                LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(availableResources) { resource ->
+                        val isSelected = resource == selectedResource
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { selectedResource = if (isSelected) null else resource },
+                            label = { Text(resource) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Range Filter (Single-select)
+                Text("Combat Range", color = MaterialTheme.colorScheme.primary, fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 16.dp))
+                Row(modifier = Modifier.padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    listOf("Melee", "Ranged").forEach { range ->
+                        val isSelected = range == selectedRange
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { selectedRange = if (isSelected) null else range },
+                            label = { Text(range) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        )
+                    }
+                }
+
+                // Active Filters Counter
+                val activeCount = selectedRoles.size + (if (selectedResource != null) 1 else 0) + (if (selectedRange != null) 1 else 0)
+                if (activeCount > 0) {
+                    TextButton(onClick = {
+                        selectedRoles = emptySet()
+                        selectedResource = null
+                        selectedRange = null
+                    }, modifier = Modifier.padding(horizontal = 8.dp)) {
+                        Text("Clear All ($activeCount)", color = Color.Red.copy(alpha = 0.8f))
+                    }
+                }
+                Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), modifier = Modifier.padding(top = 8.dp))
+            }
+        }
+
+        // --- CHAMPION LIST ---
+        LazyColumn(
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            if (filteredChampions.isEmpty()) {
+                item {
+                    Text("No champions match your filters.", color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.fillMaxWidth().padding(32.dp), textAlign = TextAlign.Center)
+                }
+            } else {
+                items(filteredChampions) { champ ->
+                    val imageFileName = champ.image.full.takeIf { it.isNotEmpty() } ?: "${champ.id}.png"
+                    val patchVersion = champ.version ?: "14.23.1"
+                    val imageUrl = "https://ddragon.leagueoflegends.com/cdn/$patchVersion/img/champion/$imageFileName"
+
+                    Row(
                         modifier = Modifier
-                            .size(64.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .border(
-                                2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp)
-                            ),
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column {
-                        Text(
-                            text = champ.name,
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.titleLarge
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.surface)
+                            .clickable { onChampionClick(champ) }
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current).data(imageUrl).crossfade(true).error(R.mipmap.ic_launcher).build(),
+                            contentDescription = "${champ.name} Icon",
+                            modifier = Modifier
+                                .size(64.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
                         )
-                        Text(
-                            text = champ.title,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column {
+                            Text(text = champ.name, color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.titleLarge)
+                            Text(text = champ.title, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyMedium)
+                        }
                     }
                 }
             }
         }
     }
 }
-
 @Composable
 fun ChampionDetailScreen(champion: Champion) {
     val configuration = LocalConfiguration.current
