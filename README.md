@@ -44,7 +44,7 @@ Welcome, Summoner. **Champion Codex** is an offline-first, highly responsive And
 * 📊 **Deep-Dive Analytics:** Dive into the numbers. Shows over 20 specific base stats and per-level scalings (HP, MP, Attack Damage, Armor, Crit, etc.) mapped perfectly into a balanced UI grid.
 * ⚔️ **Combat Visualizers:** Custom Jetpack Compose progress bars that visually translate a champion's Attack, Defense, Magic, and Difficulty ratings out of 10.
 * 📱 **Responsive "Adaptive" UI:** The UI reacts to your device. Hold it in Portrait for a smooth scrolling experience, or tilt to Landscape for a split-screen tactical view (List on the left, details on the right).
-* 🔔 **System Alerts (Custom Snackbars):** Custom-themed snackbars with the app's logo notify you instantly whether you are pulling data from the live API or reading from offline storage.
+* 🔔 **System Alerts (Custom Snackbars):** Custom snackbars with the app's logo notify you instantly whether you are pulling data from the live API or reading from offline storage.
 * 👈 **Gesture Navigation:** Fully supports Android 13+ predictive back gestures for a buttery smooth user experience.
 
 ---
