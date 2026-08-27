@@ -24,3 +24,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "LOL Guide"
 include(":app")
+include(":domain")
+include(":data")
+include(":presentation")

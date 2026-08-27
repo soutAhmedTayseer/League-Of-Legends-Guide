@@ -1,8 +1,21 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
+
+// The Riot API key is machine-local and must never be committed (AGENTS.md section 8.2).
+// An absent or empty key is not an error: everything in Phases 0-3 is keyless,
+// and keyed features are expected to degrade to a "not configured" state.
+val riotApiKey: String = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) FileInputStream(file).use { load(it) }
+}.getProperty("RIOT_API_KEY").orEmpty()
 
 android {
     namespace = "com.example.lolguide"
@@ -20,6 +33,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "RIOT_API_KEY", "\"$riotApiKey\"")
     }
 
     buildTypes {
@@ -31,6 +45,7 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -38,46 +53,64 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
 dependencies {
+    implementation(project(":domain"))
+    implementation(project(":data"))
+    implementation(project(":presentation"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.core.splashscreen)
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material.icons.extended)
+    implementation(libs.androidx.navigation.compose)
 
-    // WorkManager for Kotlin
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+    ksp(libs.hilt.compiler)
 
-    // Retrofit & Gson (Network)
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-
-    // Coil for loading images in Compose
-    implementation("io.coil-kt:coil-compose:2.5.0")
-
-    // Bridge between LiveData (from WorkManager) and Compose State
-    implementation("androidx.compose.runtime:runtime-livedata")
-
-    // Room Database
-    implementation(libs.room.ktx)
+    // The Hilt modules in :app construct data-layer implementations, so :app
+    // needs the libraries those constructors take as parameters.
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.kotlinx.serialization)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.room.runtime)
-    ksp(libs.room.compiler)
+    implementation(libs.room.ktx)
+    implementation(libs.androidx.datastore.preferences)
 
-    // Gson (Needed for TypeConverters later)
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation(libs.kotlinx.collections.immutable)
+    implementation(libs.coil3.compose)
+    implementation(libs.coil3.network)
+    implementation(libs.timber)
 
-    testImplementation(libs.junit)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    testImplementation(libs.junit.jupiter.api)
+    testRuntimeOnly(libs.junit.jupiter.engine)
+    testRuntimeOnly(libs.junit.platform.launcher)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
