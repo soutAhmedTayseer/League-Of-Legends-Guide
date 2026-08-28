@@ -130,7 +130,7 @@ fun ChampionListScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.surface,
+                    containerColor = AppTheme.colors.background,
                 ),
             )
         },

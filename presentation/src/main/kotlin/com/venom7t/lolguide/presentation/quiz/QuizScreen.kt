@@ -105,7 +105,7 @@ fun QuizScreen(
                         modifier = Modifier.padding(end = AppTheme.dimens.spaceMd),
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = AppTheme.colors.surface),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = AppTheme.colors.background),
             )
         },
     ) { padding ->

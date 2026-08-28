@@ -107,7 +107,7 @@ fun SummonerProfileScreen(
             TopAppBar(
                 title = { Text(state.summoner?.riotId.orEmpty()) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.surface,
+                    containerColor = AppTheme.colors.background,
                     titleContentColor = AppTheme.colors.textPrimary,
                 ),
             )

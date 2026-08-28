@@ -95,7 +95,7 @@ fun RunesScreen(
                         state.patchVersion?.let { PatchBadge(version = it) }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = AppTheme.colors.surface),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = AppTheme.colors.background),
             )
         },
     ) { padding ->

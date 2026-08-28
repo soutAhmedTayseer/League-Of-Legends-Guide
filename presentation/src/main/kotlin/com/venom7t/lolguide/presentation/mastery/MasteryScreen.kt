@@ -79,7 +79,7 @@ fun MasteryScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.surface,
+                    containerColor = AppTheme.colors.background,
                     titleContentColor = AppTheme.colors.textPrimary,
                 ),
             )

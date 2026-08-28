@@ -145,7 +145,7 @@ fun ItemListScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.surface,
+                    containerColor = AppTheme.colors.background,
                 ),
             )
         },
