@@ -3,6 +3,7 @@ package com.venom7t.lolguide.presentation.home
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.usecase.ObserveChampionsUseCase
 import com.venom7t.lolguide.domain.item.usecase.ObservePurchasableItemsUseCase
 import com.venom7t.lolguide.domain.onboarding.model.Region
@@ -26,14 +27,32 @@ data class HomeState(
     /** Null means "not yet checked" or "genuinely nothing to compare against". */
     val hasWhatsNew: Boolean = false,
     /**
-     * Champion ids (Data Dragon string ids, already resolved from CHAMPION-V3's
-     * numeric keys via the cached champion list) for the current free
-     * rotation. Null while loading or when no Riot key is configured -- the
-     * card falls back to its Phase 3 "not configured" placeholder in that
+     * The current free rotation, resolved from CHAMPION-V3's numeric keys
+     * against the cached champion list. Null while loading or when no Riot
+     * key is configured -- the hero falls back to a patch summary in that
      * case (AGENTS.md §8.2), it does not show an error.
+     *
+     * Full [Champion]s rather than ids: the hero needs a display name, and
+     * deriving one from the Data Dragon id would print "MonkeyKing" instead
+     * of "Wukong".
      */
-    val freeRotationChampionIds: List<String>? = null,
-)
+    val freeRotation: List<Champion>? = null,
+    /**
+     * A champion picked from the local cache by date, so the hero has real
+     * art to show even with no Riot key and no network. Free rotation needs
+     * CHAMPION-V3, which is keyed and frequently unavailable (AGENTS.md
+     * §8.2); without this the hero would be a large empty band whenever
+     * that call fails, which reads as a bug rather than as a degraded
+     * feature.
+     */
+    val dailyChampion: Champion? = null,
+) {
+    /** The champion the hero leads with. */
+    val featured: Champion? get() = freeRotation?.firstOrNull() ?: dailyChampion
+
+    /** Drives the hero's eyebrow, so it never mislabels the daily pick as the rotation. */
+    val isFeaturedFreeRotation: Boolean get() = !freeRotation.isNullOrEmpty()
+}
 
 sealed interface HomeEvent {
     data object ScreenOpened : HomeEvent
@@ -71,6 +90,8 @@ class HomeViewModel @Inject constructor(
             _state.update { it.copy(patchVersion = patch.version, isPatchStale = patch.isStale) }
 
             val champions = observeChampions().first()
+            _state.update { it.copy(dailyChampion = champions.pickForToday()) }
+
             val items = observeItems().first()
             // Cheap existence check only -- the full diff computation happens
             // in WhatsNewViewModel when the user actually opens that screen.
@@ -84,10 +105,24 @@ class HomeViewModel @Inject constructor(
             // the rotation card is not the place to surface a Riot API error.
             val region = onboardingRepository.observePreferences().first().region ?: Region.NA
             getCurrentRotation(region).onSuccess { rotation ->
-                val keyToId = champions.associate { it.key.toIntOrNull() to it.id }
-                val championIds = rotation.championIds.mapNotNull { keyToId[it] }
-                _state.update { it.copy(freeRotationChampionIds = championIds) }
+                val byKey = champions.associateBy { it.key.toIntOrNull() }
+                val rotationChampions = rotation.championIds.mapNotNull { byKey[it] }
+                _state.update { it.copy(freeRotation = rotationChampions) }
             }
         }
     }
+}
+
+/**
+ * The same champion for the whole day, and the same one on every device.
+ *
+ * Keyed on days-since-epoch over a name-sorted list rather than
+ * [kotlin.random.Random], so the hero does not change on every recomposition
+ * or reshuffle when the screen is reopened. Uses millis rather than
+ * `java.time` because this module targets API 24 without desugaring.
+ */
+private fun List<Champion>.pickForToday(): Champion? {
+    if (isEmpty()) return null
+    val daysSinceEpoch = System.currentTimeMillis() / 86_400_000L
+    return sortedBy { it.id }[(daysSinceEpoch % size).toInt()]
 }

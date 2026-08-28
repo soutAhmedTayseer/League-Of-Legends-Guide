@@ -1,7 +1,7 @@
 package com.venom7t.lolguide.presentation.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -10,7 +10,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 data class AppShapes(
@@ -31,11 +33,22 @@ data class AppDimens(
     val abilityIcon: Dp,
 )
 
+/**
+ * Corners are **cut**, not rounded.
+ *
+ * This is the app's signature and the one shape decision everything else
+ * inherits: the League client frames its champion portraits, item slots and
+ * panels with a 45-degree chamfer, and adopting it here is what separates
+ * these surfaces from default Material cards. Changing these four values
+ * re-skins every card, frame, chip and button in the app at once.
+ */
 internal val defaultShapes = AppShapes(
-    small = RoundedCornerShape(4.dp),
-    medium = RoundedCornerShape(8.dp),
-    large = RoundedCornerShape(16.dp),
-    pill = RoundedCornerShape(percent = 50),
+    small = CutCornerShape(5.dp),
+    medium = CutCornerShape(10.dp),
+    large = CutCornerShape(14.dp),
+    // Deliberately not a true pill: a 50% cut would render as a diamond.
+    // A shallow chamfer reads as the same family as the cards around it.
+    pill = CutCornerShape(8.dp),
 )
 
 internal val defaultDimens = AppDimens(
@@ -72,7 +85,9 @@ fun AppTheme(
     content: @Composable () -> Unit,
 ) {
     val colors = if (useDarkTheme) DarkAppColors else LightAppColors
-    val typography = appTypography()
+    val typography = appTypography(
+        isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl,
+    )
 
     // Keep the Material scheme in step with our own roles so that any Material
     // component we do not skin still lands in the right palette.

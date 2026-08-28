@@ -11,11 +11,13 @@ import androidx.compose.ui.graphics.Color
  * with teal as the interactive accent.
  */
 internal object Palette {
-    // Blues -- the client's background family, darkest first.
-    val Abyss = Color(0xFF010A13)
+    // Blues -- the client's background family, darkest first. Every step
+    // stays on the blue axis: a neutral grey anywhere in this ramp reads as
+    // "dark theme" rather than as League, and kills the gold sitting on it.
+    val Abyss = Color(0xFF061018)
     val MidnightNavy = Color(0xFF0A1428)
-    val DeepNavy = Color(0xFF091428)
-    val SlateNavy = Color(0xFF1E2328)
+    val DeepNavy = Color(0xFF0F1D30)
+    val SlateNavy = Color(0xFF16273F)
     val Steel = Color(0xFF3C3C41)
     val Fog = Color(0xFF5B5A56)
 
@@ -24,19 +26,29 @@ internal object Palette {
     val Gold = Color(0xFFC8AA6E)
     val GoldDeep = Color(0xFFC89B3C)
     val GoldShadow = Color(0xFF785A28)
+    /** Secondary text on dark: gold desaturated far enough to stop competing with [Gold]. */
+    val GoldMuted = Color(0xFFA99781)
 
     // Teals -- hextech, used for interactive affordances.
     val HextechBright = Color(0xFF0AC8B9)
     val Hextech = Color(0xFF0397AB)
     val HextechDeep = Color(0xFF005A82)
 
-    // Neutrals for the light theme.
-    val Parchment = Color(0xFFF7F4EC)
-    val ParchmentDim = Color(0xFFEBE5D6)
-    val Ink = Color(0xFF1B1B1B)
-    val InkMuted = Color(0xFF55524B)
+    // Neutrals for the light theme. Parchment and gold leaf rather than
+    // white-on-cream, so the light theme carries the same identity as dark
+    // instead of reading as a generic light mode.
+    val Parchment = Color(0xFFEFE9DA)
+    val ParchmentRaised = Color(0xFFFBF8F1)
+    val ParchmentDim = Color(0xFFE4DCC7)
+    val Ink = Color(0xFF14100A)
+    val InkMuted = Color(0xFF5B5346)
 
     val White = Color(0xFFFFFFFF)
+
+    // Trim. Both themes frame surfaces with the same gold family at low
+    // alpha, which is what keeps the identity intact across the switch.
+    val GoldTrim = Color(0x6BC8AA6E)
+    val GoldTrimLight = Color(0x57785A28)
 
     // Status.
     val Ruby = Color(0xFFBE1E37)
@@ -77,15 +89,15 @@ data class AppColors(
 
 internal val DarkAppColors = AppColors(
     background = Palette.Abyss,
-    surface = Palette.MidnightNavy,
+    surface = Palette.DeepNavy,
     surfaceElevated = Palette.SlateNavy,
-    border = Palette.GoldShadow,
-    primary = Palette.GoldDeep,
+    border = Palette.GoldTrim,
+    primary = Palette.Gold,
     onPrimary = Palette.Abyss,
     accent = Palette.HextechBright,
     onAccent = Palette.Abyss,
     textPrimary = Palette.GoldBright,
-    textSecondary = Palette.Gold,
+    textSecondary = Palette.GoldMuted,
     textDisabled = Palette.Fog,
     error = Palette.Ruby,
     warning = Palette.Amber,
@@ -99,9 +111,9 @@ internal val DarkAppColors = AppColors(
 
 internal val LightAppColors = AppColors(
     background = Palette.Parchment,
-    surface = Palette.White,
+    surface = Palette.ParchmentRaised,
     surfaceElevated = Palette.ParchmentDim,
-    border = Palette.Gold,
+    border = Palette.GoldTrimLight,
     primary = Palette.GoldShadow,
     onPrimary = Palette.White,
     accent = Palette.HextechDeep,

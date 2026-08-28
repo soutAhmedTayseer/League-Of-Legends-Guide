@@ -253,9 +253,20 @@
     <string name="home_whats_new_teaser">What\'s new this patch</string>
     <string name="home_whats_new_open">View changes</string>
     <string name="home_whats_new_unavailable">Nothing to compare yet -- check back after the next patch.</string>
-    <string name="home_quick_links_title">Quick links</string>
+    <string name="home_quick_links_title">Armory</string>
     <string name="home_rotation_placeholder_title">Free champion rotation</string>
     <string name="home_rotation_placeholder_body">Coming in a future update -- this needs a Riot API key.</string>
+    <string name="home_wordmark">LOL Guide</string>
+    <string name="home_daily_champion">Champion of the day</string>
+    <string name="home_rotation_title">Free rotation</string>
+    <string name="home_rotation_count">%1$d free</string>
+    <string name="home_summoners_title">Summoners</string>
+    <string name="home_tool_riddle">Guess the champion</string>
+    <string name="home_tool_simulator">Simulate and save builds</string>
+    <string name="home_tool_timers">Baron, drakes, spells</string>
+    <string name="home_tool_roulette">Pick one for me</string>
+    <string name="home_tool_quiz">Test what you know</string>
+    <string name="home_tool_ladder">Top of the ranked ladder</string>
 
     <!-- Phase 3: what's new / patch diff -->
     <string name="whats_new_title">What\'s new</string>

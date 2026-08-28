@@ -253,9 +253,20 @@
     <string name="home_whats_new_teaser">ما الجديد في هذا التحديث</string>
     <string name="home_whats_new_open">عرض التغييرات</string>
     <string name="home_whats_new_unavailable">لا يوجد شيء للمقارنة بعد -- تحقق مرة أخرى بعد التحديث القادم.</string>
-    <string name="home_quick_links_title">روابط سريعة</string>
+    <string name="home_quick_links_title">الترسانة</string>
     <string name="home_rotation_placeholder_title">التناوب المجاني للأبطال</string>
     <string name="home_rotation_placeholder_body">قادم في تحديث مستقبلي -- يتطلب مفتاح Riot API.</string>
+    <string name="home_wordmark">دليل ليج</string>
+    <string name="home_daily_champion">بطل اليوم</string>
+    <string name="home_rotation_title">التناوب المجاني</string>
+    <string name="home_rotation_count">%1$d مجاني</string>
+    <string name="home_summoners_title">المستدعون</string>
+    <string name="home_tool_riddle">خمّن البطل</string>
+    <string name="home_tool_simulator">حاكِ البناءات واحفظها</string>
+    <string name="home_tool_timers">بارون، التنانين، التعويذات</string>
+    <string name="home_tool_roulette">اختر لي بطلًا</string>
+    <string name="home_tool_quiz">اختبر معلوماتك</string>
+    <string name="home_tool_ladder">قمة سلم التصنيف</string>
 
     <!-- Phase 3: what's new / patch diff -->
     <string name="whats_new_title">ما الجديد</string>
