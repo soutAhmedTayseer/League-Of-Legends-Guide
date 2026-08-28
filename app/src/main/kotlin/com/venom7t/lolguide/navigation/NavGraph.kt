@@ -36,6 +36,7 @@ import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.compare.CompareScreenRoot
 import com.venom7t.lolguide.presentation.favourite.FavouritesScreenRoot
 import com.venom7t.lolguide.presentation.account.AccountScreenRoot
+import com.venom7t.lolguide.presentation.account.SignInGateScreenRoot
 import com.venom7t.lolguide.presentation.followed.FollowedSummonersScreenRoot
 import com.venom7t.lolguide.presentation.game.hub.GameHubScreenRoot
 import com.venom7t.lolguide.presentation.game.round.GameRoundScreenRoot
@@ -53,6 +54,7 @@ import com.venom7t.lolguide.presentation.navigation.ChampionListRoute
 import com.venom7t.lolguide.presentation.navigation.CompareRoute
 import com.venom7t.lolguide.presentation.navigation.FavouritesRoute
 import com.venom7t.lolguide.presentation.navigation.AccountRoute
+import com.venom7t.lolguide.presentation.navigation.SignInGateRoute
 import com.venom7t.lolguide.presentation.navigation.FollowedSummonersRoute
 import com.venom7t.lolguide.presentation.navigation.GameHubRoute
 import com.venom7t.lolguide.presentation.navigation.GameRoundRoute
@@ -110,7 +112,12 @@ fun LolGuideNavGraph(
     }
 
     LolGuideNavGraphContent(
-        startDestination = if (readyState.hasCompletedOnboarding) HomeRoute else OnboardingRoute,
+        startDestination = when {
+            readyState.needsGoogleSignIn -> SignInGateRoute
+            readyState.hasCompletedOnboarding -> HomeRoute
+            else -> OnboardingRoute
+        },
+        hasCompletedOnboarding = readyState.hasCompletedOnboarding,
         modifier = modifier,
         navController = navController,
     )
@@ -119,6 +126,7 @@ fun LolGuideNavGraph(
 @Composable
 private fun LolGuideNavGraphContent(
     startDestination: Any,
+    hasCompletedOnboarding: Boolean,
     modifier: Modifier = Modifier,
     navController: NavHostController,
 ) {
@@ -178,6 +186,16 @@ private fun LolGuideNavGraphContent(
                 .fillMaxSize()
                 .padding(padding),
         ) {
+            composable<SignInGateRoute> {
+                SignInGateScreenRoot(
+                    onSignedIn = {
+                        navController.navigate(if (hasCompletedOnboarding) HomeRoute else OnboardingRoute) {
+                            popUpTo(SignInGateRoute) { inclusive = true }
+                        }
+                    },
+                )
+            }
+
             composable<OnboardingRoute> {
                 OnboardingScreenRoot(
                     onFinished = {

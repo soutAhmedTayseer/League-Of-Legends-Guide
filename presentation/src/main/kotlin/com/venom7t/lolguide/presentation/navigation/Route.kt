@@ -95,6 +95,10 @@ data object FollowedSummonersRoute
 @Serializable
 data object AccountRoute
 
+/** The mandatory sign-in gate a fresh install lands on before anything else. */
+@Serializable
+data object SignInGateRoute
+
 @Serializable
 data object GameHubRoute
 

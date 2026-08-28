@@ -353,5 +353,7 @@
     <string name="account_sign_out">تسجيل الخروج</string>
     <string name="account_sign_in_error">تعذّر تسجيل الدخول. حاول مرة أخرى.</string>
     <string name="account_sign_in_benefit">سجّل الدخول للاحتفاظ بمفضلتك واللاعبين المتابَعين عند تغيير هاتفك.</string>
+    <string name="sign_in_gate_title">سجّل الدخول للمتابعة</string>
+    <string name="sign_in_gate_body">يحافظ تسجيل الدخول عبر Google على مفضلتك واللاعبين المتابَعين -- بدونه، سيؤدي حذف التطبيق إلى فقدانهم نهائيًا.</string>
 
 </resources>

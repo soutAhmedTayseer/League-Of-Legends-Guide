@@ -69,7 +69,7 @@ fun AccountScreenRoot(
  * for the system UI -- everything past the token itself stays in
  * [AccountViewModel] and :domain.
  */
-private suspend fun launchGoogleSignIn(
+internal suspend fun launchGoogleSignIn(
     context: android.content.Context,
     viewModel: AccountViewModel,
 ) {

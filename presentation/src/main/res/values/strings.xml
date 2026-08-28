@@ -356,5 +356,7 @@
     <string name="account_sign_out">Sign out</string>
     <string name="account_sign_in_error">Couldn\'t sign in. Try again.</string>
     <string name="account_sign_in_benefit">Sign in to keep your favourites and followed summoners if you switch phones.</string>
+    <string name="sign_in_gate_title">Sign in to continue</string>
+    <string name="sign_in_gate_body">A Google sign-in keeps your favourites and followed summoners safe -- without it, uninstalling the app loses them for good.</string>
 
 </resources>

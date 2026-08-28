@@ -2,6 +2,8 @@ package com.venom7t.lolguide.navigation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.venom7t.lolguide.domain.auth.usecase.EnsureSignedInUseCase
+import com.venom7t.lolguide.domain.auth.usecase.ObserveAccountUseCase
 import com.venom7t.lolguide.domain.onboarding.repository.OnboardingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,13 +18,20 @@ import javax.inject.Inject
  * Decides the app's start destination once, before the NavHost is created.
  *
  * The NavHost needs a single, immediate `startDestination` -- it cannot be
- * changed after first composition -- so onboarding completion has to be known
- * before the NavHost exists at all, not discovered mid-navigation. This
- * exists purely to gate that one read; nothing else in the app needs it.
+ * changed after first composition -- so onboarding completion (and, since
+ * the Google sign-in addendum, whether the session is still anonymous) has
+ * to be known before the NavHost exists at all, not discovered mid-navigation.
+ *
+ * Google sign-in is mandatory (owner decision): an anonymous session is
+ * exactly what caused synced data to become unreachable after an uninstall,
+ * so a fresh install is routed to the sign-in gate before anything else,
+ * every time, rather than letting the user postpone it and lose data again.
  */
 @HiltViewModel
 class AppStartViewModel @Inject constructor(
     private val onboardingRepository: OnboardingRepository,
+    private val ensureSignedIn: EnsureSignedInUseCase,
+    private val observeAccount: ObserveAccountUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<AppStartState>(AppStartState.Loading)
@@ -30,13 +39,25 @@ class AppStartViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            // A baseline anonymous session must exist before observeAccount()
+            // has anything to report -- this is the same bootstrap
+            // SyncOnStartUseCase performs, just needed a little earlier here
+            // since the sign-in gate itself depends on knowing isAnonymous.
+            ensureSignedIn()
+
+            val account = observeAccount().first()
             val hasCompleted = onboardingRepository.observePreferences().first().hasCompletedOnboarding
-            _state.update { AppStartState.Ready(hasCompletedOnboarding = hasCompleted) }
+            _state.update {
+                AppStartState.Ready(
+                    needsGoogleSignIn = account == null || account.isAnonymous,
+                    hasCompletedOnboarding = hasCompleted,
+                )
+            }
         }
     }
 }
 
 sealed interface AppStartState {
     data object Loading : AppStartState
-    data class Ready(val hasCompletedOnboarding: Boolean) : AppStartState
+    data class Ready(val needsGoogleSignIn: Boolean, val hasCompletedOnboarding: Boolean) : AppStartState
 }
