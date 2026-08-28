@@ -327,4 +327,21 @@
     <string name="clash_not_registered">غير مسجل في فريق كلاش حاليًا.</string>
     <string name="clash_tier">المستوى %1$d</string>
 
+    <!-- Phase 6: champion riddle -->
+    <string name="game_hub_title">لغز البطل</string>
+    <string name="game_hub_streak">سلسلة %1$d</string>
+    <string name="game_hub_best_streak">الأفضل %1$d</string>
+    <string name="game_hub_win_rate">%1$d%% فوز</string>
+    <string name="game_mode_classic">كلاسيكي</string>
+    <string name="game_mode_classic_description">خمّن البطل. كل تخمين يقارن خمس خصائص مع الإجابة.</string>
+    <string name="game_mode_ability">مهارة</string>
+    <string name="game_mode_ability_description">خمّن من أيقونة مهارة واحدة بدون أي سياق آخر.</string>
+    <string name="game_mode_splash">صورة</string>
+    <string name="game_mode_splash_description">خمّن من صورة مقصوصة. كل تخمين خاطئ يوسّع العرض.</string>
+    <string name="game_round_guess_hint">خمّن بطلاً</string>
+    <string name="game_round_guesses_remaining">%1$d تخمينات متبقية</string>
+    <string name="game_round_won">أحسنت، خمّنت بشكل صحيح!</string>
+    <string name="game_round_lost">نفدت التخمينات</string>
+    <string name="game_round_answer_was">الإجابة كانت %1$s</string>
+
 </resources>

@@ -327,4 +327,21 @@
     <string name="clash_not_registered">Not registered for a Clash team right now.</string>
     <string name="clash_tier">Tier %1$d</string>
 
+    <!-- Phase 6: champion riddle -->
+    <string name="game_hub_title">Champion riddle</string>
+    <string name="game_hub_streak">Streak %1$d</string>
+    <string name="game_hub_best_streak">Best %1$d</string>
+    <string name="game_hub_win_rate">%1$d%% wins</string>
+    <string name="game_mode_classic">Classic</string>
+    <string name="game_mode_classic_description">Guess the champion. Every guess scores five attributes against the answer.</string>
+    <string name="game_mode_ability">Ability</string>
+    <string name="game_mode_ability_description">Guess from one ability icon, no other context.</string>
+    <string name="game_mode_splash">Splash</string>
+    <string name="game_mode_splash_description">Guess from a cropped splash. Each wrong guess zooms out.</string>
+    <string name="game_round_guess_hint">Guess a champion</string>
+    <string name="game_round_guesses_remaining">%1$d guesses remaining</string>
+    <string name="game_round_won">You got it!</string>
+    <string name="game_round_lost">Out of guesses</string>
+    <string name="game_round_answer_was">The answer was %1$s</string>
+
 </resources>

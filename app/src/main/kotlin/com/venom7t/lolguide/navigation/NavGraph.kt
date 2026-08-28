@@ -36,6 +36,8 @@ import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.compare.CompareScreenRoot
 import com.venom7t.lolguide.presentation.favourite.FavouritesScreenRoot
 import com.venom7t.lolguide.presentation.followed.FollowedSummonersScreenRoot
+import com.venom7t.lolguide.presentation.game.hub.GameHubScreenRoot
+import com.venom7t.lolguide.presentation.game.round.GameRoundScreenRoot
 import com.venom7t.lolguide.presentation.home.HomeScreenRoot
 import com.venom7t.lolguide.presentation.item.ItemDetailScreenRoot
 import com.venom7t.lolguide.presentation.item.ItemListScreenRoot
@@ -50,6 +52,8 @@ import com.venom7t.lolguide.presentation.navigation.ChampionListRoute
 import com.venom7t.lolguide.presentation.navigation.CompareRoute
 import com.venom7t.lolguide.presentation.navigation.FavouritesRoute
 import com.venom7t.lolguide.presentation.navigation.FollowedSummonersRoute
+import com.venom7t.lolguide.presentation.navigation.GameHubRoute
+import com.venom7t.lolguide.presentation.navigation.GameRoundRoute
 import com.venom7t.lolguide.presentation.navigation.GameTimersRoute
 import com.venom7t.lolguide.presentation.navigation.HomeRoute
 import com.venom7t.lolguide.presentation.navigation.ItemDetailRoute
@@ -191,6 +195,7 @@ private fun LolGuideNavGraphContent(
                     onNavigateToTimers = { navController.navigate(GameTimersRoute) },
                     onNavigateToLadder = { navController.navigate(LadderRoute) },
                     onNavigateToFollowedSummoners = { navController.navigate(FollowedSummonersRoute) },
+                    onNavigateToGame = { navController.navigate(GameHubRoute) },
                 )
             }
 
@@ -204,6 +209,17 @@ private fun LolGuideNavGraphContent(
 
             composable<GameTimersRoute> {
                 GameTimersScreenRoot(onNavigateBack = { navController.popBackStack() })
+            }
+
+            composable<GameHubRoute> {
+                GameHubScreenRoot(
+                    onNavigateToRound = { mode -> navController.navigate(GameRoundRoute(mode = mode.name)) },
+                    onBack = { navController.popBackStack() },
+                )
+            }
+
+            composable<GameRoundRoute> {
+                GameRoundScreenRoot(onBack = { navController.popBackStack() })
             }
 
             composable<ChampionListRoute> {

@@ -93,6 +93,12 @@ data object LadderRoute
 data object FollowedSummonersRoute
 
 @Serializable
+data object GameHubRoute
+
+@Serializable
+data class GameRoundRoute(val mode: String)
+
+@Serializable
 data class LpHistoryRoute(
     val puuid: String,
     val riotIdName: String,
