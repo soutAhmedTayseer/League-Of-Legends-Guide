@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.lolguide.data.champion.local.ChampionDao
 import com.example.lolguide.data.common.local.LolGuideDatabase
+import com.example.lolguide.data.favourite.local.FavouriteChampionDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,13 +20,17 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): LolGuideDatabase =
         Room.databaseBuilder(context, LolGuideDatabase::class.java, LolGuideDatabase.NAME)
-            // Acceptable only while everything stored is a rebuildable CDN
-            // cache: on a schema change the app simply re-downloads. This must
-            // be replaced with real migrations before Phase 1 adds favourites,
-            // which are user-authored data that cannot be regenerated.
-            .fallbackToDestructiveMigration(dropAllTables = true)
+            // Destructive fallback was acceptable in Phase 0 when the only
+            // content was a rebuildable CDN cache. Favourites are user-authored
+            // and cannot be re-downloaded, so schema changes migrate properly
+            // from here on.
+            .addMigrations(LolGuideDatabase.MIGRATION_1_2)
             .build()
 
     @Provides
     fun provideChampionDao(database: LolGuideDatabase): ChampionDao = database.championDao()
+
+    @Provides
+    fun provideFavouriteChampionDao(database: LolGuideDatabase): FavouriteChampionDao =
+        database.favouriteChampionDao()
 }

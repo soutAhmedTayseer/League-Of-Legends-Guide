@@ -80,6 +80,23 @@ data class ChampionDetailDto(
     val lore: String = "",
     val passive: PassiveDto = PassiveDto(),
     val spells: List<SpellDto> = emptyList(),
+    /**
+     * Skins ship inside the existing champion detail payload, so the gallery
+     * costs no additional request.
+     */
+    val skins: List<SkinDto> = emptyList(),
+)
+
+@Serializable
+data class SkinDto(
+    val id: String = "",
+    /**
+     * The index used in splash and loading art paths. Distinct from [id];
+     * using [id] in an image URL 404s.
+     */
+    val num: Int = 0,
+    val name: String = "",
+    val chromas: Boolean = false,
 )
 
 @Serializable

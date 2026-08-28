@@ -11,6 +11,7 @@ data class ChampionDetail(
     val lore: String,
     val passive: Passive,
     val spells: List<Spell>,
+    val skins: List<Skin>,
     val patchVersion: String,
 )
 

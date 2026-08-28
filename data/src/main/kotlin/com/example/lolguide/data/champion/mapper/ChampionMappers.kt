@@ -11,6 +11,7 @@ import com.example.lolguide.domain.champion.model.ChampionInfo
 import com.example.lolguide.domain.champion.model.ChampionStats
 import com.example.lolguide.domain.champion.model.ChampionTag
 import com.example.lolguide.domain.champion.model.Passive
+import com.example.lolguide.domain.champion.model.Skin
 import com.example.lolguide.domain.champion.model.Spell
 import com.example.lolguide.domain.champion.model.SpellSlot
 import com.example.lolguide.domain.common.AppLocale
@@ -110,6 +111,14 @@ fun ChampionDetailDto.toDomain(championId: String, patchVersion: String) = Champ
         description = passive.description,
         imageFileName = passive.image.full,
     ),
+    skins = skins.map { skin ->
+        Skin(
+            id = skin.id,
+            num = skin.num,
+            name = skin.name,
+            hasChromas = skin.chromas,
+        )
+    },
     // Data Dragon orders `spells` Q, W, E, R. Anything beyond the fourth entry
     // is not a keybound ability and is dropped rather than mislabelled.
     spells = spells.mapIndexedNotNull { index, dto ->

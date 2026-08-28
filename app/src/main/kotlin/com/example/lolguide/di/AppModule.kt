@@ -6,11 +6,13 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.example.lolguide.data.champion.repository.ChampionRepositoryImpl
+import com.example.lolguide.data.favourite.repository.FavouritesRepositoryImpl
 import com.example.lolguide.data.common.di.DefaultDispatcher
 import com.example.lolguide.data.common.di.IoDispatcher
 import com.example.lolguide.data.patch.repository.PatchRepositoryImpl
 import com.example.lolguide.domain.champion.repository.ChampionRepository
 import com.example.lolguide.domain.common.AppLocale
+import com.example.lolguide.domain.favourite.repository.FavouritesRepository
 import com.example.lolguide.domain.patch.repository.PatchRepository
 import dagger.Binds
 import dagger.Module
@@ -41,6 +43,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPatchRepository(impl: PatchRepositoryImpl): PatchRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFavouritesRepository(impl: FavouritesRepositoryImpl): FavouritesRepository
 }
 
 @Module
