@@ -10,7 +10,11 @@ import com.venom7t.lolguide.data.champion.local.ChampionEntity
 import com.venom7t.lolguide.data.favourite.local.FavouriteChampionDao
 import com.venom7t.lolguide.data.favourite.local.FavouriteChampionEntity
 import com.venom7t.lolguide.data.item.local.ItemDao
+import com.venom7t.lolguide.data.followed.local.FollowedSummonerDao
+import com.venom7t.lolguide.data.followed.local.FollowedSummonerEntity
 import com.venom7t.lolguide.data.item.local.ItemEntity
+import com.venom7t.lolguide.data.match.local.MatchDao
+import com.venom7t.lolguide.data.match.local.MatchEntity
 import com.venom7t.lolguide.data.patch.local.PreviousPatchSnapshotDao
 import com.venom7t.lolguide.data.patch.local.PreviousPatchSnapshotEntity
 
@@ -20,8 +24,10 @@ import com.venom7t.lolguide.data.patch.local.PreviousPatchSnapshotEntity
         FavouriteChampionEntity::class,
         ItemEntity::class,
         PreviousPatchSnapshotEntity::class,
+        MatchEntity::class,
+        FollowedSummonerEntity::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -34,6 +40,10 @@ abstract class LolGuideDatabase : RoomDatabase() {
     abstract fun itemDao(): ItemDao
 
     abstract fun previousPatchSnapshotDao(): PreviousPatchSnapshotDao
+
+    abstract fun matchDao(): MatchDao
+
+    abstract fun followedSummonerDao(): FollowedSummonerDao
 
     companion object {
         const val NAME = "lol_guide.db"
@@ -124,6 +134,40 @@ abstract class LolGuideDatabase : RoomDatabase() {
                         `version` TEXT NOT NULL,
                         `payloadJson` TEXT NOT NULL,
                         PRIMARY KEY(`kind`)
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
+        /**
+         * Adds the permanent match cache and the local (Phase 4, owner
+         * decision) followed-summoners list. Neither is patch-scoped data:
+         * a finished match cannot change once played, and a followed
+         * summoner is user-authored, so both need a real migration for the
+         * same reason favourites did in v1->v2.
+         */
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `cached_matches` (
+                        `matchId` TEXT NOT NULL,
+                        `payloadJson` TEXT NOT NULL,
+                        `cachedAtEpochMillis` INTEGER NOT NULL,
+                        PRIMARY KEY(`matchId`)
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `followed_summoners` (
+                        `puuid` TEXT NOT NULL,
+                        `riotIdName` TEXT NOT NULL,
+                        `riotIdTagline` TEXT NOT NULL,
+                        `regionName` TEXT NOT NULL,
+                        `followedAtEpochMillis` INTEGER NOT NULL,
+                        PRIMARY KEY(`puuid`)
                     )
                     """.trimIndent()
                 )

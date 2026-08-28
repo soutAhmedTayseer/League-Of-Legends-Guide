@@ -8,11 +8,19 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.venom7t.lolguide.data.champion.repository.ChampionRepositoryImpl
 import com.venom7t.lolguide.data.favourite.repository.FavouritesRepositoryImpl
+import com.venom7t.lolguide.data.followed.repository.FollowedSummonerRepositoryImpl
 import com.venom7t.lolguide.data.item.repository.ItemRepositoryImpl
+import com.venom7t.lolguide.data.ladder.repository.LadderRepositoryImpl
+import com.venom7t.lolguide.data.livegame.repository.LiveGameRepositoryImpl
+import com.venom7t.lolguide.data.mastery.repository.MasteryRepositoryImpl
+import com.venom7t.lolguide.data.match.repository.MatchRepositoryImpl
 import com.venom7t.lolguide.data.onboarding.repository.OnboardingRepositoryImpl
 import com.venom7t.lolguide.data.patch.repository.PreviousPatchSnapshotRepositoryImpl
+import com.venom7t.lolguide.data.rotation.repository.RotationRepositoryImpl
 import com.venom7t.lolguide.data.rune.repository.RuneRepositoryImpl
 import com.venom7t.lolguide.data.spell.repository.SummonerSpellRepositoryImpl
+import com.venom7t.lolguide.data.status.repository.ServerStatusRepositoryImpl
+import com.venom7t.lolguide.data.summoner.repository.SummonerRepositoryImpl
 import com.venom7t.lolguide.data.voiceline.repository.VoiceLineRepositoryImpl
 import com.venom7t.lolguide.data.common.di.DefaultDispatcher
 import com.venom7t.lolguide.data.common.di.IoDispatcher
@@ -20,11 +28,19 @@ import com.venom7t.lolguide.data.patch.repository.PatchRepositoryImpl
 import com.venom7t.lolguide.domain.champion.repository.ChampionRepository
 import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.favourite.repository.FavouritesRepository
+import com.venom7t.lolguide.domain.followed.repository.FollowedSummonerRepository
 import com.venom7t.lolguide.domain.item.repository.ItemRepository
+import com.venom7t.lolguide.domain.ladder.repository.LadderRepository
+import com.venom7t.lolguide.domain.livegame.repository.LiveGameRepository
+import com.venom7t.lolguide.domain.mastery.repository.MasteryRepository
+import com.venom7t.lolguide.domain.match.repository.MatchRepository
 import com.venom7t.lolguide.domain.onboarding.repository.OnboardingRepository
 import com.venom7t.lolguide.domain.patch.repository.PreviousPatchSnapshotRepository
+import com.venom7t.lolguide.domain.rotation.repository.RotationRepository
 import com.venom7t.lolguide.domain.rune.repository.RuneRepository
 import com.venom7t.lolguide.domain.spell.repository.SummonerSpellRepository
+import com.venom7t.lolguide.domain.status.repository.ServerStatusRepository
+import com.venom7t.lolguide.domain.summoner.repository.SummonerRepository
 import com.venom7t.lolguide.domain.voiceline.repository.VoiceLineRepository
 import com.venom7t.lolguide.domain.patch.repository.PatchRepository
 import dagger.Binds
@@ -88,6 +104,40 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindVoiceLineRepository(impl: VoiceLineRepositoryImpl): VoiceLineRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSummonerRepository(impl: SummonerRepositoryImpl): SummonerRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMatchRepository(impl: MatchRepositoryImpl): MatchRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLiveGameRepository(impl: LiveGameRepositoryImpl): LiveGameRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMasteryRepository(impl: MasteryRepositoryImpl): MasteryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLadderRepository(impl: LadderRepositoryImpl): LadderRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindServerStatusRepository(impl: ServerStatusRepositoryImpl): ServerStatusRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRotationRepository(impl: RotationRepositoryImpl): RotationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFollowedSummonerRepository(
+        impl: FollowedSummonerRepositoryImpl,
+    ): FollowedSummonerRepository
 }
 
 @Module

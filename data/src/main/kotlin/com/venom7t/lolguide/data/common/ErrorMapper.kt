@@ -1,5 +1,6 @@
 package com.venom7t.lolguide.data.common
 
+import com.venom7t.lolguide.data.riot.remote.MissingApiKeyException
 import com.venom7t.lolguide.domain.common.AppError
 import kotlinx.serialization.SerializationException
 import retrofit2.HttpException
@@ -26,6 +27,12 @@ fun Throwable.toAppError(): AppError = when (this) {
         )
         else -> AppError.Http(code = code(), body = message())
     }
+
+    // Must be checked before the generic IOException case below, since this
+    // is itself an IOException subtype (thrown from inside an OkHttp
+    // interceptor, which only accepts IOException) but means something
+    // different: "no key configured", not "network unreachable".
+    is MissingApiKeyException -> AppError.ApiKeyMissing
 
     // OkHttp surfaces every connectivity problem as an IOException subclass:
     // no DNS, no route, timeout, connection reset.

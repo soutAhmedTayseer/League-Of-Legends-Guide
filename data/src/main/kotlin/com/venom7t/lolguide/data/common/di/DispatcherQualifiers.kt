@@ -31,3 +31,14 @@ annotation class DataDragonRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class RiotApiRetrofit
+
+/**
+ * The Riot API key, read from `local.properties` and surfaced as a
+ * `BuildConfig` field in `:app` (AGENTS.md §8.2). Exposed to `:data` through
+ * this qualifier rather than a direct `BuildConfig` reference, since `:data`
+ * cannot import `:app`'s generated class -- the module dependency runs the
+ * other way (`app` depends on `data`, never the reverse, AGENTS.md §3).
+ */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class RiotApiKey

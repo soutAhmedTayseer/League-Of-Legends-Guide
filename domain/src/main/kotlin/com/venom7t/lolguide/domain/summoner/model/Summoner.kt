@@ -12,6 +12,8 @@ import com.venom7t.lolguide.domain.onboarding.model.Region
  */
 data class Summoner(
     val puuid: String,
+    /** LEAGUE-V4's by-summoner path still keys on this, not puuid. */
+    val summonerId: String,
     val riotIdName: String,
     val riotIdTagline: String,
     val summonerLevel: Long,
