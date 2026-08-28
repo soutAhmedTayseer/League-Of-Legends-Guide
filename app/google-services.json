@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "404574107891",
+    "project_id": "lol-guide-c5ce3",
+    "storage_bucket": "lol-guide-c5ce3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:404574107891:android:a8af870e1965aaa4c21f86",
+        "android_client_info": {
+          "package_name": "com.venom7t.lolguide"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbo496ZkW9T813GFIDoUYT-ikwU4hagpk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

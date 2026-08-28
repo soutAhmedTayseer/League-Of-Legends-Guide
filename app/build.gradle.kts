@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.services)
 }
 
 // The Riot API key is machine-local and must never be committed (AGENTS.md section 8.2).
@@ -98,6 +99,13 @@ dependencies {
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
     implementation(libs.timber)
+
+    // Phase 5: live service. The BoM pins every Firebase artifact's version,
+    // so individual firebase-* libraries below declare no version of their own.
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 
