@@ -26,3 +26,20 @@ data object RouletteRoute
 
 @Serializable
 data object CompareRoute
+
+// --- Phase 2: items, builds and references ---
+
+@Serializable
+data object ItemListRoute
+
+@Serializable
+data class ItemDetailRoute(val itemId: String)
+
+@Serializable
+data object BuildSimulatorRoute
+
+@Serializable
+data object RunesRoute
+
+@Serializable
+data object SummonerSpellsRoute

@@ -136,4 +136,71 @@
     <string name="nav_champions">الأبطال</string>
     <string name="nav_favourites">المفضلة</string>
 
+    <!-- Phase 2: items -->
+    <string name="items_title">العناصر</string>
+    <string name="items_search_hint">ابحث عن عنصر</string>
+    <string name="items_empty">لا توجد عناصر محفوظة بعد.</string>
+    <string name="items_no_results">لا يوجد عنصر يطابق هذا البحث.</string>
+    <string name="item_icon">أيقونة %1$s</string>
+    <string name="item_cost">%1$d ذهب</string>
+    <string name="item_cost_combine">%1$d للتجميع</string>
+    <string name="item_sell">يُباع بـ %1$d</string>
+    <string name="item_stats">الإحصائيات</string>
+    <string name="item_build_path">مسار البناء</string>
+    <string name="item_components">يُبنى من</string>
+    <string name="item_builds_into">يُبنى إلى</string>
+    <string name="item_no_build_path">لا يحتوي هذا العنصر على مكونات ولا يُبنى إلى شيء.</string>
+
+    <!-- Phase 2: gold efficiency -->
+    <string name="efficiency_title">كفاءة الذهب</string>
+    <string name="efficiency_value">%1$d%%</string>
+    <string name="efficiency_stat_value">قيمة الإحصائيات نحو %1$d ذهب</string>
+    <string name="efficiency_partial">جزئي: إحصائية واحدة على الأقل بلا سعر مرجعي في هذا التحديث.</string>
+    <string name="efficiency_unavailable">لا تنشر Riot إحصائيات قابلة للقراءة الآلية لهذا العنصر، لذا يتعذر حساب كفاءته.</string>
+    <string name="efficiency_note">تقدير يعتمد على تسعير كل إحصائية مقابل العنصر الأساسي الذي يبيعها في هذا التحديث. لا يمكنه تسعير القدرات الكامنة أو المفعّلة، لذا قد يظهر عنصر قوي بأقل من ١٠٠%%.</string>
+
+    <!-- Phase 2: stat names -->
+    <string name="stat_ability_power">القوة السحرية</string>
+    <string name="stat_mana">المانا</string>
+    <string name="stat_crit_chance">الضربة الحاسمة</string>
+    <string name="stat_life_steal">امتصاص الحياة</string>
+    <string name="stat_percent_suffix">%1$s%%</string>
+
+    <!-- Phase 2: build simulator -->
+    <string name="simulator_title">محاكي البناء</string>
+    <string name="simulator_open">محاكي البناء</string>
+    <string name="simulator_pick_champion">اختر بطلًا</string>
+    <string name="simulator_change_champion">تغيير البطل</string>
+    <string name="simulator_add_item">إضافة عنصر</string>
+    <string name="simulator_remove_item">إزالة %1$s</string>
+    <string name="simulator_slot_empty">خانة فارغة</string>
+    <string name="simulator_totals">الإجماليات عند المستوى %1$d</string>
+    <string name="simulator_total_gold">تكلفة البناء %1$d ذهب</string>
+    <string name="simulator_ehp_physical">الصحة الفعالة ضد الفيزيائي</string>
+    <string name="simulator_ehp_magic">الصحة الفعالة ضد السحري</string>
+    <string name="simulator_dps">ضرر الهجوم في الثانية</string>
+    <string name="simulator_assumptions_title">يفترض رقم الضرر ما يلي:</string>
+    <string name="assumption_no_armor">الهدف بلا درع</string>
+    <string name="assumption_autos_only">هجمات عادية فقط، بدون قدرات</string>
+    <string name="assumption_no_passives">بدون قدرات كامنة أو مفعّلة للعناصر</string>
+    <string name="assumption_default_crit">ضربات حاسمة بضرر ١٧٥%% الافتراضي</string>
+    <string name="simulator_unpublished_stats">عنصر واحد أو أكثر بلا إحصائيات منشورة، لذا هذه الإجماليات أقل من البناء الفعلي.</string>
+    <string name="simulator_empty">اختر بطلًا لبدء البناء.</string>
+
+    <!-- Phase 2: runes -->
+    <string name="runes_title">الرونات</string>
+    <string name="runes_open">الرونات</string>
+    <string name="rune_keystones">الرونات الأساسية</string>
+    <string name="rune_icon">أيقونة رونة %1$s</string>
+
+    <!-- Phase 2: summoner spells -->
+    <string name="spells_title">تعويذات المستدعي</string>
+    <string name="spells_open">تعويذات المستدعي</string>
+    <string name="spell_cooldown">زمن انتظار %1$s ثانية</string>
+    <string name="spell_required_level">يُفتح عند المستوى %1$d</string>
+    <string name="spell_rift_only">يتم عرض تعويذات ساحة المستدعي فقط.</string>
+
+    <!-- Phase 2: nav -->
+    <string name="nav_items">العناصر</string>
+
 </resources>

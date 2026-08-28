@@ -38,4 +38,17 @@ object DataDragonUrls {
     /** The cropped, wider "loading screen" portrait. Also unversioned. */
     fun championLoading(championId: String, skinNum: Int = 0): String =
         "$CDN/img/champion/loading/${championId}_$skinNum.jpg"
+
+    /** A shop item icon. */
+    fun itemIcon(version: String, imageFileName: String): String =
+        "$CDN/$version/img/item/$imageFileName"
+
+    /**
+     * A rune or rune-tree icon.
+     *
+     * The one irregular asset path in Data Dragon: runesReforged.json ships a
+     * path that is already rooted under cdn/img/ and carries no version
+     * segment, so this joins it as-is. Inserting a version here 404s.
+     */
+    fun runeIcon(iconPath: String): String = "$CDN/img/$iconPath"
 }

@@ -136,4 +136,71 @@
     <string name="nav_champions">Champions</string>
     <string name="nav_favourites">Favourites</string>
 
+    <!-- Phase 2: items -->
+    <string name="items_title">Items</string>
+    <string name="items_search_hint">Search items</string>
+    <string name="items_empty">No items cached yet.</string>
+    <string name="items_no_results">No item matches that search.</string>
+    <string name="item_icon">%1$s icon</string>
+    <string name="item_cost">%1$d gold</string>
+    <string name="item_cost_combine">%1$d to combine</string>
+    <string name="item_sell">Sells for %1$d</string>
+    <string name="item_stats">Stats</string>
+    <string name="item_build_path">Build path</string>
+    <string name="item_components">Builds from</string>
+    <string name="item_builds_into">Builds into</string>
+    <string name="item_no_build_path">This item has no components and builds into nothing.</string>
+
+    <!-- Phase 2: gold efficiency -->
+    <string name="efficiency_title">Gold efficiency</string>
+    <string name="efficiency_value">%1$d%%</string>
+    <string name="efficiency_stat_value">Stats worth about %1$d gold</string>
+    <string name="efficiency_partial">Partial: at least one stat has no reference price this patch.</string>
+    <string name="efficiency_unavailable">Riot does not publish machine-readable stats for this item, so its efficiency cannot be calculated.</string>
+    <string name="efficiency_note">Estimated by pricing each stat against the basic item that sells it on this patch. It cannot price passives, actives or cooldowns, so a strong item can sit below 100%%.</string>
+
+    <!-- Phase 2: stat names -->
+    <string name="stat_ability_power">Ability power</string>
+    <string name="stat_mana">Mana</string>
+    <string name="stat_crit_chance">Critical strike</string>
+    <string name="stat_life_steal">Life steal</string>
+    <string name="stat_percent_suffix">%1$s%%</string>
+
+    <!-- Phase 2: build simulator -->
+    <string name="simulator_title">Build simulator</string>
+    <string name="simulator_open">Build simulator</string>
+    <string name="simulator_pick_champion">Pick a champion</string>
+    <string name="simulator_change_champion">Change champion</string>
+    <string name="simulator_add_item">Add item</string>
+    <string name="simulator_remove_item">Remove %1$s</string>
+    <string name="simulator_slot_empty">Empty slot</string>
+    <string name="simulator_totals">Totals at level %1$d</string>
+    <string name="simulator_total_gold">Build cost %1$d gold</string>
+    <string name="simulator_ehp_physical">Effective HP vs physical</string>
+    <string name="simulator_ehp_magic">Effective HP vs magic</string>
+    <string name="simulator_dps">Auto-attack DPS</string>
+    <string name="simulator_assumptions_title">The DPS figure assumes:</string>
+    <string name="assumption_no_armor">the target has no armor</string>
+    <string name="assumption_autos_only">auto-attacks only, no abilities</string>
+    <string name="assumption_no_passives">no item passives or actives</string>
+    <string name="assumption_default_crit">critical strikes at the default 175%% damage</string>
+    <string name="simulator_unpublished_stats">One or more selected items have no published stats, so these totals are lower than the real build.</string>
+    <string name="simulator_empty">Pick a champion to start building.</string>
+
+    <!-- Phase 2: runes -->
+    <string name="runes_title">Runes</string>
+    <string name="runes_open">Runes</string>
+    <string name="rune_keystones">Keystones</string>
+    <string name="rune_icon">%1$s rune icon</string>
+
+    <!-- Phase 2: summoner spells -->
+    <string name="spells_title">Summoner spells</string>
+    <string name="spells_open">Summoner spells</string>
+    <string name="spell_cooldown">%1$s second cooldown</string>
+    <string name="spell_required_level">Unlocks at level %1$d</string>
+    <string name="spell_rift_only">Showing Summoners Rift spells only.</string>
+
+    <!-- Phase 2: nav -->
+    <string name="nav_items">Items</string>
+
 </resources>
