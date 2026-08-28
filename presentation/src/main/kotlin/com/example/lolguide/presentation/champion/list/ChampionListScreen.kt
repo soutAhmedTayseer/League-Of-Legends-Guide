@@ -52,7 +52,7 @@ import com.example.lolguide.presentation.common.uiText
 import com.example.lolguide.presentation.theme.AppTheme
 
 @Composable
-fun ChampionListRoute(
+fun ChampionListScreenRoot(
     onNavigateToDetail: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ChampionListViewModel = hiltViewModel(),

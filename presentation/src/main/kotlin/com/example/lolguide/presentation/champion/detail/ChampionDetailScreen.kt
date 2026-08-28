@@ -51,7 +51,7 @@ import com.example.lolguide.presentation.common.components.PatchBadge
 import com.example.lolguide.presentation.theme.AppTheme
 
 @Composable
-fun ChampionDetailRoute(
+fun ChampionDetailScreenRoot(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ChampionDetailViewModel = hiltViewModel(),
