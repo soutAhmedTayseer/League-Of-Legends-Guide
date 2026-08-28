@@ -52,6 +52,8 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.ui)
     implementation(libs.androidx.palette)
     implementation(libs.timber)
 

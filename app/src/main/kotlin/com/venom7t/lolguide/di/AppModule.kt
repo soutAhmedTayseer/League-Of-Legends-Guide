@@ -13,6 +13,7 @@ import com.venom7t.lolguide.data.onboarding.repository.OnboardingRepositoryImpl
 import com.venom7t.lolguide.data.patch.repository.PreviousPatchSnapshotRepositoryImpl
 import com.venom7t.lolguide.data.rune.repository.RuneRepositoryImpl
 import com.venom7t.lolguide.data.spell.repository.SummonerSpellRepositoryImpl
+import com.venom7t.lolguide.data.voiceline.repository.VoiceLineRepositoryImpl
 import com.venom7t.lolguide.data.common.di.DefaultDispatcher
 import com.venom7t.lolguide.data.common.di.IoDispatcher
 import com.venom7t.lolguide.data.patch.repository.PatchRepositoryImpl
@@ -24,6 +25,7 @@ import com.venom7t.lolguide.domain.onboarding.repository.OnboardingRepository
 import com.venom7t.lolguide.domain.patch.repository.PreviousPatchSnapshotRepository
 import com.venom7t.lolguide.domain.rune.repository.RuneRepository
 import com.venom7t.lolguide.domain.spell.repository.SummonerSpellRepository
+import com.venom7t.lolguide.domain.voiceline.repository.VoiceLineRepository
 import com.venom7t.lolguide.domain.patch.repository.PatchRepository
 import dagger.Binds
 import dagger.Module
@@ -82,6 +84,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindOnboardingRepository(impl: OnboardingRepositoryImpl): OnboardingRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindVoiceLineRepository(impl: VoiceLineRepositoryImpl): VoiceLineRepository
 }
 
 @Module
