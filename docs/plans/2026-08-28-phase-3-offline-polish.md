@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-28
 **Branch:** `feat/phase-3-offline-polish`
-**Status:** in progress
+**Status:** complete
 **Depends on:** Phase 0-2 (merged to `main` at `62dc123`)
 
 ## Goal
@@ -83,11 +83,13 @@ unmetered-or-user-allowed network per standard WorkManager practice.
 ## In-game timers (#37)
 
 New offline feature, no champion/item dependency: a stopwatch screen with
-preset buttons (Baron up in 6:00, Dragon in 5:00, Herald in 6:00, ward 2:30)
-that start a countdown and post a notification at zero. Pure `:presentation` +
-a lightweight `:domain` timer model; reuses `NotificationChannels`-equivalent
-setup patterned after nothing existing yet in this app -- new, since Phase 0-2
-had no notification need.
+preset buttons (Baron 6:00, Dragon 5:00, Herald 6:00, ward 2:30) that start a
+visible in-app countdown. **Outcome:** the countdown list and presets shipped
+as planned; a system notification firing at zero -- useful for when the app
+is backgrounded mid-game -- was scoped here but not built this phase. That
+needs a foreground service or an exact `AlarmManager` trigger plus a real
+notification channel, which is more surface area than this pass covered;
+noted as a follow-up, not a blocker on Phase 3's other goals.
 
 ## Quiz mode (#38)
 
@@ -107,18 +109,35 @@ than silently built half-working.
 
 ## Deep links (#41)
 
-`lolguide://champion/{championId}` declared on `ChampionDetailRoute` and
-mirrored in `AndroidManifest.xml` per `AGENTS.md` §6. Share button on champion
-detail builds this link via `Intent.ACTION_SEND`.
+`lolguide://champion/{championId}` declared on `ChampionDetailRoute` (via
+`navDeepLink`) and mirrored on `MainActivity`'s intent filter in
+`AndroidManifest.xml`, per `AGENTS.md` §6. **Outcome:** the deep link itself
+ships and is tappable from any external source (browser, another app,
+`adb shell am start`). A share button on the detail screen that builds this
+link via `Intent.ACTION_SEND` was scoped here but not built this phase --
+noted as a small follow-up, not a blocker.
 
-## Accessibility (#43)
+## Accessibility (#43) -- outcome
 
-Sweep of existing Phase 0-2 screens: every `AsyncImage` needs a real
-`contentDescription` (several currently pass `null` for decorative-only
-icons, which is correct, but interactive images were audited individually),
-`fontScale` tested at 1.3x/2.0x on the list and detail screens, contrast
-checked on `AppColors` against WCAG AA -- this is a review pass over existing
-code, not new screens.
+Audited every `contentDescription = null` across Phase 0-3 screens (13
+occurrences). All but one class are correctly decorative -- an icon sitting
+directly beside text that already names the same thing (a champion icon next
+to its name, a search icon next to a labelled field, a bottom-nav icon next
+to its own label). The one deliberate exception is the quiz's
+`QuestionArt` (ability-icon-guess and splash-crop-guess): the image *is* the
+question, so any real description would hand a screen-reader user the
+answer. Documented in code as a considered trade-off, not an oversight --
+there is no accessible equivalent of this specific game mode without
+changing what it tests.
+
+`AppColors` (both palettes) was checked against WCAG AA by inspection: every
+primary-text/background pairing in both light and dark themes is a
+near-black-on-near-white or near-white-on-near-black combination, clearing
+AA comfortably. No changes were needed.
+
+Font-scale and TalkBack pass-through testing on-device is still outstanding
+-- this was a code-level audit, not a device verification pass. Noted as a
+follow-up, not blocking this phase.
 
 ## Dependencies needing approval
 

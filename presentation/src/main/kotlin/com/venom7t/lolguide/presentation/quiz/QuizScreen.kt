@@ -173,6 +173,16 @@ private fun QuizContent(
     }
 }
 
+/**
+ * The quiz art -- an ability icon or a splash crop -- is deliberately left
+ * without a contentDescription. Unlike a decorative icon, this image is the
+ * question itself: any real description would name the champion and give the
+ * answer away to a screen reader user before they could guess. There is no
+ * accessible equivalent of this specific game mode without changing what it
+ * tests, so this is a documented, deliberate exception rather than an
+ * oversight -- AbilityIconGuess and SplashCropGuess are the two quiz modes
+ * this affects.
+ */
 @Composable
 private fun QuestionArt(question: QuizQuestion, modifier: Modifier = Modifier) {
     when (question) {
