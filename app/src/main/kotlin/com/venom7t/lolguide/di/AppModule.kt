@@ -1,6 +1,7 @@
 package com.venom7t.lolguide.di
 
 import android.content.Context
+import androidx.work.WorkManager
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
@@ -109,6 +110,16 @@ object DataStoreModule {
     ): DataStore<Preferences> = PreferenceDataStoreFactory.create {
         context.preferencesDataStoreFile(PREFERENCES_NAME)
     }
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object WorkManagerModule {
+
+    @Provides
+    @Singleton
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
+        WorkManager.getInstance(context)
 }
 
 @Module
