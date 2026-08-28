@@ -3,9 +3,10 @@ package com.venom7t.lolguide.navigation
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -17,17 +18,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.champion.detail.ChampionDetailScreenRoot
 import com.venom7t.lolguide.presentation.champion.list.ChampionListScreenRoot
+import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.compare.CompareScreenRoot
 import com.venom7t.lolguide.presentation.favourite.FavouritesScreenRoot
+import com.venom7t.lolguide.presentation.home.HomeScreenRoot
 import com.venom7t.lolguide.presentation.item.ItemDetailScreenRoot
 import com.venom7t.lolguide.presentation.item.ItemListScreenRoot
 import com.venom7t.lolguide.presentation.navigation.BuildSimulatorRoute
@@ -35,16 +41,25 @@ import com.venom7t.lolguide.presentation.navigation.ChampionDetailRoute
 import com.venom7t.lolguide.presentation.navigation.ChampionListRoute
 import com.venom7t.lolguide.presentation.navigation.CompareRoute
 import com.venom7t.lolguide.presentation.navigation.FavouritesRoute
+import com.venom7t.lolguide.presentation.navigation.GameTimersRoute
+import com.venom7t.lolguide.presentation.navigation.HomeRoute
 import com.venom7t.lolguide.presentation.navigation.ItemDetailRoute
 import com.venom7t.lolguide.presentation.navigation.ItemListRoute
+import com.venom7t.lolguide.presentation.navigation.OnboardingRoute
+import com.venom7t.lolguide.presentation.navigation.QuizRoute
 import com.venom7t.lolguide.presentation.navigation.RouletteRoute
 import com.venom7t.lolguide.presentation.navigation.RunesRoute
 import com.venom7t.lolguide.presentation.navigation.SummonerSpellsRoute
+import com.venom7t.lolguide.presentation.navigation.WhatsNewRoute
+import com.venom7t.lolguide.presentation.onboarding.OnboardingScreenRoot
+import com.venom7t.lolguide.presentation.quiz.QuizScreenRoot
 import com.venom7t.lolguide.presentation.roulette.RouletteScreenRoot
 import com.venom7t.lolguide.presentation.rune.RunesScreenRoot
 import com.venom7t.lolguide.presentation.simulator.BuildSimulatorScreenRoot
 import com.venom7t.lolguide.presentation.spell.SummonerSpellsScreenRoot
 import com.venom7t.lolguide.presentation.theme.AppTheme
+import com.venom7t.lolguide.presentation.timer.GameTimersScreenRoot
+import com.venom7t.lolguide.presentation.whatsnew.WhatsNewScreenRoot
 import kotlin.reflect.KClass
 
 /**
@@ -58,13 +73,37 @@ import kotlin.reflect.KClass
 fun LolGuideNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
+    appStartViewModel: AppStartViewModel = hiltViewModel(),
+) {
+    val startState by appStartViewModel.state.collectAsStateWithLifecycle()
+
+    // The NavHost's start destination cannot change after first composition,
+    // so onboarding completion must be known before the NavHost exists at
+    // all. This is the one deliberate blocking read in the app's launch path.
+    val readyState = startState as? AppStartState.Ready ?: run {
+        LoadingContent()
+        return
+    }
+
+    LolGuideNavGraphContent(
+        startDestination = if (readyState.hasCompletedOnboarding) HomeRoute else OnboardingRoute,
+        modifier = modifier,
+        navController = navController,
+    )
+}
+
+@Composable
+private fun LolGuideNavGraphContent(
+    startDestination: Any,
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
 
     // The bar is shown only on top-level destinations. Keeping it visible on
-    // the detail, compare and roulette screens would offer a sideways jump out
-    // of a screen the user navigated into deliberately.
+    // detail/compare/roulette/etc. would offer a sideways jump out of a
+    // screen the user navigated into deliberately.
     val showBottomBar = topLevelDestinations.any { destination ->
         currentDestination?.hasRoute(destination.route) == true
     }
@@ -83,7 +122,7 @@ fun LolGuideNavGraph(
                                 navController.navigate(destination.navigate()) {
                                     // Switching tabs must not stack them, and
                                     // must restore where the user left off.
-                                    popUpTo(ChampionListRoute) { saveState = true }
+                                    popUpTo(HomeRoute) { saveState = true }
                                     launchSingleTop = true
                                     restoreState = true
                                 }
@@ -110,11 +149,43 @@ fun LolGuideNavGraph(
     ) { padding ->
         NavHost(
             navController = navController,
-            startDestination = ChampionListRoute,
+            startDestination = startDestination,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding),
         ) {
+            composable<OnboardingRoute> {
+                OnboardingScreenRoot(
+                    onFinished = {
+                        navController.navigate(HomeRoute) {
+                            popUpTo(OnboardingRoute) { inclusive = true }
+                        }
+                    },
+                )
+            }
+
+            composable<HomeRoute> {
+                HomeScreenRoot(
+                    onNavigateToWhatsNew = { navController.navigate(WhatsNewRoute) },
+                    onNavigateToSimulator = { navController.navigate(BuildSimulatorRoute) },
+                    onNavigateToRoulette = { navController.navigate(RouletteRoute) },
+                    onNavigateToQuiz = { navController.navigate(QuizRoute) },
+                    onNavigateToTimers = { navController.navigate(GameTimersRoute) },
+                )
+            }
+
+            composable<WhatsNewRoute> {
+                WhatsNewScreenRoot(onNavigateBack = { navController.popBackStack() })
+            }
+
+            composable<QuizRoute> {
+                QuizScreenRoot(onNavigateBack = { navController.popBackStack() })
+            }
+
+            composable<GameTimersRoute> {
+                GameTimersScreenRoot(onNavigateBack = { navController.popBackStack() })
+            }
+
             composable<ChampionListRoute> {
                 ChampionListScreenRoot(
                     onNavigateToDetail = { championId ->
@@ -125,7 +196,15 @@ fun LolGuideNavGraph(
                 )
             }
 
-            composable<ChampionDetailRoute> {
+            composable<ChampionDetailRoute>(
+                // Feature 41: lolguide://champion/{championId}, mirrored on
+                // the activity's intent filter in AndroidManifest.xml
+                // (AGENTS.md §6 -- deep links are declared on the route and
+                // mirrored in the manifest).
+                deepLinks = listOf(
+                    navDeepLink { uriPattern = "lolguide://champion/{championId}" },
+                ),
+            ) {
                 ChampionDetailScreenRoot(
                     onNavigateBack = { navController.popBackStack() },
                 )
@@ -208,6 +287,12 @@ private class TopLevelDestination(
 )
 
 private val topLevelDestinations = listOf(
+    TopLevelDestination(
+        route = HomeRoute::class,
+        navigate = { HomeRoute },
+        icon = Icons.Default.Home,
+        labelRes = R.string.nav_home,
+    ),
     TopLevelDestination(
         route = ChampionListRoute::class,
         navigate = { ChampionListRoute },

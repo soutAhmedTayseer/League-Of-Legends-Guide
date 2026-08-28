@@ -2,6 +2,7 @@ package com.venom7t.lolguide.widget
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
@@ -61,6 +62,17 @@ class PatchStatusWidget : GlanceAppWidget() {
     }
 }
 
+/**
+ * Static widget palette, matching the League client colours used in
+ * [com.venom7t.lolguide.presentation.theme.Color]. Not sourced from a
+ * `@ColorRes` -- Glance's resource-id overload of `ColorProvider` is
+ * `@RestrictTo` to the androidx.glance library group in this version, so a
+ * plain [Color] literal is the public, supported path for a static value.
+ */
+private val WidgetBackground = Color(0xFF0A1428)
+private val WidgetAccent = Color(0xFFC8AA6E)
+private val WidgetText = Color(0xFFF0E6D2)
+
 @Composable
 private fun WidgetContent(patchVersion: String?) {
     val context = LocalContext.current
@@ -68,19 +80,19 @@ private fun WidgetContent(patchVersion: String?) {
     Column(
         modifier = GlanceModifier
             .fillMaxSize()
-            .background(ColorProvider(R.color.widget_background))
+            .background(ColorProvider(WidgetBackground))
             .padding(12.dp)
             .clickable(actionStartActivity<MainActivity>()),
     ) {
         Text(
             text = context.getString(R.string.app_name),
-            style = TextStyle(color = ColorProvider(R.color.widget_accent)),
+            style = TextStyle(color = ColorProvider(WidgetAccent)),
         )
         Text(
             text = patchVersion
                 ?.let { context.getString(R.string.widget_patch_label, it) }
                 ?: context.getString(R.string.widget_open_app),
-            style = TextStyle(color = ColorProvider(R.color.widget_text)),
+            style = TextStyle(color = ColorProvider(WidgetText)),
         )
     }
 }

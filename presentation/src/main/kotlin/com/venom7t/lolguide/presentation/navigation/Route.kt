@@ -43,3 +43,20 @@ data object RunesRoute
 
 @Serializable
 data object SummonerSpellsRoute
+
+// --- Phase 3: onboarding, home, and offline extras ---
+
+@Serializable
+data object OnboardingRoute
+
+@Serializable
+data object HomeRoute
+
+@Serializable
+data object WhatsNewRoute
+
+@Serializable
+data object QuizRoute
+
+@Serializable
+data object GameTimersRoute
