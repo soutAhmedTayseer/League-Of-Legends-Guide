@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.lolguide.presentation"
+    namespace = "com.venom7t.lolguide.presentation"
     compileSdk {
         version = release(37) {
             minorApiLevel = 1

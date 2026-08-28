@@ -113,7 +113,7 @@ carry them.
 
 ## Open questions
 
-- Package rename from `com.example.lolguide` — deferred to a single commit at
-  the end of Phase 0 (`AGENTS.md` §0.1). Final application id not yet chosen.
+- ~~Package rename from `com.example.lolguide`~~ — **resolved.** Renamed to
+  `com.venom7t.lolguide` in its own commit after Phase 1.
 - Arabic translations in Phase 0 are structural; wording should get a native
   review pass before release.

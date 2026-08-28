@@ -18,7 +18,7 @@ val riotApiKey: String = Properties().apply {
 }.getProperty("RIOT_API_KEY").orEmpty()
 
 android {
-    namespace = "com.example.lolguide"
+    namespace = "com.venom7t.lolguide"
     compileSdk {
         version = release(37) {
             minorApiLevel = 1
@@ -26,7 +26,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.lolguide"
+        applicationId = "com.venom7t.lolguide"
         minSdk = 24
         targetSdk = 37
         versionCode = 1

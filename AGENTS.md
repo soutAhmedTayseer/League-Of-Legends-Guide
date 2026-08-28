@@ -12,7 +12,7 @@
 | Field            | Value                                                                 |
 |------------------|-----------------------------------------------------------------------|
 | **App Name**     | LoL Guide                                                             |
-| **Package**      | `com.example.lolguide` (see §0.1 — rename pending)                    |
+| **Package**      | `com.venom7t.lolguide`                                                |
 | **Platform**     | Android (Kotlin + Jetpack Compose)                                    |
 | **Domain**       | Gaming reference & companion app for League of Legends                |
 | **Users**        | Anonymous by default; optional account in Phase 5                     |
@@ -20,11 +20,16 @@
 | **Languages**    | English + Arabic, both required from Phase 0                          |
 | **Min SDK**      | 24 · **Target/Compile SDK** 37                                        |
 
-### 0.1 Package rename
+### 0.1 Application id
 
-`com.example.*` is a placeholder and must not ship. The rename to a real
-application id happens as a single dedicated commit at the end of Phase 0.
-Do not half-rename packages across feature commits.
+`com.venom7t.lolguide`, renamed from the `com.example.*` placeholder in commit
+`chore: rename package`. Module namespaces are `com.venom7t.lolguide`,
+`.data` and `.presentation`.
+
+Note this id does not correspond to a domain the author owns, which is the
+usual convention. It is unique and stable, which is what Android actually
+requires; if the app is ever published under a domain, changing it is a
+one-way door -- Play treats a new application id as a different app.
 
 ---
 
