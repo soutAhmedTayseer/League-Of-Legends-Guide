@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -27,12 +28,22 @@ import com.venom7t.lolguide.presentation.champion.detail.ChampionDetailScreenRoo
 import com.venom7t.lolguide.presentation.champion.list.ChampionListScreenRoot
 import com.venom7t.lolguide.presentation.compare.CompareScreenRoot
 import com.venom7t.lolguide.presentation.favourite.FavouritesScreenRoot
+import com.venom7t.lolguide.presentation.item.ItemDetailScreenRoot
+import com.venom7t.lolguide.presentation.item.ItemListScreenRoot
+import com.venom7t.lolguide.presentation.navigation.BuildSimulatorRoute
 import com.venom7t.lolguide.presentation.navigation.ChampionDetailRoute
 import com.venom7t.lolguide.presentation.navigation.ChampionListRoute
 import com.venom7t.lolguide.presentation.navigation.CompareRoute
 import com.venom7t.lolguide.presentation.navigation.FavouritesRoute
+import com.venom7t.lolguide.presentation.navigation.ItemDetailRoute
+import com.venom7t.lolguide.presentation.navigation.ItemListRoute
 import com.venom7t.lolguide.presentation.navigation.RouletteRoute
+import com.venom7t.lolguide.presentation.navigation.RunesRoute
+import com.venom7t.lolguide.presentation.navigation.SummonerSpellsRoute
 import com.venom7t.lolguide.presentation.roulette.RouletteScreenRoot
+import com.venom7t.lolguide.presentation.rune.RunesScreenRoot
+import com.venom7t.lolguide.presentation.simulator.BuildSimulatorScreenRoot
+import com.venom7t.lolguide.presentation.spell.SummonerSpellsScreenRoot
 import com.venom7t.lolguide.presentation.theme.AppTheme
 import kotlin.reflect.KClass
 
@@ -142,6 +153,49 @@ fun LolGuideNavGraph(
                     onNavigateBack = { navController.popBackStack() },
                 )
             }
+
+            composable<ItemListRoute> {
+                ItemListScreenRoot(
+                    onNavigateToDetail = { itemId ->
+                        navController.navigate(ItemDetailRoute(itemId = itemId))
+                    },
+                    onNavigateToBuildSimulator = { navController.navigate(BuildSimulatorRoute) },
+                    onNavigateToRunes = { navController.navigate(RunesRoute) },
+                    onNavigateToSummonerSpells = { navController.navigate(SummonerSpellsRoute) },
+                )
+            }
+
+            composable<ItemDetailRoute> {
+                ItemDetailScreenRoot(
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateToItem = { itemId ->
+                        // Following a build-path link replaces rather than
+                        // stacks, so tapping through several tiers of an item
+                        // line does not leave a long chain to back out of.
+                        navController.navigate(ItemDetailRoute(itemId = itemId)) {
+                            popUpTo(ItemListRoute)
+                        }
+                    },
+                )
+            }
+
+            composable<BuildSimulatorRoute> {
+                BuildSimulatorScreenRoot(
+                    onNavigateBack = { navController.popBackStack() },
+                )
+            }
+
+            composable<RunesRoute> {
+                RunesScreenRoot(
+                    onNavigateBack = { navController.popBackStack() },
+                )
+            }
+
+            composable<SummonerSpellsRoute> {
+                SummonerSpellsScreenRoot(
+                    onNavigateBack = { navController.popBackStack() },
+                )
+            }
         }
     }
 }
@@ -165,5 +219,11 @@ private val topLevelDestinations = listOf(
         navigate = { FavouritesRoute },
         icon = Icons.Default.Star,
         labelRes = R.string.nav_favourites,
+    ),
+    TopLevelDestination(
+        route = ItemListRoute::class,
+        navigate = { ItemListRoute },
+        icon = Icons.Default.ShoppingCart,
+        labelRes = R.string.nav_items,
     ),
 )

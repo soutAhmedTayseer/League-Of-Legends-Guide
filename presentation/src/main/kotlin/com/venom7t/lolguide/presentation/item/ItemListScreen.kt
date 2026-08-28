@@ -15,8 +15,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -51,6 +54,9 @@ import com.venom7t.lolguide.presentation.theme.AppTheme
 @Composable
 fun ItemListScreenRoot(
     onNavigateToDetail: (String) -> Unit,
+    onNavigateToBuildSimulator: () -> Unit,
+    onNavigateToRunes: () -> Unit,
+    onNavigateToSummonerSpells: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ItemListViewModel = hiltViewModel(),
 ) {
@@ -68,7 +74,14 @@ fun ItemListScreenRoot(
         }
     }
 
-    ItemListScreen(state = state, onEvent = viewModel::onEvent, modifier = modifier)
+    ItemListScreen(
+        state = state,
+        onEvent = viewModel::onEvent,
+        onNavigateToBuildSimulator = onNavigateToBuildSimulator,
+        onNavigateToRunes = onNavigateToRunes,
+        onNavigateToSummonerSpells = onNavigateToSummonerSpells,
+        modifier = modifier,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -76,6 +89,9 @@ fun ItemListScreenRoot(
 fun ItemListScreen(
     state: ItemListState,
     onEvent: (ItemListEvent) -> Unit,
+    onNavigateToBuildSimulator: () -> Unit,
+    onNavigateToRunes: () -> Unit,
+    onNavigateToSummonerSpells: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -97,6 +113,27 @@ fun ItemListScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onNavigateToBuildSimulator) {
+                        Icon(
+                            imageVector = Icons.Default.Calculate,
+                            contentDescription = stringResource(R.string.simulator_open),
+                            tint = AppTheme.colors.textSecondary,
+                        )
+                    }
+                    IconButton(onClick = onNavigateToRunes) {
+                        Icon(
+                            imageVector = Icons.Default.Shield,
+                            contentDescription = stringResource(R.string.runes_open),
+                            tint = AppTheme.colors.textSecondary,
+                        )
+                    }
+                    IconButton(onClick = onNavigateToSummonerSpells) {
+                        Icon(
+                            imageVector = Icons.Default.Bolt,
+                            contentDescription = stringResource(R.string.spells_open),
+                            tint = AppTheme.colors.textSecondary,
+                        )
+                    }
                     if (state.selectedTags.isNotEmpty() || state.query.isNotEmpty()) {
                         IconButton(onClick = { onEvent(ItemListEvent.FiltersCleared) }) {
                             Icon(
