@@ -47,11 +47,9 @@ class SubmitGuessUseCase @Inject constructor(
     ): Pair<RoundProgress, GuessResult> {
         val result = evaluateGuess(guess, answer)
         val guessedIds = round.guessedIds + guess.id
-        val outcome = when {
-            result.isCorrect -> RoundOutcome.WON
-            guessedIds.size >= round.mode.maxGuesses -> RoundOutcome.LOST
-            else -> RoundOutcome.IN_PROGRESS
-        }
+        // No guess limit: a round only ends here on a correct guess. The
+        // other way out is GiveUpRoundUseCase, an explicit player choice.
+        val outcome = if (result.isCorrect) RoundOutcome.WON else RoundOutcome.IN_PROGRESS
         val updated = round.copy(guessedIds = guessedIds, outcome = outcome)
         repository.saveRound(updated)
 
@@ -61,5 +59,24 @@ class SubmitGuessUseCase @Inject constructor(
         }
 
         return updated to result
+    }
+}
+
+/**
+ * Ends an unfinished round as a loss at the player's request and reveals the
+ * answer. Confirmed in the UI first (AGENTS.md §13) since it forfeits the
+ * round's streak the same way running out of guesses used to.
+ */
+class GiveUpRoundUseCase @Inject constructor(
+    private val repository: GameProgressRepository,
+) {
+    suspend operator fun invoke(round: RoundProgress): RoundProgress {
+        val updated = round.copy(outcome = RoundOutcome.GAVE_UP)
+        repository.saveRound(updated)
+
+        val stats = repository.observeStats(round.mode).first()
+        repository.saveStats(stats.applyResult(round.epochDay, won = false))
+
+        return updated
     }
 }

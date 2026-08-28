@@ -360,10 +360,24 @@
     <string name="game_mode_splash">صورة</string>
     <string name="game_mode_splash_description">خمّن من صورة مقصوصة. كل تخمين خاطئ يوسّع العرض.</string>
     <string name="game_round_guess_hint">خمّن بطلاً</string>
-    <string name="game_round_guesses_remaining">%1$d تخمينات متبقية</string>
+    <string name="game_round_guess_count">%1$d تخمينات</string>
     <string name="game_round_won">أحسنت، خمّنت بشكل صحيح!</string>
-    <string name="game_round_lost">نفدت التخمينات</string>
+    <string name="game_round_gave_up">تم الاستسلام عن الجولة</string>
     <string name="game_round_answer_was">الإجابة كانت %1$s</string>
+    <string name="game_round_give_up">استسلام</string>
+    <string name="game_round_give_up_confirm_title">الاستسلام عن هذه الجولة؟</string>
+    <string name="game_round_give_up_confirm_body">سيكشف هذا الإجابة ويُحتسب كخسارة لسلسلة اليوم. لا يمكن التراجع عن هذا.</string>
+    <string name="game_round_column_champion">البطل</string>
+    <string name="game_round_column_role">الدور</string>
+    <string name="game_round_column_resource">المورد</string>
+    <string name="game_round_column_damage">الضرر</string>
+    <string name="game_round_column_difficulty">الصعوبة</string>
+    <string name="game_round_column_range">المدى</string>
+    <string name="game_round_legend_match">مطابق</string>
+    <string name="game_round_legend_partial">جزئي</string>
+    <string name="game_round_legend_miss">غير مطابق</string>
+    <string name="game_round_legend_higher">الإجابة أعلى</string>
+    <string name="game_round_legend_lower">الإجابة أقل</string>
 
     <!-- Phase 5 addendum: Google sign-in -->
     <string name="google_sign_in_web_client_id" translatable="false">404574107891-536m94robfl44nclmjov1mduvd73ocb4.apps.googleusercontent.com</string>

@@ -3,24 +3,24 @@ package com.venom7t.lolguide.domain.game.model
 /**
  * The three ways to play.
  *
- * Each mode is a different amount of information per guess, so each gets a
- * different budget. Classic hands back five clue columns every time and can
- * afford six attempts; the picture modes give almost nothing, so a longer
- * round would just be six shots in the dark.
+ * A round has no guess limit in any mode -- it ends only on a correct guess
+ * or the player giving up. [splashZoomSteps] is not a budget; it is how many
+ * wrong guesses it takes [GameMode.SPLASH] to fully reveal the art, after
+ * which further wrong guesses just stay at full zoom.
  */
-enum class GameMode(val maxGuesses: Int) {
+enum class GameMode(val splashZoomSteps: Int = 0) {
 
     /** Guess the champion; every attempt scores five attributes against it. */
-    CLASSIC(maxGuesses = 6),
+    CLASSIC,
 
     /** One ability icon, no other context. */
-    ABILITY(maxGuesses = 4),
+    ABILITY,
 
     /**
      * A cropped region of splash art that widens with each wrong guess, so a
      * miss buys information rather than only costing an attempt.
      */
-    SPLASH(maxGuesses = 4),
+    SPLASH(splashZoomSteps = 5),
     ;
 
     companion object {

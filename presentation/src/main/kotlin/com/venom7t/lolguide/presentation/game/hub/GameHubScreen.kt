@@ -10,9 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,11 +23,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.domain.game.model.GameMode
 import com.venom7t.lolguide.domain.game.model.GameStats
 import com.venom7t.lolguide.presentation.R
+import com.venom7t.lolguide.presentation.common.components.CutSurface
 import com.venom7t.lolguide.presentation.theme.AppTheme
 
 @Composable
@@ -66,15 +66,24 @@ fun GameHubScreen(
         containerColor = AppTheme.colors.background,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.game_hub_title)) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.game_hub_title),
+                        style = AppTheme.typography.titleLarge,
+                        color = AppTheme.colors.textPrimary,
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { onEvent(GameHubEvent.BackClicked) }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.action_back),
+                            tint = AppTheme.colors.textPrimary,
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = AppTheme.colors.background,
-                    titleContentColor = AppTheme.colors.textPrimary,
                 ),
             )
         },
@@ -99,21 +108,18 @@ fun GameHubScreen(
 
 @Composable
 private fun GameModeCard(mode: GameMode, stats: GameStats?, onClick: () -> Unit) {
-    Card(
-        onClick = onClick,
-        colors = CardDefaults.cardColors(containerColor = AppTheme.colors.surface),
-        shape = AppTheme.shapes.medium,
-    ) {
+    CutSurface(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(AppTheme.dimens.spaceMd)) {
             Text(
                 text = modeTitle(mode),
-                style = AppTheme.typography.titleMedium,
+                style = AppTheme.typography.tileLabel,
                 color = AppTheme.colors.textPrimary,
             )
             Text(
                 text = modeDescription(mode),
                 style = AppTheme.typography.bodyMedium,
                 color = AppTheme.colors.textSecondary,
+                modifier = Modifier.padding(top = 2.dp),
             )
             if (stats != null && stats.played > 0) {
                 Row(

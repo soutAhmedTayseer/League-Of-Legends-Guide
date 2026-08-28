@@ -360,10 +360,24 @@
     <string name="game_mode_splash">Splash</string>
     <string name="game_mode_splash_description">Guess from a cropped splash. Each wrong guess zooms out.</string>
     <string name="game_round_guess_hint">Guess a champion</string>
-    <string name="game_round_guesses_remaining">%1$d guesses remaining</string>
+    <string name="game_round_guess_count">%1$d guesses</string>
     <string name="game_round_won">You got it!</string>
-    <string name="game_round_lost">Out of guesses</string>
+    <string name="game_round_gave_up">Round given up</string>
     <string name="game_round_answer_was">The answer was %1$s</string>
+    <string name="game_round_give_up">Give up</string>
+    <string name="game_round_give_up_confirm_title">Give up this round?</string>
+    <string name="game_round_give_up_confirm_body">This reveals the answer and counts as a loss for today\'s streak. This cannot be undone.</string>
+    <string name="game_round_column_champion">Champion</string>
+    <string name="game_round_column_role">Role</string>
+    <string name="game_round_column_resource">Resource</string>
+    <string name="game_round_column_damage">Damage</string>
+    <string name="game_round_column_difficulty">Difficulty</string>
+    <string name="game_round_column_range">Range</string>
+    <string name="game_round_legend_match">Match</string>
+    <string name="game_round_legend_partial">Partial</string>
+    <string name="game_round_legend_miss">Miss</string>
+    <string name="game_round_legend_higher">Answer is higher</string>
+    <string name="game_round_legend_lower">Answer is lower</string>
 
     <!-- Phase 5 addendum: Google sign-in -->
     <!-- Not user-facing: the Firebase project's Web OAuth client id, required by Credential

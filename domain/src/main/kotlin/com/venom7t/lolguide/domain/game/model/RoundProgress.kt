@@ -1,7 +1,16 @@
 package com.venom7t.lolguide.domain.game.model
 
-/** How a round ended, or that it has not. */
-enum class RoundOutcome { IN_PROGRESS, WON, LOST }
+/**
+ * How a round ended, or that it has not.
+ *
+ * [GAVE_UP] exists because there is no guess limit any more: the only other
+ * way out of a round the player cannot solve is closing the app and never
+ * finishing it, which would silently corrupt the streak (still "in
+ * progress" forever). Giving up is an explicit, confirmed choice
+ * (AGENTS.md §13) that counts as a loss for streak purposes, same as
+ * [LOST] did before guesses were capped.
+ */
+enum class RoundOutcome { IN_PROGRESS, WON, LOST, GAVE_UP }
 
 /**
  * A round in progress or finished, for one mode on one day.
@@ -20,8 +29,6 @@ data class RoundProgress(
     val outcome: RoundOutcome,
 ) {
     val guessesUsed: Int get() = guessedIds.size
-
-    val guessesRemaining: Int get() = (mode.maxGuesses - guessesUsed).coerceAtLeast(0)
 
     val isFinished: Boolean get() = outcome != RoundOutcome.IN_PROGRESS
 

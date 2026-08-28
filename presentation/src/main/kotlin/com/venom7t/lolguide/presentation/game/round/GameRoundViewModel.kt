@@ -11,6 +11,7 @@ import com.venom7t.lolguide.domain.champion.usecase.SearchChampionsUseCase
 import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.game.model.GameMode
 import com.venom7t.lolguide.domain.game.model.RoundProgress
+import com.venom7t.lolguide.domain.game.usecase.GiveUpRoundUseCase
 import com.venom7t.lolguide.domain.game.usecase.ObserveGameStatsUseCase
 import com.venom7t.lolguide.domain.game.usecase.StartOrResumeRoundUseCase
 import com.venom7t.lolguide.domain.game.usecase.SubmitGuessUseCase
@@ -37,6 +38,7 @@ class GameRoundViewModel @Inject constructor(
     private val searchChampions: SearchChampionsUseCase,
     private val startOrResumeRound: StartOrResumeRoundUseCase,
     private val submitGuess: SubmitGuessUseCase,
+    private val giveUpRound: GiveUpRoundUseCase,
     private val observeGameStats: ObserveGameStatsUseCase,
     private val getChampionDetail: GetChampionDetailUseCase,
     private val resolvePatch: ResolvePatchUseCase,
@@ -64,6 +66,28 @@ class GameRoundViewModel @Inject constructor(
                 _effects.send(GameRoundEffect.NavigateBack)
             }
             GameRoundEvent.PlayAgainDismissed -> Unit
+
+            GameRoundEvent.GiveUpClicked -> _state.update { it.copy(pendingGiveUp = true) }
+            GameRoundEvent.GiveUpCancelled -> _state.update { it.copy(pendingGiveUp = false) }
+            GameRoundEvent.GiveUpConfirmed -> onGiveUp()
+        }
+    }
+
+    private fun onGiveUp() {
+        val currentRound = round ?: return
+        val currentAnswer = answer ?: return
+        if (currentRound.isFinished) return
+
+        viewModelScope.launch {
+            val updated = giveUpRound(currentRound)
+            round = updated
+            _state.update {
+                it.copy(
+                    pendingGiveUp = false,
+                    outcome = updated.outcome,
+                    revealedAnswerName = currentAnswer.name,
+                )
+            }
         }
     }
 
@@ -115,7 +139,6 @@ class GameRoundViewModel @Inject constructor(
                     isLoading = false,
                     patchVersion = patch,
                     answerChampionId = startedRound.answerChampionId,
-                    guessesRemaining = startedRound.guessesRemaining,
                     outcome = startedRound.outcome,
                     abilityIconFileName = abilityIcon,
                     revealedAnswerName = if (startedRound.isFinished) answer?.name else null,
@@ -147,7 +170,6 @@ class GameRoundViewModel @Inject constructor(
                     query = "",
                     suggestions = emptyList(),
                     guesses = it.guesses + result,
-                    guessesRemaining = updatedRound.guessesRemaining,
                     outcome = updatedRound.outcome,
                     revealedAnswerName = if (updatedRound.isFinished) currentAnswer.name else null,
                 )
