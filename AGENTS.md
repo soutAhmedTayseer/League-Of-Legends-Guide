@@ -81,6 +81,7 @@ project's equivalent of a safety bug.
 | Preferences           | DataStore Preferences                  |                                 |
 | Navigation            | Navigation Compose, type-safe          | String routes are BANNED        |
 | Images                | Coil 3                                 | `AsyncImage`                    |
+| Palette extraction    | `androidx.palette`                     | Splash-tinted accents only      |
 | Collections in State  | `kotlinx.collections.immutable`        | `ImmutableList`, not `List`     |
 | Background            | WorkManager                            | Patch sync, trackers            |
 | Logging               | Timber                                 | No `Log` / `println`            |

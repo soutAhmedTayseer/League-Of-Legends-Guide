@@ -47,6 +47,8 @@ import com.venom7t.lolguide.domain.champion.model.ChampionDetail
 import com.venom7t.lolguide.domain.champion.model.Spell
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.DataDragonUrls
+import com.venom7t.lolguide.presentation.common.abilityText
+import com.venom7t.lolguide.presentation.common.rememberSplashAccent
 import com.venom7t.lolguide.presentation.common.components.ErrorContent
 import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.common.components.PatchBadge
@@ -193,6 +195,14 @@ private fun DetailContent(
     onEvent: (ChampionDetailEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Accent pulled from the splash art of the skin currently on screen, so
+    // the page picks up the champion's own colouring. Falls back to the theme
+    // accent, and is used only for accents -- never for text on a background.
+    val accent = rememberSplashAccent(
+        championId = champion.id,
+        skinNum = detail.skins.getOrNull(state.selectedSkinIndex)?.num ?: 0,
+    )
+
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(AppTheme.dimens.spaceMd),
@@ -237,7 +247,7 @@ private fun DetailContent(
 
         if (detail.lore.isNotBlank()) {
             item {
-                SectionHeader(text = stringResource(R.string.champion_detail_lore))
+                SectionHeader(text = stringResource(R.string.champion_detail_lore), accent = accent)
             }
             item {
                 Text(
@@ -249,7 +259,7 @@ private fun DetailContent(
         }
 
         item {
-            SectionHeader(text = stringResource(R.string.champion_detail_abilities))
+            SectionHeader(text = stringResource(R.string.champion_detail_abilities), accent = accent)
         }
 
         item {
@@ -290,7 +300,7 @@ private fun DetailContent(
         }
 
         item {
-            SectionHeader(text = stringResource(R.string.champion_detail_base_stats))
+            SectionHeader(text = stringResource(R.string.champion_detail_base_stats), accent = accent)
         }
 
         item {
@@ -300,11 +310,15 @@ private fun DetailContent(
 }
 
 @Composable
-private fun SectionHeader(text: String, modifier: Modifier = Modifier) {
+private fun SectionHeader(
+    text: String,
+    modifier: Modifier = Modifier,
+    accent: Color = AppTheme.colors.primary,
+) {
     Text(
         text = text,
         style = AppTheme.typography.titleMedium,
-        color = AppTheme.colors.primary,
+        color = accent,
         modifier = modifier.padding(top = AppTheme.dimens.spaceSm),
     )
 }
@@ -422,10 +436,9 @@ private fun AbilityCard(
         }
 
         Text(
-            // Data Dragon embeds HTML tags in ability text. Stripping them is
-            // a Phase 1 job; leaving the raw markup visible for now is more
-            // honest than silently dropping characters with a naive regex.
-            text = description,
+            // Data Dragon ships pseudo-HTML here; the parser maps damage-type
+            // tags to colours and drops the structural ones.
+            text = abilityText(description),
             style = AppTheme.typography.bodyMedium,
             color = AppTheme.colors.textSecondary,
         )

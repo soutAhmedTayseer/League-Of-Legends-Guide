@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
+    implementation(libs.androidx.palette)
     implementation(libs.timber)
 
     debugImplementation(libs.androidx.compose.ui.tooling)

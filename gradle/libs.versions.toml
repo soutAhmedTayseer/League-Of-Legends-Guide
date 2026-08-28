@@ -35,6 +35,7 @@ work = "2.10.0"
 kotlinxCoroutines = "1.8.1"
 kotlinxCollectionsImmutable = "0.3.8"
 coil3 = "3.0.4"
+palette = "1.0.0"
 timber = "5.0.1"
 
 [libraries]
@@ -87,6 +88,7 @@ kotlinx-collections-immutable = { group = "org.jetbrains.kotlinx", name = "kotli
 coil3-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil3" }
 coil3-network = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coil3" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+androidx-palette = { group = "androidx.palette", name = "palette-ktx", version.ref = "palette" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
