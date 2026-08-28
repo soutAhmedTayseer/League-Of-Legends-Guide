@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,6 +28,7 @@ import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Icon
@@ -111,7 +114,7 @@ fun HomeScreen(
         modifier = modifier
             .fillMaxSize()
             .background(AppTheme.colors.background),
-        contentPadding = PaddingValues(bottom = AppTheme.dimens.spaceXl),
+        contentPadding = PaddingValues(bottom = AppTheme.dimens.spaceLg),
     ) {
         item {
             HomeHero(
@@ -274,15 +277,21 @@ private fun HomeHero(
             )
         }
 
-        // Dissolves the art into the page so the hero has no hard bottom
-        // edge to read as a separate bar.
+        // Two scrims, both resolving to the page background so this works in
+        // either theme. The lower one dissolves the art into the page so the
+        // hero has no hard bottom edge, and carries the title block on a
+        // near-solid base -- splash art is bright and busy, and text laid
+        // straight onto it is unreadable at any weight. The upper one does
+        // the same job for the wordmark and account control.
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        0f to Color.Transparent,
-                        0.45f to Color.Transparent,
+                        0f to AppTheme.colors.background.copy(alpha = 0.72f),
+                        0.22f to Color.Transparent,
+                        0.42f to Color.Transparent,
+                        0.74f to AppTheme.colors.background.copy(alpha = 0.94f),
                         1f to AppTheme.colors.background,
                     ),
                 ),
@@ -358,7 +367,7 @@ private fun AccountBadge(onClick: () -> Unit, modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = Icons.Default.Extension,
+            imageVector = Icons.Default.Person,
             contentDescription = stringResource(R.string.account_title),
             tint = AppTheme.colors.onPrimary,
             modifier = Modifier.size(18.dp),
@@ -455,11 +464,21 @@ private fun ToolGrid(
     ) {
         tools.chunked(2).forEach { row ->
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                // Intrinsic min height ties the two tiles in a row together,
+                // so a label that wraps to two lines grows its neighbour to
+                // match instead of leaving a ragged step between them.
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min),
                 horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
             ) {
                 row.forEach { tool ->
-                    ToolTile(tool = tool, modifier = Modifier.weight(1f))
+                    ToolTile(
+                        tool = tool,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                    )
                 }
                 // Keeps a lone trailing tile at column width instead of
                 // stretching it across the grid.
