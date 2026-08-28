@@ -1,39 +1,58 @@
 package com.venom7t.lolguide.presentation.timer
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.venom7t.lolguide.domain.spell.model.SummonerSpell
+import com.venom7t.lolguide.domain.timer.model.EnemyLane
 import com.venom7t.lolguide.domain.timer.model.GameTimer
 import com.venom7t.lolguide.domain.timer.model.GameTimerPreset
+import com.venom7t.lolguide.domain.timer.model.SpellTimer
 import com.venom7t.lolguide.presentation.R
+import com.venom7t.lolguide.presentation.common.DataDragonUrls
 import com.venom7t.lolguide.presentation.common.components.EmptyContent
+import com.venom7t.lolguide.presentation.common.components.HextechFrame
+import com.venom7t.lolguide.presentation.common.components.SectionRule
 import com.venom7t.lolguide.presentation.common.uiText
 import com.venom7t.lolguide.presentation.theme.AppTheme
 
@@ -93,25 +112,13 @@ fun GameTimersScreen(
             contentPadding = PaddingValues(AppTheme.dimens.spaceMd),
             verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
         ) {
-            item {
-                Text(
-                    text = stringResource(R.string.timers_presets_title),
-                    style = AppTheme.typography.titleMedium,
-                    color = AppTheme.colors.primary,
-                )
-            }
+            item { SectionRule(title = stringResource(R.string.timers_presets_title)) }
 
             item {
                 PresetGrid(onPresetClick = { onEvent(GameTimersEvent.PresetStarted(it)) })
             }
 
-            item {
-                Text(
-                    text = stringResource(R.string.timers_running_title),
-                    style = AppTheme.typography.titleMedium,
-                    color = AppTheme.colors.primary,
-                )
-            }
+            item { SectionRule(title = stringResource(R.string.timers_running_title)) }
 
             if (state.running.isEmpty()) {
                 item { EmptyContent(message = uiText(R.string.timers_none_running)) }
@@ -124,7 +131,76 @@ fun GameTimersScreen(
                     )
                 }
             }
+
+            item {
+                SectionRule(
+                    title = stringResource(R.string.timers_enemy_team_title),
+                    modifier = Modifier.padding(top = AppTheme.dimens.spaceSm),
+                )
+            }
+
+            items(EnemyLane.entries) { lane ->
+                EnemyLaneRow(
+                    lane = lane,
+                    slots = state.laneSlots[lane],
+                    spells = state.spells,
+                    patchVersion = state.patchVersion,
+                    nowEpochMillis = state.nowEpochMillis,
+                    onSlotClick = { slotIndex ->
+                        onEvent(GameTimersEvent.SpellSlotClicked(SpellSlotTarget(lane, slotIndex)))
+                    },
+                )
+            }
         }
+    }
+
+    val pickingTarget = state.pickingTarget
+    if (pickingTarget != null) {
+        SpellPickerSheet(
+            spells = state.spells,
+            patchVersion = state.patchVersion,
+            onPick = { onEvent(GameTimersEvent.SpellPicked(it)) },
+            onDismiss = { onEvent(GameTimersEvent.SpellPickerDismissed) },
+        )
+    }
+
+    if (state.pendingCancelTarget != null) {
+        AlertDialog(
+            onDismissRequest = { onEvent(GameTimersEvent.SpellCancelDismissed) },
+            containerColor = AppTheme.colors.surface,
+            title = {
+                Text(
+                    text = stringResource(R.string.timers_clear_spell_title),
+                    style = AppTheme.typography.titleMedium,
+                    color = AppTheme.colors.textPrimary,
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.timers_clear_spell_body),
+                    style = AppTheme.typography.bodyMedium,
+                    color = AppTheme.colors.textSecondary,
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { onEvent(GameTimersEvent.SpellCancelConfirmed) }) {
+                    Text(
+                        text = stringResource(R.string.action_remove),
+                        style = AppTheme.typography.label,
+                        color = AppTheme.colors.error,
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onEvent(GameTimersEvent.SpellCancelDismissed) }) {
+                    Text(
+                        text = stringResource(R.string.action_cancel),
+                        style = AppTheme.typography.label,
+                        color = AppTheme.colors.textSecondary,
+                    )
+                }
+            },
+        )
     }
 }
 
@@ -154,8 +230,8 @@ private fun PresetGrid(
                     Column(
                         modifier = Modifier
                             .weight(1f)
-                            .background(AppTheme.colors.surface, AppTheme.shapes.medium)
-                            .border(AppTheme.dimens.borderWidth, AppTheme.colors.border, AppTheme.shapes.medium)
+                            .clip(AppTheme.shapes.medium)
+                            .background(AppTheme.colors.surface)
                             .clickable { onPresetClick(preset) }
                             .padding(AppTheme.dimens.spaceMd),
                     ) {
@@ -193,8 +269,8 @@ private fun RunningTimerRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(AppTheme.colors.surface, AppTheme.shapes.medium)
-            .border(AppTheme.dimens.borderWidth, AppTheme.colors.border, AppTheme.shapes.medium)
+            .clip(AppTheme.shapes.medium)
+            .background(AppTheme.colors.surface)
             .padding(AppTheme.dimens.spaceMd),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
@@ -227,6 +303,146 @@ private fun RunningTimerRow(
             )
         }
     }
+}
+
+@Composable
+private fun EnemyLaneRow(
+    lane: EnemyLane,
+    slots: List<SpellTimer?>?,
+    spells: List<SummonerSpell>,
+    patchVersion: String?,
+    nowEpochMillis: Long,
+    onSlotClick: (slotIndex: Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(AppTheme.shapes.medium)
+            .background(AppTheme.colors.surface)
+            .padding(AppTheme.dimens.spaceMd),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
+    ) {
+        Text(
+            text = stringResource(lane.labelRes()),
+            style = AppTheme.typography.tileLabel,
+            color = AppTheme.colors.textPrimary,
+            modifier = Modifier.weight(1f),
+        )
+        (slots ?: listOf(null, null)).forEachIndexed { index, slot ->
+            SpellSlot(
+                slot = slot,
+                spell = spells.firstOrNull { it.id == slot?.spellId },
+                patchVersion = patchVersion,
+                nowEpochMillis = nowEpochMillis,
+                onClick = { onSlotClick(index) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun SpellSlot(
+    slot: SpellTimer?,
+    spell: SummonerSpell?,
+    patchVersion: String?,
+    nowEpochMillis: Long,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        if (slot != null && spell != null && patchVersion != null) {
+            HextechFrame(
+                model = DataDragonUrls.spellIcon(patchVersion, spell.imageFileName),
+                contentDescription = spell.name,
+                modifier = modifier
+                    .size(44.dp)
+                    .clickable(onClick = onClick),
+            )
+            Text(
+                text = slot.remainingSeconds(nowEpochMillis).formatDuration(),
+                style = AppTheme.typography.caption,
+                color = AppTheme.colors.textSecondary,
+            )
+        } else {
+            Box(
+                modifier = modifier
+                    .size(44.dp)
+                    .clip(AppTheme.shapes.small)
+                    .background(AppTheme.colors.surfaceElevated)
+                    .clickable(onClick = onClick),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.timers_assign_spell),
+                    tint = AppTheme.colors.textDisabled,
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SpellPickerSheet(
+    spells: List<SummonerSpell>,
+    patchVersion: String?,
+    onPick: (SummonerSpell) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val sheetState = rememberModalBottomSheetState()
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = AppTheme.colors.surface,
+    ) {
+        Text(
+            text = stringResource(R.string.timers_pick_spell),
+            style = AppTheme.typography.titleMedium,
+            color = AppTheme.colors.textPrimary,
+            modifier = Modifier.padding(horizontal = AppTheme.dimens.spaceMd),
+        )
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(4),
+            contentPadding = PaddingValues(AppTheme.dimens.spaceMd),
+            horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
+            verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
+            // Sheet content, not an outer LazyColumn item -- unlike PresetGrid,
+            // this is the sheet's only scrollable content, so nesting is safe.
+            modifier = Modifier.padding(bottom = AppTheme.dimens.spaceLg),
+        ) {
+            items(spells, key = { it.id }) { spell ->
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    if (patchVersion != null) {
+                        HextechFrame(
+                            model = DataDragonUrls.spellIcon(patchVersion, spell.imageFileName),
+                            contentDescription = spell.name,
+                            modifier = Modifier
+                                .size(52.dp)
+                                .clickable { onPick(spell) },
+                        )
+                    }
+                    Text(
+                        text = spell.name,
+                        style = AppTheme.typography.caption,
+                        color = AppTheme.colors.textSecondary,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                    )
+                }
+            }
+        }
+    }
+}
+
+private fun EnemyLane.labelRes(): Int = when (this) {
+    EnemyLane.TOP -> R.string.lane_top
+    EnemyLane.JUNGLE -> R.string.lane_jungle
+    EnemyLane.MID -> R.string.lane_mid
+    EnemyLane.BOTTOM -> R.string.lane_bottom
+    EnemyLane.SUPPORT -> R.string.lane_support
 }
 
 private fun GameTimerPreset.labelRes(): Int = when (this) {

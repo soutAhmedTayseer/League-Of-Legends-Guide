@@ -224,6 +224,16 @@
     <string name="timer_dragon">التنين</string>
     <string name="timer_herald">هيرالد</string>
     <string name="timer_ward">الحارس</string>
+    <string name="timers_enemy_team_title">الفريق المعادي</string>
+    <string name="timers_assign_spell">تعيين تعويذة استدعاء</string>
+    <string name="timers_pick_spell">ما التعويذة التي استخدمها؟</string>
+    <string name="timers_clear_spell_title">مسح هذا المؤقت؟</string>
+    <string name="timers_clear_spell_body">سيتوقف تتبع زمن انتظار التعويذة لهذه الخانة.</string>
+    <string name="lane_top">أعلى</string>
+    <string name="lane_jungle">الأدغال</string>
+    <string name="lane_mid">الوسط</string>
+    <string name="lane_bottom">أسفل</string>
+    <string name="lane_support">الداعم</string>
 
     <!-- Phase 3: quiz -->
     <string name="quiz_title">اختبار الأبطال</string>

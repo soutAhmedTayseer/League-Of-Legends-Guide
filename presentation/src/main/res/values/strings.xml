@@ -224,6 +224,16 @@
     <string name="timer_dragon">Dragon</string>
     <string name="timer_herald">Herald</string>
     <string name="timer_ward">Ward</string>
+    <string name="timers_enemy_team_title">Enemy team</string>
+    <string name="timers_assign_spell">Assign summoner spell</string>
+    <string name="timers_pick_spell">Which spell did they use?</string>
+    <string name="timers_clear_spell_title">Clear this timer?</string>
+    <string name="timers_clear_spell_body">This stops tracking the spell\'s cooldown for this slot.</string>
+    <string name="lane_top">Top</string>
+    <string name="lane_jungle">Jungle</string>
+    <string name="lane_mid">Mid</string>
+    <string name="lane_bottom">Bottom</string>
+    <string name="lane_support">Support</string>
 
     <!-- Phase 3: quiz -->
     <string name="quiz_title">Champion quiz</string>
