@@ -9,9 +9,6 @@ Multi-module Gradle project: `:app`, `:domain`, `:data`, `:presentation`.
 
 - Build debug APK: `./gradlew assembleDebug`
 - Compile check (fast): `./gradlew :app:compileDebugKotlin`
-- Unit tests (all modules): `./gradlew test`
-- Unit tests, single module: `./gradlew :presentation:test`
-- Single test class: `./gradlew :presentation:test --tests "*.ChampionListViewModelTest"`
 - Lint: `./gradlew lint`
 
 The build requires `local.properties` with `sdk.dir` set. It is gitignored and
@@ -34,7 +31,7 @@ build succeeds with an empty value.
 - **Never hardcode a patch version** (§1). Resolve it at runtime from
   `versions.json`. The original code pinned `12.6.1` and served stale data.
 - **Plan first.** Non-trivial features get a plan in `docs/plans/` (§12).
-- **Every ViewModel needs a test file** (§11).
+- **No unit tests** (§11) — do not add test files; verify with a build and by running the app.
 - **Zero hardcoded user-facing strings** — English *and* Arabic, same commit (§10).
 - **Strict layer boundaries**: `presentation -> domain <- data`. Domain is pure
   Kotlin with zero Android imports (§3).

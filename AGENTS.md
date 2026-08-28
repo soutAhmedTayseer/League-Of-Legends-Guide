@@ -80,7 +80,6 @@ project's equivalent of a safety bug.
 | Background            | WorkManager                            | Patch sync, trackers            |
 | Logging               | Timber                                 | No `Log` / `println`            |
 | Annotation processing | KSP                                    | **KAPT is BANNED**              |
-| Tests                 | JUnit 5 + MockK + Turbine              | No Mockito                      |
 
 ### 2.2 Explicitly Forbidden — Zero Exceptions
 
@@ -300,16 +299,17 @@ A custom design system wrapping Material 3, exposed as `AppTheme`:
 
 ## 11. Testing
 
-- **Every ViewModel has a `*ViewModelTest.kt`** covering: initial state, every
-  Event to State transition, every Event to Effect emission, and error paths. A
-  ViewModel change without a test update is an incomplete change.
-- Mappers and any calculator logic (build simulator, stat scaling) get pure
-  unit tests with known-good fixtures.
-- Repositories are tested against fakes, not mocks, wherever practical.
-- `runTest` + Turbine for Flow and Channel assertions.
-- Test method names are backtick-quoted sentences describing the behaviour.
+**This project does not maintain unit tests.** Do not add `*Test.kt` files, do
+not create test source sets, and do not treat missing coverage as an incomplete
+change. This is a deliberate owner decision, not an oversight.
 
----
+Correctness is therefore enforced by the rules in this document rather than by
+a suite -- in particular §1 (patch correctness) and §7.2 (never swallow an
+error into an empty success). Verification is a real build plus running the
+app:
+
+- `./gradlew assembleDebug`
+- `./gradlew lint`
 
 ## 12. Planning Protocol
 

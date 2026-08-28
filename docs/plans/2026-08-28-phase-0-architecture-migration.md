@@ -66,9 +66,10 @@ out of the migration:
   `ChampionListViewModel` + contract, `ChampionDetailScreen` +
   `ChampionDetailViewModel` + contract.
 - **0.9 Strings** — `values/strings.xml` and `values-ar/strings.xml`.
-- **0.10 Tests** — `ChampionListViewModelTest`, `ChampionDetailViewModelTest`,
-  mapper tests, `FakeChampionRepository`.
-- **0.11 Verify** — `./gradlew assembleDebug test lint` green, app runs.
+- **0.10 Verify** — `./gradlew assembleDebug lint` green, app runs.
+
+  (A test step was planned here and removed: the owner decided on 2026-08-28
+  that this project does not maintain unit tests. See `AGENTS.md` §11.)
 
 ## Data sources (all keyless in Phase 0)
 
@@ -103,13 +104,6 @@ depending on app language.
 **ChampionDetail** — State: `isLoading`, `champion`, `detail`, `patchVersion`,
 `error`. Events: `Retry`, `BackClicked`. Effects: `NavigateBack`,
 `ShowSnackbar`.
-
-## Test plan
-
-- Both ViewModels: initial state, success path, error path, every event's state
-  transition, every effect emission. Fake repository, Turbine, `runTest`.
-- Mappers: DTO to domain and entity round-trip on a fixture champion.
-- Patch resolution: cached-then-refreshed, cache-miss, network-failure-with-cache.
 
 ## Deliberately out of scope for Phase 0
 
