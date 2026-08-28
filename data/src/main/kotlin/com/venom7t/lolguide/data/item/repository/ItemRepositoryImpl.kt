@@ -9,6 +9,7 @@ import com.venom7t.lolguide.data.item.mapper.toEntity
 import com.venom7t.lolguide.domain.common.AppError
 import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.common.runCatchingCancellable
+import com.venom7t.lolguide.domain.patch.repository.PreviousPatchSnapshotRepository
 import com.venom7t.lolguide.domain.item.model.Item
 import com.venom7t.lolguide.domain.item.repository.ItemRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -23,6 +24,7 @@ import javax.inject.Singleton
 class ItemRepositoryImpl @Inject constructor(
     private val api: DataDragonApi,
     private val dao: ItemDao,
+    private val snapshots: PreviousPatchSnapshotRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ItemRepository {
 
@@ -54,6 +56,14 @@ class ItemRepositoryImpl @Inject constructor(
             // table on a malformed response would break offline browsing.
             if (response.data.isEmpty()) {
                 throw AppError.Serialization("item.json contained no items")
+            }
+
+            // Same reasoning as the champion cache: only snapshot on an
+            // actual patch change.
+            val existing = dao.getAllOnce()
+            val existingVersion = existing.firstOrNull()?.patchVersion
+            if (existing.isNotEmpty() && existingVersion != null && existingVersion != version) {
+                snapshots.captureItemSnapshot(existingVersion, existing.map { it.toDomain() })
             }
 
             val entities = response.data.map { (itemId, dto) ->

@@ -8,6 +8,8 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import com.venom7t.lolguide.data.champion.repository.ChampionRepositoryImpl
 import com.venom7t.lolguide.data.favourite.repository.FavouritesRepositoryImpl
 import com.venom7t.lolguide.data.item.repository.ItemRepositoryImpl
+import com.venom7t.lolguide.data.onboarding.repository.OnboardingRepositoryImpl
+import com.venom7t.lolguide.data.patch.repository.PreviousPatchSnapshotRepositoryImpl
 import com.venom7t.lolguide.data.rune.repository.RuneRepositoryImpl
 import com.venom7t.lolguide.data.spell.repository.SummonerSpellRepositoryImpl
 import com.venom7t.lolguide.data.common.di.DefaultDispatcher
@@ -17,6 +19,8 @@ import com.venom7t.lolguide.domain.champion.repository.ChampionRepository
 import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.favourite.repository.FavouritesRepository
 import com.venom7t.lolguide.domain.item.repository.ItemRepository
+import com.venom7t.lolguide.domain.onboarding.repository.OnboardingRepository
+import com.venom7t.lolguide.domain.patch.repository.PreviousPatchSnapshotRepository
 import com.venom7t.lolguide.domain.rune.repository.RuneRepository
 import com.venom7t.lolguide.domain.spell.repository.SummonerSpellRepository
 import com.venom7t.lolguide.domain.patch.repository.PatchRepository
@@ -67,6 +71,16 @@ abstract class RepositoryModule {
     abstract fun bindSummonerSpellRepository(
         impl: SummonerSpellRepositoryImpl,
     ): SummonerSpellRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPreviousPatchSnapshotRepository(
+        impl: PreviousPatchSnapshotRepositoryImpl,
+    ): PreviousPatchSnapshotRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindOnboardingRepository(impl: OnboardingRepositoryImpl): OnboardingRepository
 }
 
 @Module

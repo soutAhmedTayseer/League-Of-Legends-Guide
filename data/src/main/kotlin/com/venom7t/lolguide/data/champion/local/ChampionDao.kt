@@ -20,6 +20,10 @@ interface ChampionDao {
     @Query("SELECT * FROM champions WHERE id = :championId LIMIT 1")
     suspend fun getById(championId: String): ChampionEntity?
 
+    /** One-shot read, used only to snapshot the cache before it is replaced. */
+    @Query("SELECT * FROM champions")
+    suspend fun getAllOnce(): List<ChampionEntity>
+
     @Query("SELECT COUNT(*) FROM champions")
     suspend fun count(): Int
 

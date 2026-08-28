@@ -12,6 +12,7 @@ import com.venom7t.lolguide.domain.champion.repository.ChampionRepository
 import com.venom7t.lolguide.domain.common.AppError
 import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.common.runCatchingCancellable
+import com.venom7t.lolguide.domain.patch.repository.PreviousPatchSnapshotRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -31,6 +32,7 @@ import javax.inject.Singleton
 class ChampionRepositoryImpl @Inject constructor(
     private val api: DataDragonApi,
     private val dao: ChampionDao,
+    private val snapshots: PreviousPatchSnapshotRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ChampionRepository {
 
@@ -54,6 +56,16 @@ class ChampionRepositoryImpl @Inject constructor(
             // blank app with no way back offline (AGENTS.md §7.2).
             if (response.data.isEmpty()) {
                 throw AppError.Serialization("champion.json contained no champions")
+            }
+
+            // Only worth snapshotting on a genuine patch change -- capturing
+            // the same patch's data as "previous" on every app-open refresh
+            // would be pure churn, and ComputePatchDiffUseCase would discard
+            // it anyway since it guards against a same-version snapshot.
+            val existing = dao.getAllOnce()
+            val existingVersion = existing.firstOrNull()?.patchVersion
+            if (existing.isNotEmpty() && existingVersion != null && existingVersion != version) {
+                snapshots.captureChampionSnapshot(existingVersion, existing.map { it.toDomain() })
             }
 
             val entities = response.data.values.map { it.toEntity(version, locale) }

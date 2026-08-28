@@ -11,10 +11,17 @@ import com.venom7t.lolguide.data.favourite.local.FavouriteChampionDao
 import com.venom7t.lolguide.data.favourite.local.FavouriteChampionEntity
 import com.venom7t.lolguide.data.item.local.ItemDao
 import com.venom7t.lolguide.data.item.local.ItemEntity
+import com.venom7t.lolguide.data.patch.local.PreviousPatchSnapshotDao
+import com.venom7t.lolguide.data.patch.local.PreviousPatchSnapshotEntity
 
 @Database(
-    entities = [ChampionEntity::class, FavouriteChampionEntity::class, ItemEntity::class],
-    version = 3,
+    entities = [
+        ChampionEntity::class,
+        FavouriteChampionEntity::class,
+        ItemEntity::class,
+        PreviousPatchSnapshotEntity::class,
+    ],
+    version = 4,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -25,6 +32,8 @@ abstract class LolGuideDatabase : RoomDatabase() {
     abstract fun favouriteChampionDao(): FavouriteChampionDao
 
     abstract fun itemDao(): ItemDao
+
+    abstract fun previousPatchSnapshotDao(): PreviousPatchSnapshotDao
 
     companion object {
         const val NAME = "lol_guide.db"
@@ -95,6 +104,26 @@ abstract class LolGuideDatabase : RoomDatabase() {
                         `stat_moveSpeedPercent` REAL NOT NULL,
                         `stat_lifeStealPercent` REAL NOT NULL,
                         PRIMARY KEY(`id`)
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
+        /**
+         * Adds the previous-patch snapshot table, backing the Phase 3 patch
+         * diff engine (AGENTS.md section 1 -- the diff is a derived result
+         * computed from two real snapshots, never invented).
+         */
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `previous_patch_snapshots` (
+                        `kind` TEXT NOT NULL,
+                        `version` TEXT NOT NULL,
+                        `payloadJson` TEXT NOT NULL,
+                        PRIMARY KEY(`kind`)
                     )
                     """.trimIndent()
                 )

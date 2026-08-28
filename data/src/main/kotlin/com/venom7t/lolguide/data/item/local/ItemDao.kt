@@ -16,6 +16,10 @@ interface ItemDao {
     @Query("SELECT * FROM items WHERE id = :itemId LIMIT 1")
     suspend fun getById(itemId: String): ItemEntity?
 
+    /** One-shot read, used only to snapshot the cache before it is replaced. */
+    @Query("SELECT * FROM items")
+    suspend fun getAllOnce(): List<ItemEntity>
+
     @Query("SELECT * FROM items WHERE id IN (:itemIds)")
     suspend fun getByIds(itemIds: List<String>): List<ItemEntity>
 

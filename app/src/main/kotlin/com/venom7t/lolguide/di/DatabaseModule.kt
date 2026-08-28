@@ -6,6 +6,7 @@ import com.venom7t.lolguide.data.champion.local.ChampionDao
 import com.venom7t.lolguide.data.common.local.LolGuideDatabase
 import com.venom7t.lolguide.data.favourite.local.FavouriteChampionDao
 import com.venom7t.lolguide.data.item.local.ItemDao
+import com.venom7t.lolguide.data.patch.local.PreviousPatchSnapshotDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,6 +29,7 @@ object DatabaseModule {
             .addMigrations(
                 LolGuideDatabase.MIGRATION_1_2,
                 LolGuideDatabase.MIGRATION_2_3,
+                LolGuideDatabase.MIGRATION_3_4,
             )
             .build()
 
@@ -40,4 +42,8 @@ object DatabaseModule {
 
     @Provides
     fun provideItemDao(database: LolGuideDatabase): ItemDao = database.itemDao()
+
+    @Provides
+    fun providePreviousPatchSnapshotDao(database: LolGuideDatabase): PreviousPatchSnapshotDao =
+        database.previousPatchSnapshotDao()
 }
