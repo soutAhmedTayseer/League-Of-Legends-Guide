@@ -54,6 +54,7 @@ import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.common.components.PatchBadge
 import com.venom7t.lolguide.presentation.common.skinDisplayName
 import com.venom7t.lolguide.presentation.theme.AppTheme
+import com.venom7t.lolguide.presentation.voiceline.VoiceLinePanel
 
 @Composable
 fun ChampionDetailScreenRoot(
@@ -305,6 +306,10 @@ private fun DetailContent(
 
         item {
             StatsGrid(champion = champion)
+        }
+
+        item {
+            VoiceLinePanel(championId = champion.id)
         }
     }
 }
