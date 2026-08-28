@@ -2,35 +2,42 @@ package com.example.lolguide.presentation.champion.list
 
 import androidx.compose.runtime.Immutable
 import com.example.lolguide.domain.champion.model.Champion
+import com.example.lolguide.domain.champion.model.ChampionFilter
+import com.example.lolguide.domain.champion.model.ChampionTag
+import com.example.lolguide.domain.champion.model.DamageType
+import com.example.lolguide.domain.champion.model.Difficulty
 import com.example.lolguide.presentation.common.UiText
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
-
-/**
- * MVI contract for the champion list (AGENTS.md §4).
- */
+import kotlinx.collections.immutable.persistentSetOf
 
 @Immutable
 data class ChampionListState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
     val champions: ImmutableList<Champion> = persistentListOf(),
+    val favouriteIds: ImmutableSet<String> = persistentSetOf(),
     val query: String = "",
+    val filter: ChampionFilter = ChampionFilter(),
+    val isFilterSheetOpen: Boolean = false,
+    /**
+     * The resource types present in the cached data, so the filter sheet
+     * offers only options that can actually match something. Hardcoding
+     * "Mana / Energy / None" would go stale the next time Riot ships a
+     * champion with a bespoke resource.
+     */
+    val availableResources: ImmutableList<String> = persistentListOf(),
     val patchVersion: String? = null,
     val isPatchStale: Boolean = false,
-    /**
-     * Kept separate from [champions] so a refresh failure can be shown as a
-     * banner over cached content instead of replacing it. Offline with cached
-     * champions is a usable screen; blanking it would be a regression.
-     */
     val error: UiText? = null,
 ) {
-    /** True only when there is genuinely nothing to render. */
-    val isEmpty: Boolean get() = !isLoading && champions.isEmpty() && query.isBlank()
+    val isEmpty: Boolean
+        get() = !isLoading && champions.isEmpty() && query.isBlank() && !filter.isActive
 
-    /** True when a search excluded everything, which is not the same as empty. */
-    val hasNoSearchResults: Boolean
-        get() = !isLoading && champions.isEmpty() && query.isNotBlank()
+    /** A search or filter excluded everything. Not the same as having no data. */
+    val hasNoResults: Boolean
+        get() = !isLoading && champions.isEmpty() && (query.isNotBlank() || filter.isActive)
 }
 
 sealed interface ChampionListEvent {
@@ -39,6 +46,16 @@ sealed interface ChampionListEvent {
     data class QueryChanged(val query: String) : ChampionListEvent
     data object QueryCleared : ChampionListEvent
     data class ChampionClicked(val championId: String) : ChampionListEvent
+    data class FavouriteToggled(val championId: String) : ChampionListEvent
+
+    data object FilterSheetOpened : ChampionListEvent
+    data object FilterSheetDismissed : ChampionListEvent
+    data class RoleToggled(val role: ChampionTag) : ChampionListEvent
+    data class ResourceToggled(val resource: String) : ChampionListEvent
+    data class DifficultyToggled(val difficulty: Difficulty) : ChampionListEvent
+    data class DamageTypeToggled(val damageType: DamageType) : ChampionListEvent
+    data object FavouritesOnlyToggled : ChampionListEvent
+    data object FiltersCleared : ChampionListEvent
 }
 
 sealed interface ChampionListEffect {

@@ -17,3 +17,12 @@ data object ChampionListRoute
 
 @Serializable
 data class ChampionDetailRoute(val championId: String)
+
+@Serializable
+data object FavouritesRoute
+
+@Serializable
+data object RouletteRoute
+
+@Serializable
+data object CompareRoute

@@ -4,8 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.example.lolguide.domain.champion.model.ChampionStatCalculator
 import com.example.lolguide.domain.champion.usecase.GetChampionDetailUseCase
+import com.example.lolguide.domain.champion.usecase.GetChampionStatsAtLevelUseCase
 import com.example.lolguide.domain.common.AppLocale
+import com.example.lolguide.domain.favourite.usecase.ObserveFavouriteIdsUseCase
+import com.example.lolguide.domain.favourite.usecase.ToggleFavouriteUseCase
 import com.example.lolguide.domain.patch.usecase.ResolvePatchUseCase
 import com.example.lolguide.presentation.common.toUiText
 import com.example.lolguide.presentation.navigation.ChampionDetailRoute
@@ -14,6 +18,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -23,14 +29,16 @@ import javax.inject.Inject
 class ChampionDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getChampionDetail: GetChampionDetailUseCase,
+    private val getStatsAtLevel: GetChampionStatsAtLevelUseCase,
+    private val observeFavouriteIds: ObserveFavouriteIdsUseCase,
+    private val toggleFavourite: ToggleFavouriteUseCase,
     private val resolvePatch: ResolvePatchUseCase,
     private val locale: AppLocale,
 ) : ViewModel() {
 
     /**
      * Read from the type-safe route rather than a stringly-typed argument key,
-     * so a rename of the route parameter is a compile error rather than a null
-     * at runtime.
+     * so renaming the route parameter is a compile error, not a runtime null.
      */
     private val championId: String = savedStateHandle.toRoute<ChampionDetailRoute>().championId
 
@@ -46,16 +54,69 @@ class ChampionDetailViewModel @Inject constructor(
         when (event) {
             ChampionDetailEvent.ScreenOpened -> start()
             ChampionDetailEvent.Retry -> load()
+
             ChampionDetailEvent.BackClicked -> viewModelScope.launch {
                 _effects.send(ChampionDetailEffect.NavigateBack)
             }
+
+            is ChampionDetailEvent.LevelChanged -> setLevel(event.level)
+
+            is ChampionDetailEvent.SkinSelected -> _state.update {
+                it.copy(selectedSkinIndex = event.index)
+            }
+
+            // Adding is harmless and immediate. Removing destroys something the
+            // user made, so it is confirmed first (AGENTS.md §13).
+            ChampionDetailEvent.FavouriteClicked -> {
+                if (_state.value.isFavourite) {
+                    _state.update { it.copy(pendingFavouriteRemoval = true) }
+                } else {
+                    commitFavouriteToggle()
+                }
+            }
+
+            ChampionDetailEvent.FavouriteRemovalConfirmed -> {
+                _state.update { it.copy(pendingFavouriteRemoval = false) }
+                commitFavouriteToggle()
+            }
+
+            ChampionDetailEvent.FavouriteRemovalCancelled ->
+                _state.update { it.copy(pendingFavouriteRemoval = false) }
         }
     }
 
     private fun start() {
         if (hasStarted) return
         hasStarted = true
+        observeFavourite()
         load()
+    }
+
+    private fun observeFavourite() {
+        observeFavouriteIds()
+            .onEach { ids -> _state.update { it.copy(isFavourite = championId in ids) } }
+            .launchIn(viewModelScope)
+    }
+
+    private fun commitFavouriteToggle() {
+        viewModelScope.launch {
+            toggleFavourite(championId).onFailure { throwable ->
+                _effects.send(ChampionDetailEffect.ShowSnackbar(throwable.toUiText()))
+            }
+        }
+    }
+
+    private fun setLevel(level: Int) {
+        val clamped = level.coerceIn(
+            ChampionStatCalculator.MIN_LEVEL,
+            ChampionStatCalculator.MAX_LEVEL,
+        )
+        _state.update { current ->
+            current.copy(
+                level = clamped,
+                scaledStats = current.champion?.let { getStatsAtLevel(it.stats, clamped) },
+            )
+        }
     }
 
     private fun load() {
@@ -69,12 +130,14 @@ class ChampionDetailViewModel @Inject constructor(
 
             getChampionDetail(championId = championId, version = patch.version, locale = locale)
                 .onSuccess { result ->
-                    _state.update {
-                        it.copy(
+                    _state.update { current ->
+                        current.copy(
                             isLoading = false,
                             champion = result.champion,
                             detail = result.detail,
                             error = null,
+                            selectedSkinIndex = 0,
+                            scaledStats = getStatsAtLevel(result.champion.stats, current.level),
                         )
                     }
                 }

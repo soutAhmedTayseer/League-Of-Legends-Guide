@@ -3,15 +3,20 @@ package com.example.lolguide.presentation.champion.list
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.lolguide.domain.champion.model.Champion
+import com.example.lolguide.domain.champion.model.ChampionFilter
+import com.example.lolguide.domain.champion.usecase.FilterChampionsUseCase
 import com.example.lolguide.domain.champion.usecase.ObserveChampionsUseCase
 import com.example.lolguide.domain.champion.usecase.RefreshChampionsUseCase
 import com.example.lolguide.domain.champion.usecase.SearchChampionsUseCase
 import com.example.lolguide.domain.common.AppError
 import com.example.lolguide.domain.common.AppLocale
+import com.example.lolguide.domain.favourite.usecase.ObserveFavouriteIdsUseCase
+import com.example.lolguide.domain.favourite.usecase.ToggleFavouriteUseCase
 import com.example.lolguide.domain.patch.usecase.ResolvePatchUseCase
 import com.example.lolguide.presentation.common.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,6 +33,9 @@ class ChampionListViewModel @Inject constructor(
     private val observeChampions: ObserveChampionsUseCase,
     private val refreshChampions: RefreshChampionsUseCase,
     private val searchChampions: SearchChampionsUseCase,
+    private val filterChampions: FilterChampionsUseCase,
+    private val observeFavouriteIds: ObserveFavouriteIdsUseCase,
+    private val toggleFavourite: ToggleFavouriteUseCase,
     private val resolvePatch: ResolvePatchUseCase,
     private val locale: AppLocale,
 ) : ViewModel() {
@@ -38,11 +46,9 @@ class ChampionListViewModel @Inject constructor(
     private val _effects = Channel<ChampionListEffect>(Channel.BUFFERED)
     val effects = _effects.receiveAsFlow()
 
-    /**
-     * The unfiltered cache. Search filters this rather than the displayed list,
-     * so deleting characters from the query restores results without a reload.
-     */
+    /** The unfiltered cache. Search and filters are applied over this. */
     private var allChampions: List<Champion> = emptyList()
+    private var favouriteIds: Set<String> = emptySet()
 
     private var hasStarted = false
 
@@ -50,19 +56,54 @@ class ChampionListViewModel @Inject constructor(
         when (event) {
             ChampionListEvent.ScreenOpened -> start()
             ChampionListEvent.Retry -> load()
-            is ChampionListEvent.QueryChanged -> applyQuery(event.query)
-            ChampionListEvent.QueryCleared -> applyQuery("")
+            is ChampionListEvent.QueryChanged -> updateQuery(event.query)
+            ChampionListEvent.QueryCleared -> updateQuery("")
+
             is ChampionListEvent.ChampionClicked -> viewModelScope.launch {
                 _effects.send(ChampionListEffect.NavigateToDetail(event.championId))
             }
+
+            is ChampionListEvent.FavouriteToggled -> viewModelScope.launch {
+                toggleFavourite(event.championId).onFailure { throwable ->
+                    _effects.send(ChampionListEffect.ShowSnackbar(throwable.toUiText()))
+                }
+            }
+
+            ChampionListEvent.FilterSheetOpened ->
+                _state.update { it.copy(isFilterSheetOpen = true) }
+
+            ChampionListEvent.FilterSheetDismissed ->
+                _state.update { it.copy(isFilterSheetOpen = false) }
+
+            is ChampionListEvent.RoleToggled -> updateFilter { current ->
+                current.copy(roles = current.roles.toggle(event.role))
+            }
+
+            is ChampionListEvent.ResourceToggled -> updateFilter { current ->
+                current.copy(resources = current.resources.toggle(event.resource))
+            }
+
+            is ChampionListEvent.DifficultyToggled -> updateFilter { current ->
+                current.copy(difficulties = current.difficulties.toggle(event.difficulty))
+            }
+
+            is ChampionListEvent.DamageTypeToggled -> updateFilter { current ->
+                current.copy(damageTypes = current.damageTypes.toggle(event.damageType))
+            }
+
+            ChampionListEvent.FavouritesOnlyToggled -> updateFilter { current ->
+                current.copy(favouritesOnly = !current.favouritesOnly)
+            }
+
+            ChampionListEvent.FiltersCleared -> updateFilter { ChampionFilter() }
         }
     }
 
-    /** Idempotent: the screen re-emits ScreenOpened on every recomposition-driven restart. */
     private fun start() {
         if (hasStarted) return
         hasStarted = true
         observeCache()
+        observeFavourites()
         load()
     }
 
@@ -72,24 +113,66 @@ class ChampionListViewModel @Inject constructor(
                 allChampions = champions
                 _state.update { current ->
                     current.copy(
-                        champions = searchChampions(champions, current.query).toImmutableList(),
-                        // Cached content arriving means we are no longer blank,
-                        // even if a refresh is still in flight.
+                        availableResources = champions
+                            .map { it.partype }
+                            .filter { it.isNotBlank() }
+                            .distinct()
+                            .sorted()
+                            .toImmutableList(),
                         isLoading = current.isLoading && champions.isEmpty(),
                     )
                 }
+                recomputeVisible()
             }
             .launchIn(viewModelScope)
     }
 
+    private fun observeFavourites() {
+        observeFavouriteIds()
+            .onEach { ids ->
+                favouriteIds = ids
+                _state.update { it.copy(favouriteIds = ids.toImmutableSet()) }
+                // A favourite change alters the visible list only while the
+                // favourites-only filter is on, but recomputing unconditionally
+                // keeps one code path instead of two.
+                recomputeVisible()
+            }
+            .launchIn(viewModelScope)
+    }
+
+    /**
+     * Filter first, then search.
+     *
+     * Order matters: searching first would rank across champions the filter is
+     * about to discard, so the top result could vanish as soon as it was
+     * ranked. Filtering first means the ranking only ever orders things the
+     * user can actually see.
+     */
+    private fun recomputeVisible() {
+        _state.update { current ->
+            val filtered = filterChampions(allChampions, current.filter, favouriteIds)
+            val searched = searchChampions(filtered, current.query)
+            current.copy(champions = searched.toImmutableList())
+        }
+    }
+
+    private fun updateQuery(query: String) {
+        _state.update { it.copy(query = query) }
+        recomputeVisible()
+    }
+
+    private fun updateFilter(transform: (ChampionFilter) -> ChampionFilter) {
+        _state.update { it.copy(filter = transform(it.filter)) }
+        recomputeVisible()
+    }
+
     private fun load() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = allChampions.isEmpty(), isRefreshing = true, error = null) }
+            _state.update {
+                it.copy(isLoading = allChampions.isEmpty(), isRefreshing = true, error = null)
+            }
 
             val patch = resolvePatch().getOrElse { throwable ->
-                // No patch means no valid request can be built at all. If we
-                // have cached champions the screen stays usable, so this is a
-                // banner rather than a full error state.
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -108,9 +191,6 @@ class ChampionListViewModel @Inject constructor(
                 it.copy(patchVersion = patch.version, isPatchStale = patch.isStale)
             }
 
-            // Only hit the network when we actually need to: a patch change,
-            // or an empty cache. Re-downloading the full champion list on every
-            // screen open would be pointless traffic (AGENTS.md §8.3).
             val needsRefresh = patch.didPatchChange || allChampions.isEmpty()
             if (!needsRefresh) {
                 _state.update { it.copy(isLoading = false, isRefreshing = false) }
@@ -126,28 +206,17 @@ class ChampionListViewModel @Inject constructor(
                         it.copy(
                             isLoading = false,
                             isRefreshing = false,
-                            error = if (allChampions.isEmpty()) {
-                                throwable.toUiText()
-                            } else {
-                                null
-                            },
+                            error = if (allChampions.isEmpty()) throwable.toUiText() else null,
                         )
                     }
-                    // With cached content on screen the failure is incidental,
-                    // so it is a transient snackbar rather than a blocking state.
                     if (allChampions.isNotEmpty()) {
                         _effects.send(ChampionListEffect.ShowSnackbar(throwable.toUiText()))
                     }
                 }
         }
     }
-
-    private fun applyQuery(query: String) {
-        _state.update { current ->
-            current.copy(
-                query = query,
-                champions = searchChampions(allChampions, query).toImmutableList(),
-            )
-        }
-    }
 }
+
+/** Adds [value] if absent, removes it if present. */
+private fun <T> Set<T>.toggle(value: T): Set<T> =
+    if (value in this) this - value else this + value

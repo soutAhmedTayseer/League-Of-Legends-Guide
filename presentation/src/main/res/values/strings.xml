@@ -65,4 +65,75 @@
     <string name="error_server">Riot\'s servers returned an error (%1$d).</string>
     <string name="error_unknown">Something went wrong.</string>
 
+    <!-- Phase 1: filters -->
+    <string name="filter_title">Filters</string>
+    <string name="filter_open">Open filters</string>
+    <string name="filter_clear">Clear all</string>
+    <string name="filter_active_count">%1$d active</string>
+    <string name="filter_section_role">Role</string>
+    <string name="filter_section_resource">Resource</string>
+    <string name="filter_section_difficulty">Difficulty</string>
+    <string name="filter_section_damage">Damage type</string>
+    <string name="filter_favourites_only">Favourites only</string>
+
+    <string name="role_assassin">Assassin</string>
+    <string name="role_fighter">Fighter</string>
+    <string name="role_mage">Mage</string>
+    <string name="role_marksman">Marksman</string>
+    <string name="role_support">Support</string>
+    <string name="role_tank">Tank</string>
+
+    <string name="difficulty_low">Low</string>
+    <string name="difficulty_medium">Medium</string>
+    <string name="difficulty_high">High</string>
+
+    <string name="damage_physical">Physical</string>
+    <string name="damage_magic">Magic</string>
+    <string name="damage_hybrid">Hybrid</string>
+    <string name="damage_type_approximate">Damage type is estimated from Riot ratings, not an official classification.</string>
+
+    <!-- Phase 1: favourites -->
+    <string name="favourites_title">Favourites</string>
+    <string name="favourite_add">Add %1$s to favourites</string>
+    <string name="favourite_remove">Remove %1$s from favourites</string>
+    <string name="favourites_empty">No favourites yet. Tap the star on a champion to add one.</string>
+    <string name="favourite_removed_confirm_title">Remove favourite?</string>
+    <string name="favourite_removed_confirm_message">Remove %1$s from your favourites?</string>
+    <string name="action_remove">Remove</string>
+    <string name="action_cancel">Cancel</string>
+
+    <!-- Phase 1: skins -->
+    <string name="skins_title">Skins</string>
+    <string name="skins_count">%1$d skins</string>
+    <string name="skin_has_chromas">Chromas available</string>
+    <string name="skin_splash">%1$s splash art</string>
+    <string name="skin_base_name">Default</string>
+
+    <!-- Phase 1: level slider -->
+    <string name="level_label">Level %1$d</string>
+    <string name="level_stats_title">Stats at level</string>
+    <string name="derived_values_notice">Calculated from base stats and per-level growth. Riot publishes only level 1 values.</string>
+
+    <!-- Phase 1: compare -->
+    <string name="compare_title">Compare</string>
+    <string name="compare_open">Compare champions</string>
+    <string name="compare_pick_left">Pick the first champion</string>
+    <string name="compare_pick_right">Pick the second champion</string>
+    <string name="compare_change">Change</string>
+    <string name="compare_empty">Pick two champions to compare them.</string>
+    <string name="compare_swap">Swap sides</string>
+
+    <!-- Phase 1: roulette -->
+    <string name="roulette_title">Random champion</string>
+    <string name="roulette_open">Random champion</string>
+    <string name="roulette_roll">Roll</string>
+    <string name="roulette_reroll">Roll again</string>
+    <string name="roulette_prompt">Roll for a random champion. Filters from the champion list apply.</string>
+    <string name="roulette_empty_pool">No champions match the current filters.</string>
+    <string name="roulette_view_champion">View champion</string>
+
+    <!-- Phase 1: nav -->
+    <string name="nav_champions">Champions</string>
+    <string name="nav_favourites">Favourites</string>
+
 </resources>

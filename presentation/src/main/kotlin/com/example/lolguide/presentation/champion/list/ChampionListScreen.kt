@@ -1,8 +1,5 @@
 package com.example.lolguide.presentation.champion.list
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,11 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Compare
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,17 +31,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import com.example.lolguide.domain.champion.model.Champion
 import com.example.lolguide.presentation.R
-import com.example.lolguide.presentation.common.DataDragonUrls
-import com.example.lolguide.presentation.common.UiText
+import com.example.lolguide.presentation.common.components.ChampionRow
 import com.example.lolguide.presentation.common.components.EmptyContent
 import com.example.lolguide.presentation.common.components.ErrorContent
 import com.example.lolguide.presentation.common.components.LoadingContent
@@ -54,6 +47,8 @@ import com.example.lolguide.presentation.theme.AppTheme
 @Composable
 fun ChampionListScreenRoot(
     onNavigateToDetail: (String) -> Unit,
+    onNavigateToCompare: () -> Unit,
+    onNavigateToRoulette: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ChampionListViewModel = hiltViewModel(),
 ) {
@@ -65,8 +60,8 @@ fun ChampionListScreenRoot(
         viewModel.onEvent(ChampionListEvent.ScreenOpened)
     }
 
-    // Effects are consumed once. Collecting them here rather than in state is
-    // what stops a navigation or a snackbar from replaying on rotation.
+    // Effects are consumed once. Collecting them here rather than holding them
+    // in state is what stops a navigation or snackbar replaying on rotation.
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
@@ -80,6 +75,8 @@ fun ChampionListScreenRoot(
     ChampionListScreen(
         state = state,
         onEvent = viewModel::onEvent,
+        onNavigateToCompare = onNavigateToCompare,
+        onNavigateToRoulette = onNavigateToRoulette,
         snackbarHostState = snackbarHostState,
         modifier = modifier,
     )
@@ -90,6 +87,8 @@ fun ChampionListScreenRoot(
 fun ChampionListScreen(
     state: ChampionListState,
     onEvent: (ChampionListEvent) -> Unit,
+    onNavigateToCompare: () -> Unit,
+    onNavigateToRoulette: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
@@ -114,6 +113,22 @@ fun ChampionListScreen(
                         }
                     }
                 },
+                actions = {
+                    IconButton(onClick = onNavigateToCompare) {
+                        Icon(
+                            imageVector = Icons.Default.Compare,
+                            contentDescription = stringResource(R.string.compare_open),
+                            tint = AppTheme.colors.textSecondary,
+                        )
+                    }
+                    IconButton(onClick = onNavigateToRoulette) {
+                        Icon(
+                            imageVector = Icons.Default.Casino,
+                            contentDescription = stringResource(R.string.roulette_open),
+                            tint = AppTheme.colors.textSecondary,
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = AppTheme.colors.surface,
                 ),
@@ -131,7 +146,21 @@ fun ChampionListScreen(
                 onClear = { onEvent(ChampionListEvent.QueryCleared) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(AppTheme.dimens.spaceMd),
+                    .padding(
+                        start = AppTheme.dimens.spaceMd,
+                        end = AppTheme.dimens.spaceMd,
+                        top = AppTheme.dimens.spaceMd,
+                    ),
+            )
+
+            ActiveFilterBar(
+                filter = state.filter,
+                onOpenFilters = { onEvent(ChampionListEvent.FilterSheetOpened) },
+                onClearFilters = { onEvent(ChampionListEvent.FiltersCleared) },
+                modifier = Modifier.padding(
+                    horizontal = AppTheme.dimens.spaceMd,
+                    vertical = AppTheme.dimens.spaceSm,
+                ),
             )
 
             when {
@@ -142,20 +171,48 @@ fun ChampionListScreen(
                     onRetry = { onEvent(ChampionListEvent.Retry) },
                 )
 
-                state.hasNoSearchResults -> EmptyContent(
-                    message = uiText(R.string.champion_list_no_results, state.query),
+                // A search or filter matching nothing is a different situation
+                // from having no data at all, and says so (AGENTS.md §13).
+                state.hasNoResults -> EmptyContent(
+                    message = if (state.query.isNotBlank()) {
+                        uiText(R.string.champion_list_no_results, state.query)
+                    } else {
+                        uiText(R.string.roulette_empty_pool)
+                    },
                 )
 
-                state.isEmpty -> EmptyContent(
-                    message = uiText(R.string.champion_list_empty),
-                )
+                state.isEmpty -> EmptyContent(message = uiText(R.string.champion_list_empty))
 
-                else -> ChampionList(
-                    champions = state.champions,
-                    patchVersion = state.patchVersion,
-                    onChampionClick = { onEvent(ChampionListEvent.ChampionClicked(it)) },
-                )
+                else -> LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        horizontal = AppTheme.dimens.spaceMd,
+                        vertical = AppTheme.dimens.spaceSm,
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
+                ) {
+                    items(items = state.champions, key = { it.id }) { champion ->
+                        ChampionRow(
+                            champion = champion,
+                            isFavourite = champion.id in state.favouriteIds,
+                            onClick = {
+                                onEvent(ChampionListEvent.ChampionClicked(champion.id))
+                            },
+                            onFavouriteClick = {
+                                onEvent(ChampionListEvent.FavouriteToggled(champion.id))
+                            },
+                        )
+                    }
+                }
             }
+        }
+
+        if (state.isFilterSheetOpen) {
+            ChampionFilterSheet(
+                filter = state.filter,
+                availableResources = state.availableResources,
+                onEvent = onEvent,
+            )
         }
     }
 }
@@ -207,95 +264,4 @@ private fun SearchField(
             cursorColor = AppTheme.colors.accent,
         ),
     )
-}
-
-@Composable
-private fun ChampionList(
-    champions: List<Champion>,
-    patchVersion: String?,
-    onChampionClick: (String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            horizontal = AppTheme.dimens.spaceMd,
-            vertical = AppTheme.dimens.spaceSm,
-        ),
-        verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
-    ) {
-        items(items = champions, key = { it.id }) { champion ->
-            ChampionRow(
-                champion = champion,
-                patchVersion = patchVersion,
-                onClick = { onChampionClick(champion.id) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun ChampionRow(
-    champion: Champion,
-    patchVersion: String?,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(AppTheme.colors.surface, AppTheme.shapes.medium)
-            .border(
-                width = AppTheme.dimens.borderWidth,
-                color = AppTheme.colors.border,
-                shape = AppTheme.shapes.medium,
-            )
-            .clickable(onClick = onClick)
-            .padding(AppTheme.dimens.spaceSm),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
-    ) {
-        // The icon is versioned art, so it is fetched on the champion's own
-        // patch rather than whatever the screen happens to be showing.
-        AsyncImage(
-            model = DataDragonUrls.championIcon(
-                version = champion.patchVersion.ifBlank { patchVersion.orEmpty() },
-                imageFileName = champion.imageFileName,
-            ),
-            contentDescription = stringResource(
-                R.string.champion_detail_portrait,
-                champion.name,
-            ),
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(AppTheme.dimens.championThumb)
-                .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.small),
-        )
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = champion.name,
-                style = AppTheme.typography.titleMedium,
-                color = AppTheme.colors.textPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Text(
-                text = champion.title,
-                style = AppTheme.typography.bodyMedium,
-                color = AppTheme.colors.textSecondary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-            if (champion.tags.isNotEmpty()) {
-                Text(
-                    text = champion.tags.joinToString(" · ") { it.raw },
-                    style = AppTheme.typography.caption,
-                    color = AppTheme.colors.accent,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
-    }
 }

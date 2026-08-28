@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +50,7 @@ import com.example.lolguide.presentation.common.DataDragonUrls
 import com.example.lolguide.presentation.common.components.ErrorContent
 import com.example.lolguide.presentation.common.components.LoadingContent
 import com.example.lolguide.presentation.common.components.PatchBadge
+import com.example.lolguide.presentation.common.skinDisplayName
 import com.example.lolguide.presentation.theme.AppTheme
 
 @Composable
@@ -122,6 +125,32 @@ fun ChampionDetailScreen(
                         state.patchVersion?.let { PatchBadge(version = it) }
                     }
                 },
+                actions = {
+                    state.champion?.let { champion ->
+                        IconButton(onClick = { onEvent(ChampionDetailEvent.FavouriteClicked) }) {
+                            Icon(
+                                imageVector = if (state.isFavourite) {
+                                    Icons.Filled.Star
+                                } else {
+                                    Icons.Outlined.StarBorder
+                                },
+                                contentDescription = stringResource(
+                                    if (state.isFavourite) {
+                                        R.string.favourite_remove
+                                    } else {
+                                        R.string.favourite_add
+                                    },
+                                    champion.name,
+                                ),
+                                tint = if (state.isFavourite) {
+                                    AppTheme.colors.primary
+                                } else {
+                                    AppTheme.colors.textDisabled
+                                },
+                            )
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = AppTheme.colors.surface,
                 ),
@@ -138,18 +167,30 @@ fun ChampionDetailScreen(
                 )
 
                 state.champion != null && state.detail != null -> DetailContent(
+                    state = state,
                     champion = state.champion,
                     detail = state.detail,
+                    onEvent = onEvent,
                 )
             }
+        }
+
+        if (state.pendingFavouriteRemoval && state.champion != null) {
+            RemoveFavouriteDialog(
+                championName = state.champion.name,
+                onConfirm = { onEvent(ChampionDetailEvent.FavouriteRemovalConfirmed) },
+                onDismiss = { onEvent(ChampionDetailEvent.FavouriteRemovalCancelled) },
+            )
         }
     }
 }
 
 @Composable
 private fun DetailContent(
+    state: ChampionDetailState,
     champion: Champion,
     detail: ChampionDetail,
+    onEvent: (ChampionDetailEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -158,18 +199,28 @@ private fun DetailContent(
         verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
     ) {
         item {
-            AsyncImage(
-                model = DataDragonUrls.championSplash(champion.id),
-                contentDescription = stringResource(
-                    R.string.champion_detail_portrait,
-                    champion.name,
-                ),
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(16f / 9f)
-                    .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.large),
-            )
+            if (detail.skins.isNotEmpty()) {
+                SkinsSection(
+                    championId = champion.id,
+                    championName = champion.name,
+                    skins = detail.skins,
+                    selectedIndex = state.selectedSkinIndex,
+                    onSkinSelected = { onEvent(ChampionDetailEvent.SkinSelected(it)) },
+                )
+            } else {
+                AsyncImage(
+                    model = DataDragonUrls.championSplash(champion.id),
+                    contentDescription = stringResource(
+                        R.string.champion_detail_portrait,
+                        champion.name,
+                    ),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(16f / 9f)
+                        .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.large),
+                )
+            }
         }
 
         item {
@@ -225,6 +276,17 @@ private fun DetailContent(
                 description = spell.description,
                 spell = spell,
             )
+        }
+
+        state.scaledStats?.let { scaled ->
+            item {
+                LevelStatsSection(
+                    level = state.level,
+                    stats = scaled,
+                    resourceName = champion.partype,
+                    onLevelChanged = { onEvent(ChampionDetailEvent.LevelChanged(it)) },
+                )
+            }
         }
 
         item {
