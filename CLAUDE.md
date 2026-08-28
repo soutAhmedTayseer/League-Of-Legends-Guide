@@ -43,8 +43,11 @@ build succeeds with an empty value.
 ## Roadmap
 
 Phase 0 foundation · 1 champion guide · 2 items & builds · 3 offline & polish ·
-4 player data (needs Riot key) · 5 live service (needs Firebase). Phases 0-3 are
-entirely keyless.
+4 player data (needs Riot key) · 5 live service (needs Firebase) · 6 champion
+riddle game. Phases 0-3 and 6 are entirely keyless.
+
+Phase 6 was briefly slated as Phase 2 and reordered on 2026-08-28; its drafted
+domain layer is parked on `feat/phase-6-champion-riddle`.
 
 If anything here conflicts with `AGENTS.md`, `AGENTS.md` wins — update this file
 to match, do not silently deviate.

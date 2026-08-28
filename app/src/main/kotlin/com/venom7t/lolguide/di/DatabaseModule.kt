@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.venom7t.lolguide.data.champion.local.ChampionDao
 import com.venom7t.lolguide.data.common.local.LolGuideDatabase
 import com.venom7t.lolguide.data.favourite.local.FavouriteChampionDao
+import com.venom7t.lolguide.data.item.local.ItemDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,7 +25,10 @@ object DatabaseModule {
             // content was a rebuildable CDN cache. Favourites are user-authored
             // and cannot be re-downloaded, so schema changes migrate properly
             // from here on.
-            .addMigrations(LolGuideDatabase.MIGRATION_1_2)
+            .addMigrations(
+                LolGuideDatabase.MIGRATION_1_2,
+                LolGuideDatabase.MIGRATION_2_3,
+            )
             .build()
 
     @Provides
@@ -33,4 +37,7 @@ object DatabaseModule {
     @Provides
     fun provideFavouriteChampionDao(database: LolGuideDatabase): FavouriteChampionDao =
         database.favouriteChampionDao()
+
+    @Provides
+    fun provideItemDao(database: LolGuideDatabase): ItemDao = database.itemDao()
 }

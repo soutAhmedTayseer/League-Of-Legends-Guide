@@ -2,6 +2,9 @@ package com.venom7t.lolguide.data.champion.remote
 
 import com.venom7t.lolguide.data.champion.remote.dto.ChampionDetailResponseDto
 import com.venom7t.lolguide.data.champion.remote.dto.ChampionListResponseDto
+import com.venom7t.lolguide.data.item.remote.dto.ItemListResponseDto
+import com.venom7t.lolguide.data.rune.remote.dto.RuneTreeDto
+import com.venom7t.lolguide.data.spell.remote.dto.SummonerSpellListResponseDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -45,4 +48,24 @@ interface DataDragonApi {
         @Path("locale") locale: String,
         @Path("championId") championId: String,
     ): ChampionDetailResponseDto
+
+    /** Every shop item, including modes and maps this app does not show. */
+    @GET("cdn/{version}/data/{locale}/item.json")
+    suspend fun getItems(
+        @Path("version") version: String,
+        @Path("locale") locale: String,
+    ): ItemListResponseDto
+
+    /** The five rune trees. Returns a bare array, not an object. */
+    @GET("cdn/{version}/data/{locale}/runesReforged.json")
+    suspend fun getRuneTrees(
+        @Path("version") version: String,
+        @Path("locale") locale: String,
+    ): List<RuneTreeDto>
+
+    @GET("cdn/{version}/data/{locale}/summoner.json")
+    suspend fun getSummonerSpells(
+        @Path("version") version: String,
+        @Path("locale") locale: String,
+    ): SummonerSpellListResponseDto
 }

@@ -9,10 +9,12 @@ import com.venom7t.lolguide.data.champion.local.ChampionDao
 import com.venom7t.lolguide.data.champion.local.ChampionEntity
 import com.venom7t.lolguide.data.favourite.local.FavouriteChampionDao
 import com.venom7t.lolguide.data.favourite.local.FavouriteChampionEntity
+import com.venom7t.lolguide.data.item.local.ItemDao
+import com.venom7t.lolguide.data.item.local.ItemEntity
 
 @Database(
-    entities = [ChampionEntity::class, FavouriteChampionEntity::class],
-    version = 2,
+    entities = [ChampionEntity::class, FavouriteChampionEntity::class, ItemEntity::class],
+    version = 3,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -21,6 +23,8 @@ abstract class LolGuideDatabase : RoomDatabase() {
     abstract fun championDao(): ChampionDao
 
     abstract fun favouriteChampionDao(): FavouriteChampionDao
+
+    abstract fun itemDao(): ItemDao
 
     companion object {
         const val NAME = "lol_guide.db"
@@ -42,6 +46,55 @@ abstract class LolGuideDatabase : RoomDatabase() {
                         `championId` TEXT NOT NULL,
                         `favouritedAtEpochMillis` INTEGER NOT NULL,
                         PRIMARY KEY(`championId`)
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
+        /**
+         * Adds the item cache.
+         *
+         * Items are rebuildable from the CDN, so this table alone would
+         * tolerate a destructive fallback -- but the same database holds
+         * favourites, which are not rebuildable, so every migration from here
+         * on has to be real.
+         */
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `items` (
+                        `id` TEXT NOT NULL,
+                        `name` TEXT NOT NULL,
+                        `plaintext` TEXT NOT NULL,
+                        `description` TEXT NOT NULL,
+                        `imageFileName` TEXT NOT NULL,
+                        `tags` TEXT NOT NULL,
+                        `fromIds` TEXT NOT NULL,
+                        `intoIds` TEXT NOT NULL,
+                        `depth` INTEGER NOT NULL,
+                        `requiredChampionId` TEXT,
+                        `availableOnSummonersRift` INTEGER NOT NULL,
+                        `patchVersion` TEXT NOT NULL,
+                        `locale` TEXT NOT NULL,
+                        `gold_base` INTEGER NOT NULL,
+                        `gold_total` INTEGER NOT NULL,
+                        `gold_sell` INTEGER NOT NULL,
+                        `gold_purchasable` INTEGER NOT NULL,
+                        `stat_attackDamage` REAL NOT NULL,
+                        `stat_abilityPower` REAL NOT NULL,
+                        `stat_health` REAL NOT NULL,
+                        `stat_mana` REAL NOT NULL,
+                        `stat_armor` REAL NOT NULL,
+                        `stat_magicResist` REAL NOT NULL,
+                        `stat_attackSpeedPercent` REAL NOT NULL,
+                        `stat_critChancePercent` REAL NOT NULL,
+                        `stat_healthRegen` REAL NOT NULL,
+                        `stat_moveSpeedFlat` REAL NOT NULL,
+                        `stat_moveSpeedPercent` REAL NOT NULL,
+                        `stat_lifeStealPercent` REAL NOT NULL,
+                        PRIMARY KEY(`id`)
                     )
                     """.trimIndent()
                 )

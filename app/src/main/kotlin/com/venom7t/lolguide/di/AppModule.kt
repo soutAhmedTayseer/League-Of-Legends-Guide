@@ -7,12 +7,18 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.venom7t.lolguide.data.champion.repository.ChampionRepositoryImpl
 import com.venom7t.lolguide.data.favourite.repository.FavouritesRepositoryImpl
+import com.venom7t.lolguide.data.item.repository.ItemRepositoryImpl
+import com.venom7t.lolguide.data.rune.repository.RuneRepositoryImpl
+import com.venom7t.lolguide.data.spell.repository.SummonerSpellRepositoryImpl
 import com.venom7t.lolguide.data.common.di.DefaultDispatcher
 import com.venom7t.lolguide.data.common.di.IoDispatcher
 import com.venom7t.lolguide.data.patch.repository.PatchRepositoryImpl
 import com.venom7t.lolguide.domain.champion.repository.ChampionRepository
 import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.favourite.repository.FavouritesRepository
+import com.venom7t.lolguide.domain.item.repository.ItemRepository
+import com.venom7t.lolguide.domain.rune.repository.RuneRepository
+import com.venom7t.lolguide.domain.spell.repository.SummonerSpellRepository
 import com.venom7t.lolguide.domain.patch.repository.PatchRepository
 import dagger.Binds
 import dagger.Module
@@ -47,6 +53,20 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindFavouritesRepository(impl: FavouritesRepositoryImpl): FavouritesRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindItemRepository(impl: ItemRepositoryImpl): ItemRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRuneRepository(impl: RuneRepositoryImpl): RuneRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSummonerSpellRepository(
+        impl: SummonerSpellRepositoryImpl,
+    ): SummonerSpellRepository
 }
 
 @Module
