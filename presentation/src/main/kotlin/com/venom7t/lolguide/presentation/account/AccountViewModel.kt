@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.venom7t.lolguide.domain.auth.usecase.ObserveAccountUseCase
 import com.venom7t.lolguide.domain.auth.usecase.SignInWithGoogleUseCase
 import com.venom7t.lolguide.domain.auth.usecase.SignOutUseCase
+import com.venom7t.lolguide.domain.sync.usecase.SyncOnStartUseCase
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.toUiText
 import com.venom7t.lolguide.presentation.common.uiText
@@ -25,6 +26,7 @@ class AccountViewModel @Inject constructor(
     private val observeAccount: ObserveAccountUseCase,
     private val signInWithGoogle: SignInWithGoogleUseCase,
     private val signOut: SignOutUseCase,
+    private val syncOnStart: SyncOnStartUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(AccountState())
@@ -47,7 +49,19 @@ class AccountViewModel @Inject constructor(
             is AccountEvent.GoogleIdTokenReceived -> viewModelScope.launch {
                 _state.update { it.copy(isSigningIn = true, error = null) }
                 signInWithGoogle(event.idToken)
-                    .onSuccess { _state.update { it.copy(isSigningIn = false) } }
+                    .onSuccess {
+                        // The app-start sync pull (LolGuideApplication.onCreate)
+                        // already ran once, before this sign-in existed --
+                        // against whatever anonymous UID was current at that
+                        // instant. Signing in can switch to a *different*,
+                        // pre-existing UID (the collision path in
+                        // AuthRepositoryImpl.linkOrSignInWithGoogle), so the
+                        // favourites/followed-summoners already sitting in
+                        // Firestore under that UID would otherwise never get
+                        // pulled down locally until some later cold start.
+                        syncOnStart()
+                        _state.update { it.copy(isSigningIn = false) }
+                    }
                     .onFailure { throwable ->
                         _state.update { it.copy(isSigningIn = false, error = throwable.toUiText()) }
                     }
