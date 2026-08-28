@@ -10,6 +10,7 @@ import com.venom7t.lolguide.data.auth.repository.AuthRepositoryImpl
 import com.venom7t.lolguide.data.champion.repository.ChampionRepositoryImpl
 import com.venom7t.lolguide.data.clash.repository.ClashRepositoryImpl
 import com.venom7t.lolguide.data.favourite.repository.FavouritesRepositoryImpl
+import com.venom7t.lolguide.data.game.repository.GameProgressRepositoryImpl
 import com.venom7t.lolguide.data.lptracker.repository.LpTrackerRepositoryImpl
 import com.venom7t.lolguide.data.sync.repository.SyncRepositoryImpl
 import com.venom7t.lolguide.data.followed.repository.FollowedSummonerRepositoryImpl
@@ -35,6 +36,7 @@ import com.venom7t.lolguide.domain.champion.repository.ChampionRepository
 import com.venom7t.lolguide.domain.clash.repository.ClashRepository
 import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.favourite.repository.FavouritesRepository
+import com.venom7t.lolguide.domain.game.repository.GameProgressRepository
 import com.venom7t.lolguide.domain.lptracker.repository.LpTrackerRepository
 import com.venom7t.lolguide.domain.sync.repository.SyncRepository
 import com.venom7t.lolguide.domain.followed.repository.FollowedSummonerRepository
@@ -163,6 +165,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindClashRepository(impl: ClashRepositoryImpl): ClashRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindGameProgressRepository(impl: GameProgressRepositoryImpl): GameProgressRepository
 }
 
 @Module
