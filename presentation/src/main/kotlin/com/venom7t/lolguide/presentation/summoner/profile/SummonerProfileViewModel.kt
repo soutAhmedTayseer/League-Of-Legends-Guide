@@ -4,9 +4,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.venom7t.lolguide.domain.clash.usecase.GetClashTeamUseCase
 import com.venom7t.lolguide.domain.followed.usecase.ToggleFollowedSummonerUseCase
 import com.venom7t.lolguide.domain.livegame.usecase.GetLiveGameUseCase
 import com.venom7t.lolguide.domain.mastery.usecase.GetChampionMasteriesUseCase
+import com.venom7t.lolguide.domain.match.usecase.ComputeDuoStatsUseCase
 import com.venom7t.lolguide.domain.match.usecase.GetMatchHistoryUseCase
 import com.venom7t.lolguide.domain.onboarding.model.Region
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
@@ -33,6 +35,8 @@ class SummonerProfileViewModel @Inject constructor(
     private val getMatchHistory: GetMatchHistoryUseCase,
     private val getChampionMasteries: GetChampionMasteriesUseCase,
     private val getLiveGame: GetLiveGameUseCase,
+    private val computeDuoStats: ComputeDuoStatsUseCase,
+    private val getClashTeam: GetClashTeamUseCase,
     private val resolvePatch: ResolvePatchUseCase,
     private val toggleFollowed: ToggleFollowedSummonerUseCase,
     private val followedRepository: com.venom7t.lolguide.domain.followed.repository.FollowedSummonerRepository,
@@ -72,6 +76,17 @@ class SummonerProfileViewModel @Inject constructor(
             }
 
             SummonerProfileEvent.FollowClicked -> followToggle()
+
+            SummonerProfileEvent.LpHistoryClicked -> viewModelScope.launch {
+                val summoner = resolvedSummoner ?: return@launch
+                _effects.send(
+                    SummonerProfileEffect.NavigateToLpHistory(
+                        puuid = summoner.puuid,
+                        riotIdName = summoner.riotIdName,
+                        riotIdTagline = summoner.riotIdTagline,
+                    ),
+                )
+            }
         }
     }
 
@@ -108,6 +123,11 @@ class SummonerProfileViewModel @Inject constructor(
             // A failed live-game lookup should never block the rest of the
             // profile from showing -- it degrades to "not shown", not an error.
             val isInLiveGame = getLiveGame(summoner.puuid, region).getOrNull() != null
+            val duoStats = computeDuoStats(summoner.puuid, matches.map { it.matchId }, region)
+            // Same "not shown, not an error" treatment as live game and
+            // mastery -- a Clash lookup failure should not block the rest of
+            // the profile.
+            val clashTeam = getClashTeam(summoner.summonerId, region).getOrNull()
 
             _state.update {
                 it.copy(
@@ -118,6 +138,8 @@ class SummonerProfileViewModel @Inject constructor(
                     topMasteries = masteries,
                     isFollowed = isFollowed,
                     isInLiveGame = isInLiveGame,
+                    duoStats = duoStats,
+                    clashTeam = clashTeam,
                     error = null,
                 )
             }

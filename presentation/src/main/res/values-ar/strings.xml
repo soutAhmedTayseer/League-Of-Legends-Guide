@@ -313,4 +313,18 @@
     <string name="ladder_open">قائمة تشالنجر</string>
     <string name="followed_summoners_open">اللاعبون المتابَعون</string>
 
+    <!-- Phase 5: LP tracker -->
+    <string name="lp_history_title">سجل نقاط الترتيب</string>
+    <string name="lp_history_empty">لا يوجد سجل بعد -- يسجل المتعقب نقطة جديدة كل 30 دقيقة تقريبًا أثناء متابعة هذا اللاعب.</string>
+    <string name="summoner_profile_lp_history">سجل نقاط الترتيب</string>
+
+    <!-- Phase 5: duo stats -->
+    <string name="duo_stats_title">إحصائيات الفريق الثنائي</string>
+    <string name="duo_stats_win_rate">نسبة فوز %1$d%% في %2$d مباراة معًا</string>
+
+    <!-- Phase 5: Clash -->
+    <string name="clash_title">كلاش</string>
+    <string name="clash_not_registered">غير مسجل في فريق كلاش حاليًا.</string>
+    <string name="clash_tier">المستوى %1$d</string>
+
 </resources>

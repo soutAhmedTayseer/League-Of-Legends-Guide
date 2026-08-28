@@ -55,6 +55,7 @@ fun SummonerProfileScreenRoot(
     onNavigateToMatchDetail: (matchId: String, viewingPuuid: String) -> Unit,
     onNavigateToLiveGame: (puuid: String) -> Unit,
     onNavigateToMasteries: (puuid: String) -> Unit,
+    onNavigateToLpHistory: (puuid: String, riotIdName: String, riotIdTagline: String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SummonerProfileViewModel = hiltViewModel(),
@@ -72,6 +73,8 @@ fun SummonerProfileScreenRoot(
                     onNavigateToMatchDetail(effect.matchId, effect.viewingPuuid)
                 is SummonerProfileEffect.NavigateToLiveGame -> onNavigateToLiveGame(effect.puuid)
                 is SummonerProfileEffect.NavigateToMasteries -> onNavigateToMasteries(effect.puuid)
+                is SummonerProfileEffect.NavigateToLpHistory ->
+                    onNavigateToLpHistory(effect.puuid, effect.riotIdName, effect.riotIdTagline)
                 is SummonerProfileEffect.ShowSnackbar ->
                     snackbarHostState.showSnackbar(effect.message.resolve(context))
             }
@@ -137,6 +140,31 @@ fun SummonerProfileScreen(
 
                 if (state.rankedEntries.isNotEmpty()) {
                     items(state.rankedEntries) { entry -> RankedEntryCard(entry) }
+                    item {
+                        Text(
+                            text = stringResource(R.string.summoner_profile_lp_history),
+                            style = AppTheme.typography.label,
+                            color = AppTheme.colors.accent,
+                            modifier = Modifier.clickable {
+                                onEvent(SummonerProfileEvent.LpHistoryClicked)
+                            },
+                        )
+                    }
+                }
+
+                if (state.clashTeam != null) {
+                    item { ClashCard(state.clashTeam) }
+                }
+
+                if (state.duoStats.isNotEmpty()) {
+                    item {
+                        Text(
+                            text = stringResource(R.string.duo_stats_title),
+                            style = AppTheme.typography.titleMedium,
+                            color = AppTheme.colors.textPrimary,
+                        )
+                    }
+                    items(state.duoStats) { duo -> DuoStatsRow(duo) }
                 }
 
                 if (state.topMasteries.isNotEmpty()) {
@@ -267,6 +295,58 @@ private fun SummonerHeader(
                     Text(stringResource(R.string.summoner_profile_in_live_game))
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ClashCard(team: com.venom7t.lolguide.domain.clash.model.ClashTeam) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = AppTheme.colors.surface),
+        shape = AppTheme.shapes.medium,
+    ) {
+        Column(modifier = Modifier.padding(AppTheme.dimens.spaceMd)) {
+            Text(
+                text = stringResource(R.string.clash_title),
+                style = AppTheme.typography.label,
+                color = AppTheme.colors.textSecondary,
+            )
+            Text(
+                text = team.name,
+                style = AppTheme.typography.bodyLarge,
+                color = AppTheme.colors.textPrimary,
+            )
+            Text(
+                text = stringResource(R.string.clash_tier, team.tier),
+                style = AppTheme.typography.bodyMedium,
+                color = AppTheme.colors.textSecondary,
+            )
+        }
+    }
+}
+
+@Composable
+private fun DuoStatsRow(duo: com.venom7t.lolguide.domain.match.model.DuoStats) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = AppTheme.colors.surface),
+        shape = AppTheme.shapes.medium,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(AppTheme.dimens.spaceMd),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = "${duo.teammateRiotIdName}#${duo.teammateRiotIdTagline}",
+                style = AppTheme.typography.bodyLarge,
+                color = AppTheme.colors.textPrimary,
+            )
+            Text(
+                text = stringResource(R.string.duo_stats_win_rate, duo.winRatePercent, duo.sampleSize),
+                style = AppTheme.typography.bodyMedium,
+                color = AppTheme.colors.textSecondary,
+            )
         }
     }
 }

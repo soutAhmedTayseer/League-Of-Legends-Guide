@@ -41,6 +41,7 @@ import com.venom7t.lolguide.presentation.item.ItemDetailScreenRoot
 import com.venom7t.lolguide.presentation.item.ItemListScreenRoot
 import com.venom7t.lolguide.presentation.ladder.LadderScreenRoot
 import com.venom7t.lolguide.presentation.livegame.LiveGameScreenRoot
+import com.venom7t.lolguide.presentation.lptracker.LpHistoryScreenRoot
 import com.venom7t.lolguide.presentation.mastery.MasteryScreenRoot
 import com.venom7t.lolguide.presentation.match.detail.MatchDetailScreenRoot
 import com.venom7t.lolguide.presentation.navigation.BuildSimulatorRoute
@@ -55,6 +56,7 @@ import com.venom7t.lolguide.presentation.navigation.ItemDetailRoute
 import com.venom7t.lolguide.presentation.navigation.ItemListRoute
 import com.venom7t.lolguide.presentation.navigation.LadderRoute
 import com.venom7t.lolguide.presentation.navigation.LiveGameRoute
+import com.venom7t.lolguide.presentation.navigation.LpHistoryRoute
 import com.venom7t.lolguide.presentation.navigation.MasteryRoute
 import com.venom7t.lolguide.presentation.navigation.MatchDetailRoute
 import com.venom7t.lolguide.presentation.navigation.OnboardingRoute
@@ -328,8 +330,21 @@ private fun LolGuideNavGraphContent(
                     onNavigateToMasteries = { puuid ->
                         navController.navigate(MasteryRoute(puuid = puuid, region = route.region))
                     },
+                    onNavigateToLpHistory = { puuid, riotIdName, riotIdTagline ->
+                        navController.navigate(
+                            LpHistoryRoute(
+                                puuid = puuid,
+                                riotIdName = riotIdName,
+                                riotIdTagline = riotIdTagline,
+                            ),
+                        )
+                    },
                     onBack = { navController.popBackStack() },
                 )
+            }
+
+            composable<LpHistoryRoute> {
+                LpHistoryScreenRoot(onBack = { navController.popBackStack() })
             }
 
             composable<MatchDetailRoute> {

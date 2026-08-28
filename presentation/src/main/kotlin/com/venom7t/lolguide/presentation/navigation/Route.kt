@@ -91,3 +91,10 @@ data object LadderRoute
 
 @Serializable
 data object FollowedSummonersRoute
+
+@Serializable
+data class LpHistoryRoute(
+    val puuid: String,
+    val riotIdName: String,
+    val riotIdTagline: String,
+)

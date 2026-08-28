@@ -313,4 +313,18 @@
     <string name="ladder_open">Challenger ladder</string>
     <string name="followed_summoners_open">Followed summoners</string>
 
+    <!-- Phase 5: LP tracker -->
+    <string name="lp_history_title">LP history</string>
+    <string name="lp_history_empty">No history yet -- the tracker records a new point roughly every 30 minutes while this summoner is followed.</string>
+    <string name="summoner_profile_lp_history">LP history</string>
+
+    <!-- Phase 5: duo stats -->
+    <string name="duo_stats_title">Duo stats</string>
+    <string name="duo_stats_win_rate">%1$d%% win rate over %2$d games together</string>
+
+    <!-- Phase 5: Clash -->
+    <string name="clash_title">Clash</string>
+    <string name="clash_not_registered">Not registered for a Clash team right now.</string>
+    <string name="clash_tier">Tier %1$d</string>
+
 </resources>
