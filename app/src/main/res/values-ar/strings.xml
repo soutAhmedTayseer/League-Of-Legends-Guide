@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">دليل LoL</string>
+    <string name="widget_patch_label">التحديث %1$s</string>
+    <string name="widget_open_app">افتح التطبيق</string>
+    <string name="widget_description">يعرض تحديث League of Legends الحالي.</string>
+</resources>

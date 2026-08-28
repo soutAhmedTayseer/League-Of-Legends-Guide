@@ -7,4 +7,12 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Widget palette: matches the League client palette, distinct set
+         because a Glance widget cannot read the Compose AppTheme
+         CompositionLocal (AGENTS.md section 9 applies within the Compose
+         tree; a widget is a separate rendering surface). -->
+    <color name="widget_background">#FF0A1428</color>
+    <color name="widget_accent">#FFC8AA6E</color>
+    <color name="widget_text">#FFF0E6D2</color>
 </resources>
