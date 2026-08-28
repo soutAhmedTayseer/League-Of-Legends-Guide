@@ -10,12 +10,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Calculate
 import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Quiz
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.presentation.R
@@ -43,6 +48,8 @@ fun HomeScreenRoot(
     onNavigateToRoulette: () -> Unit,
     onNavigateToQuiz: () -> Unit,
     onNavigateToTimers: () -> Unit,
+    onNavigateToLadder: () -> Unit,
+    onNavigateToFollowedSummoners: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -57,6 +64,8 @@ fun HomeScreenRoot(
         onNavigateToRoulette = onNavigateToRoulette,
         onNavigateToQuiz = onNavigateToQuiz,
         onNavigateToTimers = onNavigateToTimers,
+        onNavigateToLadder = onNavigateToLadder,
+        onNavigateToFollowedSummoners = onNavigateToFollowedSummoners,
         modifier = modifier,
     )
 }
@@ -70,6 +79,8 @@ fun HomeScreen(
     onNavigateToRoulette: () -> Unit,
     onNavigateToQuiz: () -> Unit,
     onNavigateToTimers: () -> Unit,
+    onNavigateToLadder: () -> Unit,
+    onNavigateToFollowedSummoners: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -106,7 +117,10 @@ fun HomeScreen(
             }
 
             item {
-                RotationPlaceholderCard()
+                RotationCard(
+                    championIds = state.freeRotationChampionIds,
+                    patchVersion = state.patchVersion,
+                )
             }
 
             item {
@@ -143,6 +157,20 @@ fun HomeScreen(
                     icon = Icons.Default.Timer,
                     label = stringResource(R.string.timers_open),
                     onClick = onNavigateToTimers,
+                )
+            }
+            item {
+                QuickLinkRow(
+                    icon = Icons.Default.Star,
+                    label = stringResource(R.string.ladder_open),
+                    onClick = onNavigateToLadder,
+                )
+            }
+            item {
+                QuickLinkRow(
+                    icon = Icons.Default.Person,
+                    label = stringResource(R.string.followed_summoners_open),
+                    onClick = onNavigateToFollowedSummoners,
                 )
             }
         }
@@ -188,13 +216,18 @@ private fun WhatsNewTeaser(
 }
 
 /**
- * Free champion rotation needs CHAMPION-V3, which is a keyed Riot endpoint
- * (Phase 4). Rather than leave this card missing entirely -- which reads as a
- * bug -- it states plainly what it is waiting on (AGENTS.md section 8.2:
- * keyed features degrade to a clear "not configured" state, not silence).
+ * Free champion rotation needs CHAMPION-V3, a keyed Riot endpoint (Phase 4).
+ * When [championIds] is null -- no key configured, or the lookup failed --
+ * this states plainly what it is waiting on rather than showing nothing,
+ * which would read as a bug (AGENTS.md §8.2: keyed features degrade to a
+ * clear "not configured" state, not silence).
  */
 @Composable
-private fun RotationPlaceholderCard(modifier: Modifier = Modifier) {
+private fun RotationCard(
+    championIds: List<String>?,
+    patchVersion: String?,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -206,11 +239,30 @@ private fun RotationPlaceholderCard(modifier: Modifier = Modifier) {
             style = AppTheme.typography.titleMedium,
             color = AppTheme.colors.textSecondary,
         )
-        Text(
-            text = stringResource(R.string.home_rotation_placeholder_body),
-            style = AppTheme.typography.caption,
-            color = AppTheme.colors.textDisabled,
-        )
+        if (championIds != null && patchVersion != null) {
+            androidx.compose.foundation.lazy.LazyRow(
+                modifier = Modifier.padding(top = AppTheme.dimens.spaceSm),
+                horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
+            ) {
+                items(championIds) { championId ->
+                    coil3.compose.AsyncImage(
+                        model = com.venom7t.lolguide.presentation.common.DataDragonUrls
+                            .championIconById(patchVersion, championId),
+                        contentDescription = championId,
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(AppTheme.colors.surface, AppTheme.shapes.small),
+                    )
+                }
+            }
+        } else {
+            Text(
+                text = stringResource(R.string.home_rotation_placeholder_body),
+                style = AppTheme.typography.caption,
+                color = AppTheme.colors.textDisabled,
+            )
+        }
     }
 }
 

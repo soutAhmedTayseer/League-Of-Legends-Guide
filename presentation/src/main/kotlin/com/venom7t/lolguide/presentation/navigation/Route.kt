@@ -60,3 +60,34 @@ data object QuizRoute
 
 @Serializable
 data object GameTimersRoute
+
+// --- Phase 4: player data ---
+
+@Serializable
+data object SummonerSearchRoute
+
+@Serializable
+data class SummonerProfileRoute(
+    val riotIdName: String,
+    val riotIdTagline: String,
+    val region: String,
+)
+
+@Serializable
+data class MatchDetailRoute(
+    val matchId: String,
+    val region: String,
+    val viewingPuuid: String,
+)
+
+@Serializable
+data class LiveGameRoute(val puuid: String, val region: String)
+
+@Serializable
+data class MasteryRoute(val puuid: String, val region: String)
+
+@Serializable
+data object LadderRoute
+
+@Serializable
+data object FollowedSummonersRoute

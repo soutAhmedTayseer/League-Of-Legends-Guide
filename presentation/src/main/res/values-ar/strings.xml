@@ -269,4 +269,48 @@
     <!-- Phase 3: sharing / deep links -->
     <string name="champion_detail_share">مشاركة</string>
 
+    <!-- Phase 4: summoner search -->
+    <string name="summoner_search_title">البحث عن لاعب</string>
+    <string name="summoner_search_hint">معرف Riot</string>
+    <string name="summoner_search_region">المنطقة</string>
+    <string name="summoner_search_action">بحث</string>
+    <string name="summoner_search_recent">عمليات بحث حديثة</string>
+
+    <!-- Phase 4: summoner profile -->
+    <string name="summoner_profile_level">المستوى %1$d</string>
+    <string name="summoner_profile_follow">متابعة</string>
+    <string name="summoner_profile_unfollow">إلغاء المتابعة</string>
+    <string name="summoner_profile_in_live_game">في مباراة مباشرة -- عرض</string>
+    <string name="summoner_profile_masteries">أعلى إتقان للأبطال</string>
+    <string name="summoner_profile_match_history">سجل المباريات</string>
+    <string name="summoner_profile_load_more">تحميل المزيد</string>
+    <string name="summoner_profile_win_loss">%1$d فوز %2$d خسارة · %3$d%%</string>
+    <string name="summoner_profile_victory">فوز</string>
+    <string name="summoner_profile_defeat">هزيمة</string>
+
+    <!-- Phase 4: match detail -->
+    <string name="action_back">رجوع</string>
+    <string name="match_detail_title">تفاصيل المباراة</string>
+    <string name="match_detail_blue_team">الفريق الأزرق</string>
+    <string name="match_detail_red_team">الفريق الأحمر</string>
+
+    <!-- Phase 4: live game -->
+    <string name="live_game_title">مباراة مباشرة</string>
+    <string name="live_game_not_in_game">غير موجود في مباراة حاليًا.</string>
+
+    <!-- Phase 4: mastery -->
+    <string name="mastery_title">إتقان الأبطال</string>
+    <string name="mastery_level">المستوى %1$d</string>
+    <string name="mastery_points">%1$d نقطة</string>
+
+    <!-- Phase 4: ladder -->
+    <string name="ladder_title">تشالنجر · %1$s</string>
+
+    <!-- Phase 4: followed summoners -->
+    <string name="followed_summoners_title">المتابَعون</string>
+    <string name="followed_summoners_empty">لا يوجد لاعبون متابَعون بعد. تابع لاعبًا من صفحته الشخصية.</string>
+    <string name="nav_summoner">اللاعب</string>
+    <string name="ladder_open">قائمة تشالنجر</string>
+    <string name="followed_summoners_open">اللاعبون المتابَعون</string>
+
 </resources>

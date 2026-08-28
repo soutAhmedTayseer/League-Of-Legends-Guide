@@ -16,6 +16,22 @@ object DataDragonUrls {
     fun championIcon(version: String, imageFileName: String): String =
         "$CDN/$version/img/champion/$imageFileName"
 
+    /**
+     * The square portrait keyed by champion id alone (`"Aatrox"` ->
+     * `Aatrox.png`), for call sites that only have the Riot API's
+     * `championId` string -- match/mastery/live-game payloads -- rather than
+     * a full [com.venom7t.lolguide.domain.champion.model.Champion] with its
+     * own `imageFileName`. Data Dragon's square-icon filename is always the
+     * champion id plus `.png`, so this does not need the champion list
+     * loaded to render match history art.
+     */
+    fun championIconById(version: String, championId: String): String =
+        "$CDN/$version/img/champion/$championId.png"
+
+    /** A summoner icon, by its numeric id. */
+    fun profileIcon(version: String, profileIconId: Int): String =
+        "$CDN/$version/img/profileicon/$profileIconId.png"
+
     /** A spell (Q/W/E/R) icon. */
     fun spellIcon(version: String, imageFileName: String): String =
         "$CDN/$version/img/spell/$imageFileName"

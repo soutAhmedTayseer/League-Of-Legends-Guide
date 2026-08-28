@@ -5,8 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom7t.lolguide.domain.champion.usecase.ObserveChampionsUseCase
 import com.venom7t.lolguide.domain.item.usecase.ObservePurchasableItemsUseCase
+import com.venom7t.lolguide.domain.onboarding.model.Region
+import com.venom7t.lolguide.domain.onboarding.repository.OnboardingRepository
 import com.venom7t.lolguide.domain.patch.usecase.ComputePatchDiffUseCase
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
+import com.venom7t.lolguide.domain.rotation.usecase.GetCurrentRotationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +25,14 @@ data class HomeState(
     val isPatchStale: Boolean = false,
     /** Null means "not yet checked" or "genuinely nothing to compare against". */
     val hasWhatsNew: Boolean = false,
+    /**
+     * Champion ids (Data Dragon string ids, already resolved from CHAMPION-V3's
+     * numeric keys via the cached champion list) for the current free
+     * rotation. Null while loading or when no Riot key is configured -- the
+     * card falls back to its Phase 3 "not configured" placeholder in that
+     * case (AGENTS.md §8.2), it does not show an error.
+     */
+    val freeRotationChampionIds: List<String>? = null,
 )
 
 sealed interface HomeEvent {
@@ -34,6 +45,8 @@ class HomeViewModel @Inject constructor(
     private val observeChampions: ObserveChampionsUseCase,
     private val observeItems: ObservePurchasableItemsUseCase,
     private val computePatchDiff: ComputePatchDiffUseCase,
+    private val getCurrentRotation: GetCurrentRotationUseCase,
+    private val onboardingRepository: OnboardingRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -65,6 +78,16 @@ class HomeViewModel @Inject constructor(
             // to show at all.
             val diff = computePatchDiff(patch.version, champions, items)
             _state.update { it.copy(hasWhatsNew = diff != null && !diff.isEmpty) }
+
+            // A missing/expired key or a network miss both degrade to "not
+            // shown" here, matching the Phase 3 placeholder's contract --
+            // the rotation card is not the place to surface a Riot API error.
+            val region = onboardingRepository.observePreferences().first().region ?: Region.NA
+            getCurrentRotation(region).onSuccess { rotation ->
+                val keyToId = champions.associate { it.key.toIntOrNull() to it.id }
+                val championIds = rotation.championIds.mapNotNull { keyToId[it] }
+                _state.update { it.copy(freeRotationChampionIds = championIds) }
+            }
         }
     }
 }

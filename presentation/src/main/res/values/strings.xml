@@ -269,4 +269,48 @@
     <!-- Phase 3: sharing / deep links -->
     <string name="champion_detail_share">Share</string>
 
+    <!-- Phase 4: summoner search -->
+    <string name="summoner_search_title">Find a summoner</string>
+    <string name="summoner_search_hint">Riot ID</string>
+    <string name="summoner_search_region">Region</string>
+    <string name="summoner_search_action">Search</string>
+    <string name="summoner_search_recent">Recent searches</string>
+
+    <!-- Phase 4: summoner profile -->
+    <string name="summoner_profile_level">Level %1$d</string>
+    <string name="summoner_profile_follow">Follow</string>
+    <string name="summoner_profile_unfollow">Unfollow</string>
+    <string name="summoner_profile_in_live_game">In a live game -- view</string>
+    <string name="summoner_profile_masteries">Top champion mastery</string>
+    <string name="summoner_profile_match_history">Match history</string>
+    <string name="summoner_profile_load_more">Load more</string>
+    <string name="summoner_profile_win_loss">%1$dW %2$dL · %3$d%%</string>
+    <string name="summoner_profile_victory">Victory</string>
+    <string name="summoner_profile_defeat">Defeat</string>
+
+    <!-- Phase 4: match detail -->
+    <string name="action_back">Back</string>
+    <string name="match_detail_title">Match details</string>
+    <string name="match_detail_blue_team">Blue team</string>
+    <string name="match_detail_red_team">Red team</string>
+
+    <!-- Phase 4: live game -->
+    <string name="live_game_title">Live game</string>
+    <string name="live_game_not_in_game">Not currently in a game.</string>
+
+    <!-- Phase 4: mastery -->
+    <string name="mastery_title">Champion mastery</string>
+    <string name="mastery_level">Level %1$d</string>
+    <string name="mastery_points">%1$d pts</string>
+
+    <!-- Phase 4: ladder -->
+    <string name="ladder_title">Challenger · %1$s</string>
+
+    <!-- Phase 4: followed summoners -->
+    <string name="followed_summoners_title">Followed</string>
+    <string name="followed_summoners_empty">No followed summoners yet. Follow one from their profile.</string>
+    <string name="nav_summoner">Summoner</string>
+    <string name="ladder_open">Challenger ladder</string>
+    <string name="followed_summoners_open">Followed summoners</string>
+
 </resources>

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
@@ -27,28 +28,41 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
+import androidx.navigation.toRoute
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.champion.detail.ChampionDetailScreenRoot
 import com.venom7t.lolguide.presentation.champion.list.ChampionListScreenRoot
 import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.compare.CompareScreenRoot
 import com.venom7t.lolguide.presentation.favourite.FavouritesScreenRoot
+import com.venom7t.lolguide.presentation.followed.FollowedSummonersScreenRoot
 import com.venom7t.lolguide.presentation.home.HomeScreenRoot
 import com.venom7t.lolguide.presentation.item.ItemDetailScreenRoot
 import com.venom7t.lolguide.presentation.item.ItemListScreenRoot
+import com.venom7t.lolguide.presentation.ladder.LadderScreenRoot
+import com.venom7t.lolguide.presentation.livegame.LiveGameScreenRoot
+import com.venom7t.lolguide.presentation.mastery.MasteryScreenRoot
+import com.venom7t.lolguide.presentation.match.detail.MatchDetailScreenRoot
 import com.venom7t.lolguide.presentation.navigation.BuildSimulatorRoute
 import com.venom7t.lolguide.presentation.navigation.ChampionDetailRoute
 import com.venom7t.lolguide.presentation.navigation.ChampionListRoute
 import com.venom7t.lolguide.presentation.navigation.CompareRoute
 import com.venom7t.lolguide.presentation.navigation.FavouritesRoute
+import com.venom7t.lolguide.presentation.navigation.FollowedSummonersRoute
 import com.venom7t.lolguide.presentation.navigation.GameTimersRoute
 import com.venom7t.lolguide.presentation.navigation.HomeRoute
 import com.venom7t.lolguide.presentation.navigation.ItemDetailRoute
 import com.venom7t.lolguide.presentation.navigation.ItemListRoute
+import com.venom7t.lolguide.presentation.navigation.LadderRoute
+import com.venom7t.lolguide.presentation.navigation.LiveGameRoute
+import com.venom7t.lolguide.presentation.navigation.MasteryRoute
+import com.venom7t.lolguide.presentation.navigation.MatchDetailRoute
 import com.venom7t.lolguide.presentation.navigation.OnboardingRoute
 import com.venom7t.lolguide.presentation.navigation.QuizRoute
 import com.venom7t.lolguide.presentation.navigation.RouletteRoute
 import com.venom7t.lolguide.presentation.navigation.RunesRoute
+import com.venom7t.lolguide.presentation.navigation.SummonerProfileRoute
+import com.venom7t.lolguide.presentation.navigation.SummonerSearchRoute
 import com.venom7t.lolguide.presentation.navigation.SummonerSpellsRoute
 import com.venom7t.lolguide.presentation.navigation.WhatsNewRoute
 import com.venom7t.lolguide.presentation.onboarding.OnboardingScreenRoot
@@ -57,6 +71,8 @@ import com.venom7t.lolguide.presentation.roulette.RouletteScreenRoot
 import com.venom7t.lolguide.presentation.rune.RunesScreenRoot
 import com.venom7t.lolguide.presentation.simulator.BuildSimulatorScreenRoot
 import com.venom7t.lolguide.presentation.spell.SummonerSpellsScreenRoot
+import com.venom7t.lolguide.presentation.summoner.profile.SummonerProfileScreenRoot
+import com.venom7t.lolguide.presentation.summoner.search.SummonerSearchScreenRoot
 import com.venom7t.lolguide.presentation.theme.AppTheme
 import com.venom7t.lolguide.presentation.timer.GameTimersScreenRoot
 import com.venom7t.lolguide.presentation.whatsnew.WhatsNewScreenRoot
@@ -171,6 +187,8 @@ private fun LolGuideNavGraphContent(
                     onNavigateToRoulette = { navController.navigate(RouletteRoute) },
                     onNavigateToQuiz = { navController.navigate(QuizRoute) },
                     onNavigateToTimers = { navController.navigate(GameTimersRoute) },
+                    onNavigateToLadder = { navController.navigate(LadderRoute) },
+                    onNavigateToFollowedSummoners = { navController.navigate(FollowedSummonersRoute) },
                 )
             }
 
@@ -275,6 +293,75 @@ private fun LolGuideNavGraphContent(
                     onNavigateBack = { navController.popBackStack() },
                 )
             }
+
+            // --- Phase 4: player data ---
+
+            composable<SummonerSearchRoute> {
+                SummonerSearchScreenRoot(
+                    onNavigateToProfile = { name, tagline, region ->
+                        navController.navigate(
+                            SummonerProfileRoute(
+                                riotIdName = name,
+                                riotIdTagline = tagline,
+                                region = region.name,
+                            ),
+                        )
+                    },
+                )
+            }
+
+            composable<SummonerProfileRoute> { backStackEntry ->
+                val route = backStackEntry.toRoute<SummonerProfileRoute>()
+                SummonerProfileScreenRoot(
+                    onNavigateToMatchDetail = { matchId, viewingPuuid ->
+                        navController.navigate(
+                            MatchDetailRoute(
+                                matchId = matchId,
+                                region = route.region,
+                                viewingPuuid = viewingPuuid,
+                            ),
+                        )
+                    },
+                    onNavigateToLiveGame = { puuid ->
+                        navController.navigate(LiveGameRoute(puuid = puuid, region = route.region))
+                    },
+                    onNavigateToMasteries = { puuid ->
+                        navController.navigate(MasteryRoute(puuid = puuid, region = route.region))
+                    },
+                    onBack = { navController.popBackStack() },
+                )
+            }
+
+            composable<MatchDetailRoute> {
+                MatchDetailScreenRoot(onBack = { navController.popBackStack() })
+            }
+
+            composable<LiveGameRoute> {
+                LiveGameScreenRoot(onBack = { navController.popBackStack() })
+            }
+
+            composable<MasteryRoute> {
+                MasteryScreenRoot(onBack = { navController.popBackStack() })
+            }
+
+            composable<LadderRoute> {
+                LadderScreenRoot(onBack = { navController.popBackStack() })
+            }
+
+            composable<FollowedSummonersRoute> {
+                FollowedSummonersScreenRoot(
+                    onNavigateToProfile = { name, tagline, region ->
+                        navController.navigate(
+                            SummonerProfileRoute(
+                                riotIdName = name,
+                                riotIdTagline = tagline,
+                                region = region.name,
+                            ),
+                        )
+                    },
+                    onBack = { navController.popBackStack() },
+                )
+            }
         }
     }
 }
@@ -310,5 +397,11 @@ private val topLevelDestinations = listOf(
         navigate = { ItemListRoute },
         icon = Icons.Default.ShoppingCart,
         labelRes = R.string.nav_items,
+    ),
+    TopLevelDestination(
+        route = SummonerSearchRoute::class,
+        navigate = { SummonerSearchRoute },
+        icon = Icons.Default.Person,
+        labelRes = R.string.nav_summoner,
     ),
 )
