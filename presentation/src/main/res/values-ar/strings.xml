@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Champion list -->
+    <string name="champion_list_title">الأبطال</string>
+    <string name="champion_list_search_hint">ابحث عن بطل</string>
+    <string name="champion_list_clear_search">مسح البحث</string>
+    <string name="champion_list_empty">لا يوجد أبطال محفوظون بعد.</string>
+    <string name="champion_list_no_results">لا يوجد بطل يطابق \"%1$s\".</string>
+    <string name="champion_list_count">%1$d بطل</string>
+
+    <!-- Champion detail -->
+    <string name="champion_detail_back">رجوع</string>
+    <string name="champion_detail_lore">القصة</string>
+    <string name="champion_detail_abilities">القدرات</string>
+    <string name="champion_detail_base_stats">الإحصائيات الأساسية</string>
+    <string name="champion_detail_passive">القدرة الكامنة</string>
+    <string name="champion_detail_portrait">صورة %1$s</string>
+    <string name="champion_detail_ability_icon">أيقونة قدرة %1$s</string>
+
+    <!-- Champion attributes -->
+    <string name="attribute_attack">الهجوم</string>
+    <string name="attribute_defense">الدفاع</string>
+    <string name="attribute_magic">السحر</string>
+    <string name="attribute_difficulty">الصعوبة</string>
+
+    <!-- Stats -->
+    <string name="stat_health">الصحة</string>
+    <string name="stat_resource">المورد</string>
+    <string name="stat_attack_damage">ضرر الهجوم</string>
+    <string name="stat_attack_speed">سرعة الهجوم</string>
+    <string name="stat_armor">الدرع</string>
+    <string name="stat_magic_resist">المقاومة السحرية</string>
+    <string name="stat_move_speed">سرعة الحركة</string>
+    <string name="stat_attack_range">مدى الهجوم</string>
+    <string name="stat_health_regen">تجدد الصحة</string>
+    <string name="stat_resource_regen">تجدد المورد</string>
+    <string name="stat_per_level">+%1$s لكل مستوى</string>
+    <string name="stat_no_growth">بدون زيادة</string>
+
+    <!-- Abilities -->
+    <string name="ability_cooldown">زمن الانتظار</string>
+    <string name="ability_cost">التكلفة</string>
+    <string name="ability_rank">المستوى %1$d</string>
+    <string name="ability_no_cost">بدون تكلفة</string>
+    <string name="ability_value_unavailable">&#8212;</string>
+
+    <!-- Patch -->
+    <string name="patch_label">التحديث %1$s</string>
+    <string name="patch_stale_notice">يتم عرض بيانات محفوظة من التحديث %1$s. تعذر الاتصال بـ Riot للتحقق من وجود تحديث أحدث.</string>
+
+    <!-- Generic states -->
+    <string name="action_retry">إعادة المحاولة</string>
+    <string name="state_loading">جارٍ التحميل</string>
+
+    <!-- Errors -->
+    <string name="error_network">يبدو أنك غير متصل بالإنترنت. تحقق من الاتصال وحاول مرة أخرى.</string>
+    <string name="error_no_cached_data">لا توجد بيانات محفوظة، وتعذر الوصول إلى Riot. اتصل بالإنترنت لتحميل الأبطال لأول مرة.</string>
+    <string name="error_api_key_missing">لم يتم إعداد مفتاح Riot API، لذا ميزات اللاعبين غير متاحة.</string>
+    <string name="error_api_key_expired">انتهت صلاحية مفتاح Riot API. مفاتيح التطوير تدوم ٢٤ ساعة ويجب تجديدها.</string>
+    <string name="error_rate_limited">عدد كبير جدًا من الطلبات إلى Riot. يرجى الانتظار قليلًا.</string>
+    <string name="error_rate_limited_retry_after">عدد كبير جدًا من الطلبات إلى Riot. حاول مرة أخرى بعد %1$d ثانية.</string>
+    <string name="error_not_found">تعذر العثور على هذا البطل في هذا التحديث.</string>
+    <string name="error_unexpected_response">أرسلت Riot بيانات بتنسيق غير متوقع.</string>
+    <string name="error_server">أعادت خوادم Riot خطأ (%1$d).</string>
+    <string name="error_unknown">حدث خطأ ما.</string>
+
+</resources>

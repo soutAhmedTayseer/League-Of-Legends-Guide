@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Champion list -->
+    <string name="champion_list_title">Champions</string>
+    <string name="champion_list_search_hint">Search champions</string>
+    <string name="champion_list_clear_search">Clear search</string>
+    <string name="champion_list_empty">No champions cached yet.</string>
+    <string name="champion_list_no_results">No champion matches \"%1$s\".</string>
+    <string name="champion_list_count">%1$d champions</string>
+
+    <!-- Champion detail -->
+    <string name="champion_detail_back">Back</string>
+    <string name="champion_detail_lore">Lore</string>
+    <string name="champion_detail_abilities">Abilities</string>
+    <string name="champion_detail_base_stats">Base stats</string>
+    <string name="champion_detail_passive">Passive</string>
+    <string name="champion_detail_portrait">Portrait of %1$s</string>
+    <string name="champion_detail_ability_icon">%1$s ability icon</string>
+
+    <!-- Champion attributes -->
+    <string name="attribute_attack">Attack</string>
+    <string name="attribute_defense">Defense</string>
+    <string name="attribute_magic">Magic</string>
+    <string name="attribute_difficulty">Difficulty</string>
+
+    <!-- Stats -->
+    <string name="stat_health">Health</string>
+    <string name="stat_resource">Resource</string>
+    <string name="stat_attack_damage">Attack damage</string>
+    <string name="stat_attack_speed">Attack speed</string>
+    <string name="stat_armor">Armor</string>
+    <string name="stat_magic_resist">Magic resist</string>
+    <string name="stat_move_speed">Move speed</string>
+    <string name="stat_attack_range">Attack range</string>
+    <string name="stat_health_regen">Health regen</string>
+    <string name="stat_resource_regen">Resource regen</string>
+    <string name="stat_per_level">+%1$s per level</string>
+    <string name="stat_no_growth">no growth</string>
+
+    <!-- Abilities -->
+    <string name="ability_cooldown">Cooldown</string>
+    <string name="ability_cost">Cost</string>
+    <string name="ability_rank">Rank %1$d</string>
+    <string name="ability_no_cost">No cost</string>
+    <string name="ability_value_unavailable">&#8212;</string>
+
+    <!-- Patch -->
+    <string name="patch_label">Patch %1$s</string>
+    <string name="patch_stale_notice">Showing cached data from patch %1$s. Could not reach Riot to check for a newer one.</string>
+
+    <!-- Generic states -->
+    <string name="action_retry">Retry</string>
+    <string name="state_loading">Loading</string>
+
+    <!-- Errors -->
+    <string name="error_network">You appear to be offline. Check your connection and try again.</string>
+    <string name="error_no_cached_data">Nothing is cached yet, and Riot could not be reached. Connect to the internet to load champions for the first time.</string>
+    <string name="error_api_key_missing">No Riot API key is configured, so player features are unavailable.</string>
+    <string name="error_api_key_expired">The Riot API key has expired. Development keys last 24 hours and need to be regenerated.</string>
+    <string name="error_rate_limited">Too many requests to Riot. Please wait a moment.</string>
+    <string name="error_rate_limited_retry_after">Too many requests to Riot. Try again in %1$d seconds.</string>
+    <string name="error_not_found">That champion could not be found on this patch.</string>
+    <string name="error_unexpected_response">Riot returned data in an unexpected format.</string>
+    <string name="error_server">Riot\'s servers returned an error (%1$d).</string>
+    <string name="error_unknown">Something went wrong.</string>
+
+</resources>
