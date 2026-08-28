@@ -42,3 +42,14 @@ annotation class RiotApiRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class RiotApiKey
+
+/**
+ * A process-lifetime [kotlinx.coroutines.CoroutineScope], for fire-and-
+ * forget work that must outlive the caller -- Phase 5's best-effort sync
+ * pushes, specifically. Favouriting a champion should not make the UI wait
+ * on a Firestore round trip, and should not be cancelled just because the
+ * screen that triggered it was left before the push finished.
+ */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ApplicationScope

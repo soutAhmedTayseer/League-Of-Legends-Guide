@@ -3,6 +3,9 @@ package com.venom7t.lolguide.data.riot.remote
 import com.venom7t.lolguide.data.riot.remote.dto.AccountDto
 import com.venom7t.lolguide.data.riot.remote.dto.ChampionMasteryDto
 import com.venom7t.lolguide.data.riot.remote.dto.ChampionRotationDto
+import com.venom7t.lolguide.data.riot.remote.dto.ClashPlayerDto
+import com.venom7t.lolguide.data.riot.remote.dto.ClashTeamDto
+import com.venom7t.lolguide.data.riot.remote.dto.ClashTournamentDto
 import com.venom7t.lolguide.data.riot.remote.dto.LeagueEntryDto
 import com.venom7t.lolguide.data.riot.remote.dto.LeagueListDto
 import com.venom7t.lolguide.data.riot.remote.dto.MatchDto
@@ -66,6 +69,16 @@ interface RiotApi {
 
     @GET
     suspend fun getPlatformStatus(@Url url: String): PlatformStatusDto
+
+    /** Empty list means "not registered for any Clash team right now" -- a normal outcome. */
+    @GET
+    suspend fun getClashPlayersBySummoner(@Url url: String): List<ClashPlayerDto>
+
+    @GET
+    suspend fun getClashTeam(@Url url: String): ClashTeamDto
+
+    @GET
+    suspend fun getClashTournament(@Url url: String): ClashTournamentDto
 }
 
 /**
@@ -107,6 +120,15 @@ object RiotApiUrls {
 
     fun platformStatus(platformId: String): String =
         "https://$platformId.api.riotgames.com/lol/status/v4/platform-data"
+
+    fun clashPlayersByPuuid(platformId: String, puuid: String): String =
+        "https://$platformId.api.riotgames.com/lol/clash/v1/players/by-puuid/$puuid"
+
+    fun clashTeam(platformId: String, teamId: String): String =
+        "https://$platformId.api.riotgames.com/lol/clash/v1/teams/$teamId"
+
+    fun clashTournament(platformId: String, tournamentId: Int): String =
+        "https://$platformId.api.riotgames.com/lol/clash/v1/tournaments/$tournamentId"
 
     /** Riot IDs can contain spaces and non-ASCII characters and must be percent-encoded. */
     private fun String.encode(): String =

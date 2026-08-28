@@ -178,3 +178,34 @@ data class StatusIncidentTitleDto(
     val locale: String = "",
     val content: String = "",
 )
+
+@Serializable
+data class ClashPlayerDto(
+    val summonerId: String = "",
+    val teamId: String = "",
+    val position: String = "",
+    val role: String = "",
+)
+
+@Serializable
+data class ClashTeamDto(
+    val id: String = "",
+    val tournamentId: Int = 0,
+    val name: String = "",
+    val tier: Int = 0,
+    val players: List<ClashPlayerDto> = emptyList(),
+)
+
+@Serializable
+data class ClashTournamentDto(
+    val id: Int = 0,
+    val schedule: List<ClashTournamentPhaseDto> = emptyList(),
+)
+
+@Serializable
+data class ClashTournamentPhaseDto(
+    val id: Int = 0,
+    val registrationTime: Long = 0,
+    val startTime: Long = 0,
+    val cancelled: Boolean = false,
+)

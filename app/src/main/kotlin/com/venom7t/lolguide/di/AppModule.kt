@@ -6,8 +6,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.venom7t.lolguide.data.auth.repository.AuthRepositoryImpl
 import com.venom7t.lolguide.data.champion.repository.ChampionRepositoryImpl
+import com.venom7t.lolguide.data.clash.repository.ClashRepositoryImpl
 import com.venom7t.lolguide.data.favourite.repository.FavouritesRepositoryImpl
+import com.venom7t.lolguide.data.lptracker.repository.LpTrackerRepositoryImpl
+import com.venom7t.lolguide.data.sync.repository.SyncRepositoryImpl
 import com.venom7t.lolguide.data.followed.repository.FollowedSummonerRepositoryImpl
 import com.venom7t.lolguide.data.item.repository.ItemRepositoryImpl
 import com.venom7t.lolguide.data.ladder.repository.LadderRepositoryImpl
@@ -22,12 +26,17 @@ import com.venom7t.lolguide.data.spell.repository.SummonerSpellRepositoryImpl
 import com.venom7t.lolguide.data.status.repository.ServerStatusRepositoryImpl
 import com.venom7t.lolguide.data.summoner.repository.SummonerRepositoryImpl
 import com.venom7t.lolguide.data.voiceline.repository.VoiceLineRepositoryImpl
+import com.venom7t.lolguide.data.common.di.ApplicationScope
 import com.venom7t.lolguide.data.common.di.DefaultDispatcher
 import com.venom7t.lolguide.data.common.di.IoDispatcher
 import com.venom7t.lolguide.data.patch.repository.PatchRepositoryImpl
+import com.venom7t.lolguide.domain.auth.repository.AuthRepository
 import com.venom7t.lolguide.domain.champion.repository.ChampionRepository
+import com.venom7t.lolguide.domain.clash.repository.ClashRepository
 import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.favourite.repository.FavouritesRepository
+import com.venom7t.lolguide.domain.lptracker.repository.LpTrackerRepository
+import com.venom7t.lolguide.domain.sync.repository.SyncRepository
 import com.venom7t.lolguide.domain.followed.repository.FollowedSummonerRepository
 import com.venom7t.lolguide.domain.item.repository.ItemRepository
 import com.venom7t.lolguide.domain.ladder.repository.LadderRepository
@@ -138,6 +147,22 @@ abstract class RepositoryModule {
     abstract fun bindFollowedSummonerRepository(
         impl: FollowedSummonerRepositoryImpl,
     ): FollowedSummonerRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSyncRepository(impl: SyncRepositoryImpl): SyncRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLpTrackerRepository(impl: LpTrackerRepositoryImpl): LpTrackerRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindClashRepository(impl: ClashRepositoryImpl): ClashRepository
 }
 
 @Module
@@ -151,6 +176,14 @@ object DispatcherModule {
     @Provides
     @DefaultDispatcher
     fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+
+    @Provides
+    @Singleton
+    @ApplicationScope
+    fun provideApplicationScope(
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+    ): kotlinx.coroutines.CoroutineScope =
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + ioDispatcher)
 }
 
 @Module
@@ -176,6 +209,21 @@ object WorkManagerModule {
     @Singleton
     fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
         WorkManager.getInstance(context)
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object FirebaseModule {
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): com.google.firebase.auth.FirebaseAuth =
+        com.google.firebase.auth.FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideFirebaseFirestore(): com.google.firebase.firestore.FirebaseFirestore =
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
 }
 
 @Module

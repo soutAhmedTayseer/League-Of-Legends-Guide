@@ -51,4 +51,13 @@ dependencies {
 
     implementation(libs.timber)
 
+    // Phase 5: live service. :data holds the sync/auth repository impls,
+    // same as every other *RepositoryImpl, so it needs the Firebase SDKs
+    // directly rather than routing calls through :app.
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+    // Firebase's Android SDK returns com.google.android.gms.tasks.Task, not
+    // a suspend function -- this is what makes .await() on one legal.
+    implementation(libs.kotlinx.coroutines.play.services)
 }

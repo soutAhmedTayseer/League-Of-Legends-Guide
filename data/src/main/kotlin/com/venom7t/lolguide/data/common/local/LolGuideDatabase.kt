@@ -13,6 +13,8 @@ import com.venom7t.lolguide.data.item.local.ItemDao
 import com.venom7t.lolguide.data.followed.local.FollowedSummonerDao
 import com.venom7t.lolguide.data.followed.local.FollowedSummonerEntity
 import com.venom7t.lolguide.data.item.local.ItemEntity
+import com.venom7t.lolguide.data.lptracker.local.LpSnapshotDao
+import com.venom7t.lolguide.data.lptracker.local.LpSnapshotEntity
 import com.venom7t.lolguide.data.match.local.MatchDao
 import com.venom7t.lolguide.data.match.local.MatchEntity
 import com.venom7t.lolguide.data.patch.local.PreviousPatchSnapshotDao
@@ -26,8 +28,9 @@ import com.venom7t.lolguide.data.patch.local.PreviousPatchSnapshotEntity
         PreviousPatchSnapshotEntity::class,
         MatchEntity::class,
         FollowedSummonerEntity::class,
+        LpSnapshotEntity::class,
     ],
-    version = 5,
+    version = 6,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -44,6 +47,8 @@ abstract class LolGuideDatabase : RoomDatabase() {
     abstract fun matchDao(): MatchDao
 
     abstract fun followedSummonerDao(): FollowedSummonerDao
+
+    abstract fun lpSnapshotDao(): LpSnapshotDao
 
     companion object {
         const val NAME = "lol_guide.db"
@@ -168,6 +173,30 @@ abstract class LolGuideDatabase : RoomDatabase() {
                         `regionName` TEXT NOT NULL,
                         `followedAtEpochMillis` INTEGER NOT NULL,
                         PRIMARY KEY(`puuid`)
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
+        /**
+         * Adds the LP tracker's snapshot history (Phase 5). Permanent,
+         * append-only -- each row is an observation the tracker made, never
+         * replaced, same non-destructive-migration discipline as every table
+         * added since v1->v2.
+         */
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `lp_snapshots` (
+                        `puuid` TEXT NOT NULL,
+                        `queueType` TEXT NOT NULL,
+                        `tier` TEXT NOT NULL,
+                        `rank` TEXT NOT NULL,
+                        `leaguePoints` INTEGER NOT NULL,
+                        `capturedAtEpochMillis` INTEGER NOT NULL,
+                        PRIMARY KEY(`puuid`, `queueType`, `capturedAtEpochMillis`)
                     )
                     """.trimIndent()
                 )

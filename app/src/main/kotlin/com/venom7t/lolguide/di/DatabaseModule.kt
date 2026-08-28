@@ -7,6 +7,7 @@ import com.venom7t.lolguide.data.common.local.LolGuideDatabase
 import com.venom7t.lolguide.data.favourite.local.FavouriteChampionDao
 import com.venom7t.lolguide.data.followed.local.FollowedSummonerDao
 import com.venom7t.lolguide.data.item.local.ItemDao
+import com.venom7t.lolguide.data.lptracker.local.LpSnapshotDao
 import com.venom7t.lolguide.data.match.local.MatchDao
 import com.venom7t.lolguide.data.patch.local.PreviousPatchSnapshotDao
 import dagger.Module
@@ -33,6 +34,7 @@ object DatabaseModule {
                 LolGuideDatabase.MIGRATION_2_3,
                 LolGuideDatabase.MIGRATION_3_4,
                 LolGuideDatabase.MIGRATION_4_5,
+                LolGuideDatabase.MIGRATION_5_6,
             )
             .build()
 
@@ -56,4 +58,7 @@ object DatabaseModule {
     @Provides
     fun provideFollowedSummonerDao(database: LolGuideDatabase): FollowedSummonerDao =
         database.followedSummonerDao()
+
+    @Provides
+    fun provideLpSnapshotDao(database: LolGuideDatabase): LpSnapshotDao = database.lpSnapshotDao()
 }

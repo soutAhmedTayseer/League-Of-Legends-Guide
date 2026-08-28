@@ -18,4 +18,13 @@ interface FavouritesRepository {
 
     /** Adds or removes, returning the state the champion ended up in. */
     suspend fun toggle(championId: String): Result<Boolean>
+
+    /**
+     * Idempotently ensures [championId] is favourited, without touching its
+     * timestamp if it already is. Used by sync to merge a remote favourite
+     * into local storage without disturbing the local list's own ordering
+     * (Phase 5) -- unlike [toggle], calling this twice is not a no-op *and*
+     * an un-favourite.
+     */
+    suspend fun ensureFavourite(championId: String)
 }
