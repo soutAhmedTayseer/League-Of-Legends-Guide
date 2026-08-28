@@ -15,9 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -219,6 +216,8 @@ private fun ChampionSlot(
     }
 }
 
+private const val ITEM_GRID_COLUMNS = 3
+
 @Composable
 private fun ItemGrid(
     items: List<Item?>,
@@ -226,21 +225,31 @@ private fun ItemGrid(
     onSlotClear: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyVerticalGrid(
+    // A plain Row/Column grid rather than LazyVerticalGrid: six fixed,
+    // never-scrolling slots don't need laziness, and a LazyVerticalGrid
+    // nested inside the outer LazyColumn's item {} gets measured with an
+    // infinite height constraint regardless of userScrollEnabled, which
+    // Compose throws on (IllegalStateException: "Vertically scrollable
+    // component was measured with an infinity maximum height constraints").
+    Column(
         modifier = modifier.fillMaxWidth(),
-        columns = GridCells.Fixed(3),
-        horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
         verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
-        // Six real slots: the grid never scrolls, so nesting it in the outer
-        // LazyColumn is safe despite both being "lazy".
-        userScrollEnabled = false,
     ) {
-        items(items.size) { index ->
-            ItemSlotCell(
-                item = items[index],
-                onClick = { onSlotClick(index) },
-                onClear = { onSlotClear(index) },
-            )
+        items.chunked(ITEM_GRID_COLUMNS).forEachIndexed { rowIndex, rowItems ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
+            ) {
+                rowItems.forEachIndexed { columnIndex, item ->
+                    val index = rowIndex * ITEM_GRID_COLUMNS + columnIndex
+                    ItemSlotCell(
+                        item = item,
+                        onClick = { onSlotClick(index) },
+                        onClear = { onSlotClear(index) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
         }
     }
 }

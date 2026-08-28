@@ -11,9 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -131,38 +128,49 @@ fun GameTimersScreen(
     }
 }
 
+private const val PRESET_GRID_COLUMNS = 2
+
 @Composable
 private fun PresetGrid(
     onPresetClick: (GameTimerPreset) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    LazyVerticalGrid(
+    // A plain Row/Column grid rather than LazyVerticalGrid: four fixed,
+    // never-scrolling presets don't need laziness, and a LazyVerticalGrid
+    // nested inside the outer LazyColumn's item {} gets measured with an
+    // infinite height constraint regardless of userScrollEnabled, which
+    // Compose throws on (IllegalStateException: "Vertically scrollable
+    // component was measured with an infinity maximum height constraints").
+    Column(
         modifier = modifier.fillMaxWidth(),
-        columns = GridCells.Fixed(2),
-        horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
         verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
-        userScrollEnabled = false,
     ) {
-        items(GameTimerPreset.entries.size) { index ->
-            val preset = GameTimerPreset.entries[index]
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(AppTheme.colors.surface, AppTheme.shapes.medium)
-                    .border(AppTheme.dimens.borderWidth, AppTheme.colors.border, AppTheme.shapes.medium)
-                    .clickable { onPresetClick(preset) }
-                    .padding(AppTheme.dimens.spaceMd),
+        GameTimerPreset.entries.chunked(PRESET_GRID_COLUMNS).forEach { rowPresets ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
             ) {
-                Text(
-                    text = stringResource(preset.labelRes()),
-                    style = AppTheme.typography.titleMedium,
-                    color = AppTheme.colors.textPrimary,
-                )
-                Text(
-                    text = preset.durationSeconds.formatDuration(),
-                    style = AppTheme.typography.caption,
-                    color = AppTheme.colors.textSecondary,
-                )
+                rowPresets.forEach { preset ->
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .background(AppTheme.colors.surface, AppTheme.shapes.medium)
+                            .border(AppTheme.dimens.borderWidth, AppTheme.colors.border, AppTheme.shapes.medium)
+                            .clickable { onPresetClick(preset) }
+                            .padding(AppTheme.dimens.spaceMd),
+                    ) {
+                        Text(
+                            text = stringResource(preset.labelRes()),
+                            style = AppTheme.typography.titleMedium,
+                            color = AppTheme.colors.textPrimary,
+                        )
+                        Text(
+                            text = preset.durationSeconds.formatDuration(),
+                            style = AppTheme.typography.caption,
+                            color = AppTheme.colors.textSecondary,
+                        )
+                    }
+                }
             }
         }
     }
