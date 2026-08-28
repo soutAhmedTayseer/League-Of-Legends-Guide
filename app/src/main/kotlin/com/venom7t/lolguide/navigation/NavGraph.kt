@@ -1,5 +1,6 @@
 package com.venom7t.lolguide.navigation
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -143,6 +144,14 @@ private fun LolGuideNavGraphContent(
     Scaffold(
         modifier = modifier,
         containerColor = AppTheme.colors.background,
+        // Only the bottom bar's own insets are applied to the NavHost below
+        // (via its padding). Leaving this at the default would also consume
+        // the top status-bar inset here, so every top-level screen's content
+        // would start below it -- exactly what stops Home's hero from
+        // running full-bleed under the status bar. Screens that need to
+        // clear the status bar (anything without its own edge-to-edge hero)
+        // apply statusBarsPadding() themselves.
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (showBottomBar) {
                 NavigationBar(containerColor = AppTheme.colors.surface) {
@@ -216,7 +225,6 @@ private fun LolGuideNavGraphContent(
                     onNavigateToLadder = { navController.navigate(LadderRoute) },
                     onNavigateToFollowedSummoners = { navController.navigate(FollowedSummonersRoute) },
                     onNavigateToGame = { navController.navigate(GameHubRoute) },
-                    onNavigateToAccount = { navController.navigate(AccountRoute) },
                 )
             }
 
@@ -353,6 +361,7 @@ private fun LolGuideNavGraphContent(
                             ),
                         )
                     },
+                    onNavigateToAccount = { navController.navigate(AccountRoute) },
                 )
             }
 

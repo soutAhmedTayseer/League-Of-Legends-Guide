@@ -39,6 +39,7 @@ import com.venom7t.lolguide.domain.champion.model.ScaledStats
 import com.venom7t.lolguide.domain.champion.model.Skin
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.DataDragonUrls
+import com.venom7t.lolguide.presentation.common.components.HextechFrame
 import com.venom7t.lolguide.presentation.common.skinDisplayName
 import com.venom7t.lolguide.presentation.theme.AppTheme
 import kotlinx.collections.immutable.ImmutableList
@@ -111,24 +112,14 @@ fun SkinsSection(
             items(items = skins, key = { it.id }) { skin ->
                 val index = skins.indexOf(skin)
                 val isSelected = index == safeIndex
-                AsyncImage(
+                HextechFrame(
                     model = DataDragonUrls.championLoading(championId, skin.num),
                     contentDescription = skinDisplayName(skin.name, championName),
-                    contentScale = ContentScale.Crop,
+                    isSelected = isSelected,
+                    onClick = { onSkinSelected(index) },
                     modifier = Modifier
                         .width(AppTheme.dimens.abilityIcon)
-                        .height(AppTheme.dimens.championThumb)
-                        .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.small)
-                        .border(
-                            width = AppTheme.dimens.borderWidth,
-                            color = if (isSelected) {
-                                AppTheme.colors.primary
-                            } else {
-                                AppTheme.colors.border
-                            },
-                            shape = AppTheme.shapes.small,
-                        )
-                        .clickable { onSkinSelected(index) },
+                        .height(AppTheme.dimens.championThumb),
                 )
             }
         }

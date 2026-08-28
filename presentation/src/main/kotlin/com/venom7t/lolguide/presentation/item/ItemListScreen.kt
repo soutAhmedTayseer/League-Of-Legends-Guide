@@ -40,12 +40,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
 import com.venom7t.lolguide.domain.item.model.Item
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.DataDragonUrls
 import com.venom7t.lolguide.presentation.common.components.EmptyContent
 import com.venom7t.lolguide.presentation.common.components.ErrorContent
+import com.venom7t.lolguide.presentation.common.components.HextechFrame
 import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.common.components.PatchBadge
 import com.venom7t.lolguide.presentation.common.uiText
@@ -261,12 +261,10 @@ private fun ItemRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
     ) {
-        AsyncImage(
+        HextechFrame(
             model = DataDragonUrls.itemIcon(item.patchVersion, item.imageFileName),
             contentDescription = stringResource(R.string.item_icon, item.name),
-            modifier = Modifier
-                .size(AppTheme.dimens.abilityIcon)
-                .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.small),
+            modifier = Modifier.size(AppTheme.dimens.abilityIcon),
         )
 
         Column(modifier = Modifier.weight(1f)) {

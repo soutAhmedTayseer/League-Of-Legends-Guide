@@ -35,13 +35,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
 import com.venom7t.lolguide.domain.item.model.Item
 import com.venom7t.lolguide.domain.item.model.ItemStats
 import com.venom7t.lolguide.domain.item.usecase.GoldEfficiency
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.DataDragonUrls
 import com.venom7t.lolguide.presentation.common.components.ErrorContent
+import com.venom7t.lolguide.presentation.common.components.HextechFrame
 import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.common.components.PatchBadge
 import com.venom7t.lolguide.presentation.common.abilityText
@@ -145,12 +145,10 @@ private fun DetailContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
             ) {
-                AsyncImage(
+                HextechFrame(
                     model = DataDragonUrls.itemIcon(item.patchVersion, item.imageFileName),
                     contentDescription = stringResource(R.string.item_icon, item.name),
-                    modifier = Modifier
-                        .size(AppTheme.dimens.championThumb)
-                        .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.small),
+                    modifier = Modifier.size(AppTheme.dimens.championThumb),
                 )
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
@@ -379,12 +377,10 @@ private fun RelatedItemRow(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceXs),
             ) {
-                AsyncImage(
+                HextechFrame(
                     model = DataDragonUrls.itemIcon(related.patchVersion, related.imageFileName),
                     contentDescription = stringResource(R.string.item_icon, related.name),
-                    modifier = Modifier
-                        .size(AppTheme.dimens.abilityIcon)
-                        .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.small),
+                    modifier = Modifier.size(AppTheme.dimens.abilityIcon),
                 )
                 Text(
                     text = related.name,

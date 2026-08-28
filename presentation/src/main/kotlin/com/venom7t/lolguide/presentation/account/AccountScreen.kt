@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -101,10 +101,20 @@ fun AccountScreen(
         containerColor = AppTheme.colors.background,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.account_title)) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.account_title),
+                        style = AppTheme.typography.titleLarge,
+                        color = AppTheme.colors.textPrimary,
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = { onEvent(AccountEvent.BackClicked) }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.action_back),
+                            tint = AppTheme.colors.textPrimary,
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

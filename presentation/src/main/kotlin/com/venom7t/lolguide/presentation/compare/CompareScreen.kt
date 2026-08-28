@@ -34,19 +34,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.model.ChampionStatCalculator
 import com.venom7t.lolguide.domain.champion.usecase.ChampionComparison
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.DataDragonUrls
 import com.venom7t.lolguide.presentation.common.components.EmptyContent
+import com.venom7t.lolguide.presentation.common.components.HextechFrame
 import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.common.uiText
 import com.venom7t.lolguide.presentation.theme.AppTheme
@@ -199,7 +198,7 @@ private fun SlotPicker(
                 textAlign = TextAlign.Center,
             )
         } else {
-            AsyncImage(
+            HextechFrame(
                 model = DataDragonUrls.championIcon(
                     version = champion.patchVersion,
                     imageFileName = champion.imageFileName,
@@ -208,10 +207,7 @@ private fun SlotPicker(
                     R.string.champion_detail_portrait,
                     champion.name,
                 ),
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(AppTheme.dimens.championThumb)
-                    .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.small),
+                modifier = Modifier.size(AppTheme.dimens.championThumb),
             )
             Text(
                 text = champion.name,
@@ -393,19 +389,13 @@ private fun ChampionPickerSheet(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
                     ) {
-                        AsyncImage(
+                        HextechFrame(
                             model = DataDragonUrls.championIcon(
                                 version = champion.patchVersion,
                                 imageFileName = champion.imageFileName,
                             ),
                             contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(AppTheme.dimens.abilityIcon)
-                                .background(
-                                    AppTheme.colors.surfaceElevated,
-                                    AppTheme.shapes.small,
-                                ),
+                            modifier = Modifier.size(AppTheme.dimens.abilityIcon),
                         )
                         Text(
                             text = champion.name,

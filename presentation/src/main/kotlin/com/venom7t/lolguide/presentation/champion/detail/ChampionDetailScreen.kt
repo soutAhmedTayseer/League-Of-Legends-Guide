@@ -50,6 +50,7 @@ import com.venom7t.lolguide.presentation.common.DataDragonUrls
 import com.venom7t.lolguide.presentation.common.abilityText
 import com.venom7t.lolguide.presentation.common.rememberSplashAccent
 import com.venom7t.lolguide.presentation.common.components.ErrorContent
+import com.venom7t.lolguide.presentation.common.components.HextechFrame
 import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.common.components.PatchBadge
 import com.venom7t.lolguide.presentation.common.skinDisplayName
@@ -439,15 +440,13 @@ private fun AbilityCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
         ) {
-            AsyncImage(
+            HextechFrame(
                 model = iconUrl,
                 contentDescription = stringResource(
                     R.string.champion_detail_ability_icon,
                     name,
                 ),
-                modifier = Modifier
-                    .size(AppTheme.dimens.abilityIcon)
-                    .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.small),
+                modifier = Modifier.size(AppTheme.dimens.abilityIcon),
             )
             Column(modifier = Modifier.weight(1f)) {
                 Text(

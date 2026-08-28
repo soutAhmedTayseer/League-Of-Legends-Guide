@@ -7,12 +7,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -44,6 +48,7 @@ import com.venom7t.lolguide.presentation.theme.AppTheme
 @Composable
 fun SummonerSearchScreenRoot(
     onNavigateToProfile: (name: String, tagline: String, region: Region) -> Unit,
+    onNavigateToAccount: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SummonerSearchViewModel = hiltViewModel(),
 ) {
@@ -65,6 +70,7 @@ fun SummonerSearchScreenRoot(
     SummonerSearchScreen(
         state = state,
         onEvent = viewModel::onEvent,
+        onNavigateToAccount = onNavigateToAccount,
         snackbarHostState = snackbarHostState,
         modifier = modifier,
     )
@@ -75,6 +81,7 @@ fun SummonerSearchScreenRoot(
 fun SummonerSearchScreen(
     state: SummonerSearchState,
     onEvent: (SummonerSearchEvent) -> Unit,
+    onNavigateToAccount: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
@@ -84,10 +91,24 @@ fun SummonerSearchScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.summoner_search_title)) },
+                title = {
+                    Text(
+                        text = stringResource(R.string.summoner_search_title),
+                        style = AppTheme.typography.titleLarge,
+                        color = AppTheme.colors.textPrimary,
+                    )
+                },
+                actions = {
+                    IconButton(onClick = onNavigateToAccount) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = stringResource(R.string.account_title),
+                            tint = AppTheme.colors.textSecondary,
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = AppTheme.colors.background,
-                    titleContentColor = AppTheme.colors.textPrimary,
                 ),
             )
         },

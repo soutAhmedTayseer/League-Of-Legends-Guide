@@ -2,7 +2,6 @@ package com.venom7t.lolguide.presentation.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -28,7 +28,6 @@ import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Leaderboard
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Quiz
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Icon
@@ -67,7 +66,6 @@ fun HomeScreenRoot(
     onNavigateToLadder: () -> Unit,
     onNavigateToFollowedSummoners: () -> Unit,
     onNavigateToGame: () -> Unit,
-    onNavigateToAccount: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -85,7 +83,6 @@ fun HomeScreenRoot(
         onNavigateToLadder = onNavigateToLadder,
         onNavigateToFollowedSummoners = onNavigateToFollowedSummoners,
         onNavigateToGame = onNavigateToGame,
-        onNavigateToAccount = onNavigateToAccount,
         modifier = modifier,
     )
 }
@@ -107,7 +104,6 @@ fun HomeScreen(
     onNavigateToLadder: () -> Unit,
     onNavigateToFollowedSummoners: () -> Unit,
     onNavigateToGame: () -> Unit,
-    onNavigateToAccount: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -126,7 +122,6 @@ fun HomeScreen(
                 },
                 patchVersion = state.patchVersion,
                 isPatchStale = state.isPatchStale,
-                onAccountClick = onNavigateToAccount,
             )
         }
 
@@ -244,7 +239,6 @@ private fun HomeHero(
     eyebrowRes: Int,
     patchVersion: String?,
     isPatchStale: Boolean,
-    onAccountClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -282,7 +276,7 @@ private fun HomeHero(
         // hero has no hard bottom edge, and carries the title block on a
         // near-solid base -- splash art is bright and busy, and text laid
         // straight onto it is unreadable at any weight. The upper one does
-        // the same job for the wordmark and account control.
+        // the same job for the wordmark.
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -300,6 +294,9 @@ private fun HomeHero(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                // The splash art behind this runs full-bleed under the status
+                // bar; only the wordmark row needs to clear it.
+                .statusBarsPadding()
                 .padding(AppTheme.dimens.spaceMd),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -307,9 +304,7 @@ private fun HomeHero(
                 text = stringResource(R.string.home_wordmark),
                 style = AppTheme.typography.tileLabel,
                 color = AppTheme.colors.textPrimary,
-                modifier = Modifier.weight(1f),
             )
-            AccountBadge(onClick = onAccountClick)
         }
 
         Column(
@@ -351,29 +346,6 @@ private fun HomeHero(
     }
 }
 
-@Composable
-private fun AccountBadge(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .size(34.dp)
-            .clip(AppTheme.shapes.small)
-            .background(
-                Brush.linearGradient(
-                    listOf(AppTheme.colors.primary, AppTheme.colors.border),
-                ),
-            )
-            .border(AppTheme.dimens.borderWidth, AppTheme.colors.primary, AppTheme.shapes.small)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) {
-        Icon(
-            imageVector = Icons.Default.Person,
-            contentDescription = stringResource(R.string.account_title),
-            tint = AppTheme.colors.onPrimary,
-            modifier = Modifier.size(18.dp),
-        )
-    }
-}
 
 @Composable
 private fun PatchChip(version: String, isStale: Boolean, modifier: Modifier = Modifier) {

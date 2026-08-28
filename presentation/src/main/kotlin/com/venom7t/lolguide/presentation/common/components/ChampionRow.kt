@@ -18,10 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import coil3.compose.AsyncImage
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.DataDragonUrls
@@ -59,7 +57,7 @@ fun ChampionRow(
     ) {
         // Versioned art fetched on the champion's own patch, so an icon can
         // never come from a different patch than the data beside it.
-        AsyncImage(
+        HextechFrame(
             model = DataDragonUrls.championIcon(
                 version = champion.patchVersion,
                 imageFileName = champion.imageFileName,
@@ -68,10 +66,7 @@ fun ChampionRow(
                 R.string.champion_detail_portrait,
                 champion.name,
             ),
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(AppTheme.dimens.championThumb)
-                .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.small),
+            modifier = Modifier.size(AppTheme.dimens.championThumb),
         )
 
         Column(modifier = Modifier.weight(1f)) {
