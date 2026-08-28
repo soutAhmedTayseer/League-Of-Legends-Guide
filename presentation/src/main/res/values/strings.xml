@@ -203,4 +203,70 @@
     <!-- Phase 2: nav -->
     <string name="nav_items">Items</string>
 
+    <!-- Phase 3: timers -->
+    <string name="timers_title">In-game timers</string>
+    <string name="timers_open">In-game timers</string>
+    <string name="timers_presets_title">Start a timer</string>
+    <string name="timers_running_title">Running</string>
+    <string name="timers_none_running">No timers running. Tap a preset above to start one.</string>
+    <string name="timers_cancel">Cancel timer</string>
+    <string name="timer_baron">Baron</string>
+    <string name="timer_dragon">Dragon</string>
+    <string name="timer_herald">Herald</string>
+    <string name="timer_ward">Ward</string>
+
+    <!-- Phase 3: quiz -->
+    <string name="quiz_title">Champion quiz</string>
+    <string name="quiz_open">Champion quiz</string>
+    <string name="quiz_score">%1$d / %2$d</string>
+    <string name="quiz_next">Next question</string>
+    <string name="quiz_insufficient_data">Not enough champions cached yet to build a quiz. Open the Champions tab first.</string>
+    <string name="quiz_prompt_ability">Whose ability is this?</string>
+    <string name="quiz_prompt_splash">Which champion is this?</string>
+
+    <!-- Phase 3: onboarding -->
+    <string name="onboarding_welcome_title">Welcome to LoL Guide</string>
+    <string name="onboarding_welcome_body">A quick two-step setup personalises your home screen. You can skip this and change it later.</string>
+    <string name="onboarding_region_title">Pick your region</string>
+    <string name="onboarding_role_title">Pick your main role</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_continue">Continue</string>
+    <string name="onboarding_finish">Done</string>
+    <string name="role_top">Top</string>
+    <string name="role_jungle">Jungle</string>
+    <string name="role_mid">Mid</string>
+    <string name="role_bottom">Bottom</string>
+
+    <!-- Phase 3: home -->
+    <string name="home_title">Home</string>
+    <string name="nav_home">Home</string>
+    <string name="home_whats_new_teaser">What\'s new this patch</string>
+    <string name="home_whats_new_open">View changes</string>
+    <string name="home_whats_new_unavailable">Nothing to compare yet -- check back after the next patch.</string>
+    <string name="home_quick_links_title">Quick links</string>
+    <string name="home_rotation_placeholder_title">Free champion rotation</string>
+    <string name="home_rotation_placeholder_body">Coming in a future update -- this needs a Riot API key.</string>
+
+    <!-- Phase 3: what's new / patch diff -->
+    <string name="whats_new_title">What\'s new</string>
+    <string name="whats_new_champions_added">New champions</string>
+    <string name="whats_new_champions_removed">Removed champions</string>
+    <string name="whats_new_champions_changed">Champion stat changes</string>
+    <string name="whats_new_items_added">New items</string>
+    <string name="whats_new_items_removed">Removed items</string>
+    <string name="whats_new_items_repriced">Repriced items</string>
+    <string name="whats_new_empty">No changes detected between patch %1$s and %2$s.</string>
+    <string name="whats_new_unavailable">Nothing to compare yet. This appears after your next patch update.</string>
+    <string name="whats_new_repriced_from_to">%1$d → %2$d gold</string>
+
+    <!-- Phase 3: voice lines -->
+    <string name="voice_lines_title">Voice lines</string>
+    <string name="voice_lines_unavailable">Voice lines are not available for this champion.</string>
+    <string name="voice_line_play">Play line %1$s</string>
+    <string name="voice_line_stop">Stop</string>
+    <string name="voice_lines_best_effort_note">Coverage is best-effort and not available for every champion.</string>
+
+    <!-- Phase 3: sharing / deep links -->
+    <string name="champion_detail_share">Share</string>
+
 </resources>

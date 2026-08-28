@@ -203,4 +203,70 @@
     <!-- Phase 2: nav -->
     <string name="nav_items">العناصر</string>
 
+    <!-- Phase 3: timers -->
+    <string name="timers_title">مؤقتات اللعبة</string>
+    <string name="timers_open">مؤقتات اللعبة</string>
+    <string name="timers_presets_title">ابدأ مؤقتًا</string>
+    <string name="timers_running_title">قيد التشغيل</string>
+    <string name="timers_none_running">لا توجد مؤقتات قيد التشغيل. اضغط على أحد الخيارات أعلاه لبدء واحد.</string>
+    <string name="timers_cancel">إلغاء المؤقت</string>
+    <string name="timer_baron">بارون</string>
+    <string name="timer_dragon">التنين</string>
+    <string name="timer_herald">هيرالد</string>
+    <string name="timer_ward">الحارس</string>
+
+    <!-- Phase 3: quiz -->
+    <string name="quiz_title">اختبار الأبطال</string>
+    <string name="quiz_open">اختبار الأبطال</string>
+    <string name="quiz_score">%1$d / %2$d</string>
+    <string name="quiz_next">السؤال التالي</string>
+    <string name="quiz_insufficient_data">لا يوجد أبطال محفوظون بما يكفي لإنشاء اختبار. افتح تبويب الأبطال أولًا.</string>
+    <string name="quiz_prompt_ability">قدرة مَن هذه؟</string>
+    <string name="quiz_prompt_splash">مَن هذا البطل؟</string>
+
+    <!-- Phase 3: onboarding -->
+    <string name="onboarding_welcome_title">مرحبًا بك في دليل LoL</string>
+    <string name="onboarding_welcome_body">إعداد سريع من خطوتين لتخصيص شاشتك الرئيسية. يمكنك تخطي هذا وتغييره لاحقًا.</string>
+    <string name="onboarding_region_title">اختر منطقتك</string>
+    <string name="onboarding_role_title">اختر دورك الأساسي</string>
+    <string name="onboarding_skip">تخطي</string>
+    <string name="onboarding_continue">متابعة</string>
+    <string name="onboarding_finish">تم</string>
+    <string name="role_top">أعلى</string>
+    <string name="role_jungle">الغابة</string>
+    <string name="role_mid">الوسط</string>
+    <string name="role_bottom">أسفل</string>
+
+    <!-- Phase 3: home -->
+    <string name="home_title">الرئيسية</string>
+    <string name="nav_home">الرئيسية</string>
+    <string name="home_whats_new_teaser">ما الجديد في هذا التحديث</string>
+    <string name="home_whats_new_open">عرض التغييرات</string>
+    <string name="home_whats_new_unavailable">لا يوجد شيء للمقارنة بعد -- تحقق مرة أخرى بعد التحديث القادم.</string>
+    <string name="home_quick_links_title">روابط سريعة</string>
+    <string name="home_rotation_placeholder_title">التناوب المجاني للأبطال</string>
+    <string name="home_rotation_placeholder_body">قادم في تحديث مستقبلي -- يتطلب مفتاح Riot API.</string>
+
+    <!-- Phase 3: what's new / patch diff -->
+    <string name="whats_new_title">ما الجديد</string>
+    <string name="whats_new_champions_added">أبطال جدد</string>
+    <string name="whats_new_champions_removed">أبطال مُزالون</string>
+    <string name="whats_new_champions_changed">تغييرات إحصائيات الأبطال</string>
+    <string name="whats_new_items_added">عناصر جديدة</string>
+    <string name="whats_new_items_removed">عناصر مُزالة</string>
+    <string name="whats_new_items_repriced">عناصر أُعيد تسعيرها</string>
+    <string name="whats_new_empty">لا توجد تغييرات بين التحديث %1$s و%2$s.</string>
+    <string name="whats_new_unavailable">لا يوجد شيء للمقارنة بعد. سيظهر هذا بعد تحديث النسخة القادم.</string>
+    <string name="whats_new_repriced_from_to">%1$d ← %2$d ذهب</string>
+
+    <!-- Phase 3: voice lines -->
+    <string name="voice_lines_title">التعليقات الصوتية</string>
+    <string name="voice_lines_unavailable">التعليقات الصوتية غير متوفرة لهذا البطل.</string>
+    <string name="voice_line_play">تشغيل المقطع %1$s</string>
+    <string name="voice_line_stop">إيقاف</string>
+    <string name="voice_lines_best_effort_note">التغطية غير مضمونة وقد لا تتوفر لكل الأبطال.</string>
+
+    <!-- Phase 3: sharing / deep links -->
+    <string name="champion_detail_share">مشاركة</string>
+
 </resources>
