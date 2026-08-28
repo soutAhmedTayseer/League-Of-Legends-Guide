@@ -5,8 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.usecase.ObserveChampionsUseCase
+import com.venom7t.lolguide.domain.champion.usecase.RefreshChampionsUseCase
+import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.favourite.usecase.ObserveFavouriteIdsUseCase
 import com.venom7t.lolguide.domain.favourite.usecase.ToggleFavouriteUseCase
+import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -16,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -44,6 +48,9 @@ class FavouritesViewModel @Inject constructor(
     private val observeChampions: ObserveChampionsUseCase,
     private val observeFavouriteIds: ObserveFavouriteIdsUseCase,
     private val toggleFavourite: ToggleFavouriteUseCase,
+    private val refreshChampions: RefreshChampionsUseCase,
+    private val resolvePatch: ResolvePatchUseCase,
+    private val locale: AppLocale,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FavouritesState())
@@ -84,5 +91,22 @@ class FavouritesViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
+
+        ensureChampionsCached()
+    }
+
+    /**
+     * Champion data only ever reaches Room through [RefreshChampionsUseCase],
+     * which normally runs from [com.venom7t.lolguide.presentation.champion.list.ChampionListViewModel].
+     * Landing here first -- e.g. straight from Home on a fresh install, or
+     * after the local cache was cleared -- would otherwise show an empty
+     * favourites list forever, even with favourite ids already synced from
+     * Firestore, until the user happened to open the Champions tab too.
+     */
+    private fun ensureChampionsCached() {
+        viewModelScope.launch {
+            if (observeChampions().first().isNotEmpty()) return@launch
+            resolvePatch().onSuccess { patch -> refreshChampions(patch.version, locale) }
+        }
     }
 }
