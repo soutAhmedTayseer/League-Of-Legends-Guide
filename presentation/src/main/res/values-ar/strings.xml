@@ -344,4 +344,14 @@
     <string name="game_round_lost">نفدت التخمينات</string>
     <string name="game_round_answer_was">الإجابة كانت %1$s</string>
 
+    <!-- Phase 5 addendum: Google sign-in -->
+    <string name="google_sign_in_web_client_id" translatable="false">404574107891-536m94robfl44nclmjov1mduvd73ocb4.apps.googleusercontent.com</string>
+    <string name="account_title">الحساب</string>
+    <string name="account_sign_in_with_google">تسجيل الدخول عبر Google</string>
+    <string name="account_signed_in_as">تم تسجيل الدخول باسم %1$s</string>
+    <string name="account_anonymous">تستخدم التطبيق بدون حساب -- تتم مزامنة المفضلة واللاعبين المتابَعين على هذا الجهاز فقط.</string>
+    <string name="account_sign_out">تسجيل الخروج</string>
+    <string name="account_sign_in_error">تعذّر تسجيل الدخول. حاول مرة أخرى.</string>
+    <string name="account_sign_in_benefit">سجّل الدخول للاحتفاظ بمفضلتك واللاعبين المتابَعين عند تغيير هاتفك.</string>
+
 </resources>

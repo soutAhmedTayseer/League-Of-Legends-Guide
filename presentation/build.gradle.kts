@@ -57,6 +57,13 @@ dependencies {
     implementation(libs.androidx.palette)
     implementation(libs.timber)
 
+    // Phase 5 addendum: Google sign-in. Credential Manager's UI flow is
+    // triggered from a Composable (needs a Context/Activity), so the call
+    // itself lives here; only the resulting ID token crosses into :domain.
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+
     debugImplementation(libs.androidx.compose.ui.tooling)
 
 }

@@ -35,6 +35,7 @@ import com.venom7t.lolguide.presentation.champion.list.ChampionListScreenRoot
 import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.compare.CompareScreenRoot
 import com.venom7t.lolguide.presentation.favourite.FavouritesScreenRoot
+import com.venom7t.lolguide.presentation.account.AccountScreenRoot
 import com.venom7t.lolguide.presentation.followed.FollowedSummonersScreenRoot
 import com.venom7t.lolguide.presentation.game.hub.GameHubScreenRoot
 import com.venom7t.lolguide.presentation.game.round.GameRoundScreenRoot
@@ -51,6 +52,7 @@ import com.venom7t.lolguide.presentation.navigation.ChampionDetailRoute
 import com.venom7t.lolguide.presentation.navigation.ChampionListRoute
 import com.venom7t.lolguide.presentation.navigation.CompareRoute
 import com.venom7t.lolguide.presentation.navigation.FavouritesRoute
+import com.venom7t.lolguide.presentation.navigation.AccountRoute
 import com.venom7t.lolguide.presentation.navigation.FollowedSummonersRoute
 import com.venom7t.lolguide.presentation.navigation.GameHubRoute
 import com.venom7t.lolguide.presentation.navigation.GameRoundRoute
@@ -196,6 +198,7 @@ private fun LolGuideNavGraphContent(
                     onNavigateToLadder = { navController.navigate(LadderRoute) },
                     onNavigateToFollowedSummoners = { navController.navigate(FollowedSummonersRoute) },
                     onNavigateToGame = { navController.navigate(GameHubRoute) },
+                    onNavigateToAccount = { navController.navigate(AccountRoute) },
                 )
             }
 
@@ -209,6 +212,10 @@ private fun LolGuideNavGraphContent(
 
             composable<GameTimersRoute> {
                 GameTimersScreenRoot(onNavigateBack = { navController.popBackStack() })
+            }
+
+            composable<AccountRoute> {
+                AccountScreenRoot(onBack = { navController.popBackStack() })
             }
 
             composable<GameHubRoute> {

@@ -51,6 +51,7 @@ fun HomeScreenRoot(
     onNavigateToLadder: () -> Unit,
     onNavigateToFollowedSummoners: () -> Unit,
     onNavigateToGame: () -> Unit,
+    onNavigateToAccount: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
@@ -68,6 +69,7 @@ fun HomeScreenRoot(
         onNavigateToLadder = onNavigateToLadder,
         onNavigateToFollowedSummoners = onNavigateToFollowedSummoners,
         onNavigateToGame = onNavigateToGame,
+        onNavigateToAccount = onNavigateToAccount,
         modifier = modifier,
     )
 }
@@ -84,6 +86,7 @@ fun HomeScreen(
     onNavigateToLadder: () -> Unit,
     onNavigateToFollowedSummoners: () -> Unit,
     onNavigateToGame: () -> Unit,
+    onNavigateToAccount: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -181,6 +184,13 @@ fun HomeScreen(
                     icon = Icons.Default.Quiz,
                     label = stringResource(R.string.game_hub_title),
                     onClick = onNavigateToGame,
+                )
+            }
+            item {
+                QuickLinkRow(
+                    icon = Icons.Default.Person,
+                    label = stringResource(R.string.account_title),
+                    onClick = onNavigateToAccount,
                 )
             }
         }

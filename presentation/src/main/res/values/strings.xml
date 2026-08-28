@@ -344,4 +344,17 @@
     <string name="game_round_lost">Out of guesses</string>
     <string name="game_round_answer_was">The answer was %1$s</string>
 
+    <!-- Phase 5 addendum: Google sign-in -->
+    <!-- Not user-facing: the Firebase project's Web OAuth client id, required by Credential
+         Manager's GetGoogleIdOption as serverClientId even though only Android sign-in happens
+         here. Comes from google-services.json's client_type 3 entry, not a secret. -->
+    <string name="google_sign_in_web_client_id" translatable="false">404574107891-536m94robfl44nclmjov1mduvd73ocb4.apps.googleusercontent.com</string>
+    <string name="account_title">Account</string>
+    <string name="account_sign_in_with_google">Sign in with Google</string>
+    <string name="account_signed_in_as">Signed in as %1$s</string>
+    <string name="account_anonymous">Playing without an account -- favourites and followed summoners sync to this device only.</string>
+    <string name="account_sign_out">Sign out</string>
+    <string name="account_sign_in_error">Couldn\'t sign in. Try again.</string>
+    <string name="account_sign_in_benefit">Sign in to keep your favourites and followed summoners if you switch phones.</string>
+
 </resources>

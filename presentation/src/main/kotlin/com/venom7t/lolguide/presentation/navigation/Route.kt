@@ -93,6 +93,9 @@ data object LadderRoute
 data object FollowedSummonersRoute
 
 @Serializable
+data object AccountRoute
+
+@Serializable
 data object GameHubRoute
 
 @Serializable

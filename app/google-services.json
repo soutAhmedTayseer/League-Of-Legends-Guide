@@ -12,7 +12,20 @@
           "package_name": "com.venom7t.lolguide"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "404574107891-ur24ghmm7u3ekkj4v6sjoqt42k62ugs9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.venom7t.lolguide",
+            "certificate_hash": "0f79209b6bc5427d08cae208aa059562a525bf73"
+          }
+        },
+        {
+          "client_id": "404574107891-536m94robfl44nclmjov1mduvd73ocb4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDbo496ZkW9T813GFIDoUYT-ikwU4hagpk"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "404574107891-536m94robfl44nclmjov1mduvd73ocb4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
