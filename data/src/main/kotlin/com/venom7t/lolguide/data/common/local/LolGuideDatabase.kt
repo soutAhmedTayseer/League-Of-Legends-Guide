@@ -5,6 +5,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.venom7t.lolguide.data.builds.local.SavedBuildDao
+import com.venom7t.lolguide.data.builds.local.SavedBuildEntity
 import com.venom7t.lolguide.data.champion.local.ChampionDao
 import com.venom7t.lolguide.data.champion.local.ChampionEntity
 import com.venom7t.lolguide.data.favourite.local.FavouriteChampionDao
@@ -29,8 +31,9 @@ import com.venom7t.lolguide.data.patch.local.PreviousPatchSnapshotEntity
         MatchEntity::class,
         FollowedSummonerEntity::class,
         LpSnapshotEntity::class,
+        SavedBuildEntity::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -49,6 +52,8 @@ abstract class LolGuideDatabase : RoomDatabase() {
     abstract fun followedSummonerDao(): FollowedSummonerDao
 
     abstract fun lpSnapshotDao(): LpSnapshotDao
+
+    abstract fun savedBuildDao(): SavedBuildDao
 
     companion object {
         const val NAME = "lol_guide.db"
@@ -197,6 +202,29 @@ abstract class LolGuideDatabase : RoomDatabase() {
                         `leaguePoints` INTEGER NOT NULL,
                         `capturedAtEpochMillis` INTEGER NOT NULL,
                         PRIMARY KEY(`puuid`, `queueType`, `capturedAtEpochMillis`)
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
+        /**
+         * Adds saved builds -- another table of user-authored data (like
+         * favourites and followed summoners before it) that a destructive
+         * fallback would silently delete, so it gets the same real-migration
+         * treatment as every table since v1->v2.
+         */
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `saved_builds` (
+                        `id` TEXT NOT NULL,
+                        `championId` TEXT NOT NULL,
+                        `itemIds` TEXT NOT NULL,
+                        `level` INTEGER NOT NULL,
+                        `savedAtEpochMillis` INTEGER NOT NULL,
+                        PRIMARY KEY(`id`)
                     )
                     """.trimIndent()
                 )

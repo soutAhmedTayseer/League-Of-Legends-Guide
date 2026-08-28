@@ -15,7 +15,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -28,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import coil3.compose.AsyncImage
+import com.venom7t.lolguide.domain.builds.model.SavedBuild
 import com.venom7t.lolguide.domain.champion.model.ChampionStatCalculator
 import com.venom7t.lolguide.domain.champion.model.ScaledStats
 import com.venom7t.lolguide.domain.champion.model.Skin
@@ -35,6 +41,7 @@ import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.DataDragonUrls
 import com.venom7t.lolguide.presentation.common.skinDisplayName
 import com.venom7t.lolguide.presentation.theme.AppTheme
+import kotlinx.collections.immutable.ImmutableList
 
 /**
  * The splash art of the currently selected skin, plus a thumbnail strip.
@@ -245,6 +252,112 @@ fun RemoveFavouriteDialog(
         text = {
             Text(
                 text = stringResource(R.string.favourite_removed_confirm_message, championName),
+                style = AppTheme.typography.bodyMedium,
+                color = AppTheme.colors.textSecondary,
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(
+                    text = stringResource(R.string.action_remove),
+                    style = AppTheme.typography.label,
+                    color = AppTheme.colors.error,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = stringResource(R.string.action_cancel),
+                    style = AppTheme.typography.label,
+                    color = AppTheme.colors.textSecondary,
+                )
+            }
+        },
+    )
+}
+
+/**
+ * The user's own saved builds for this champion (Build Simulator, synced via
+ * Firebase). Tapping a row reloads that build into the simulator; the "new
+ * build" row opens a blank one instead.
+ */
+@Composable
+fun SavedBuildsSection(
+    builds: ImmutableList<SavedBuild>,
+    onBuildClick: (String) -> Unit,
+    onNewBuildClick: () -> Unit,
+    onDeleteClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(AppTheme.colors.surface, AppTheme.shapes.medium)
+                .border(AppTheme.dimens.borderWidth, AppTheme.colors.border, AppTheme.shapes.medium)
+                .clickable(onClick = onNewBuildClick)
+                .padding(AppTheme.dimens.spaceMd),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
+        ) {
+            Icon(imageVector = Icons.Default.Add, contentDescription = null, tint = AppTheme.colors.accent)
+            Text(
+                text = stringResource(R.string.saved_build_new),
+                style = AppTheme.typography.titleMedium,
+                color = AppTheme.colors.accent,
+            )
+        }
+
+        builds.forEach { build ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(AppTheme.colors.surface, AppTheme.shapes.medium)
+                    .border(AppTheme.dimens.borderWidth, AppTheme.colors.border, AppTheme.shapes.medium)
+                    .clickable { onBuildClick(build.id) }
+                    .padding(AppTheme.dimens.spaceMd),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.saved_build_item_count, build.itemIds.size, build.level),
+                    style = AppTheme.typography.bodyMedium,
+                    color = AppTheme.colors.textPrimary,
+                    modifier = Modifier.weight(1f),
+                )
+                IconButton(onClick = { onDeleteClick(build.id) }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.saved_build_delete),
+                        tint = AppTheme.colors.textSecondary,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DeleteSavedBuildDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = AppTheme.colors.surface,
+        title = {
+            Text(
+                text = stringResource(R.string.saved_build_delete_confirm_title),
+                style = AppTheme.typography.titleMedium,
+                color = AppTheme.colors.textPrimary,
+            )
+        },
+        text = {
+            Text(
+                text = stringResource(R.string.saved_build_delete_confirm_body),
                 style = AppTheme.typography.bodyMedium,
                 color = AppTheme.colors.textSecondary,
             )

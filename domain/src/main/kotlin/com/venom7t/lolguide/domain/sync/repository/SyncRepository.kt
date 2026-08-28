@@ -1,5 +1,6 @@
 package com.venom7t.lolguide.domain.sync.repository
 
+import com.venom7t.lolguide.domain.builds.model.SavedBuild
 import com.venom7t.lolguide.domain.followed.model.FollowedSummoner
 
 /**
@@ -27,4 +28,11 @@ interface SyncRepository {
     suspend fun pullFavouriteIds(): Result<Set<String>>
 
     suspend fun pullFollowedSummoners(): Result<List<FollowedSummoner>>
+
+    suspend fun pushSavedBuild(build: SavedBuild): Result<Unit>
+
+    /** Separate from [pushSavedBuild] since deleting only ever has the id on hand. */
+    suspend fun pushDeletedSavedBuild(id: String): Result<Unit>
+
+    suspend fun pullSavedBuilds(): Result<List<SavedBuild>>
 }

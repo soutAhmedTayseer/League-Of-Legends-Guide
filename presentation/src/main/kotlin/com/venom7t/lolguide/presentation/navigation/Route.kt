@@ -35,8 +35,9 @@ data object ItemListRoute
 @Serializable
 data class ItemDetailRoute(val itemId: String)
 
+/** [savedBuildId] is null for a blank simulator, or the id of a saved build to reload. */
 @Serializable
-data object BuildSimulatorRoute
+data class BuildSimulatorRoute(val savedBuildId: String? = null)
 
 @Serializable
 data object RunesRoute

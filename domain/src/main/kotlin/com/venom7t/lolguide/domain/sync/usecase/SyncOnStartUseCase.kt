@@ -1,6 +1,7 @@
 package com.venom7t.lolguide.domain.sync.usecase
 
 import com.venom7t.lolguide.domain.auth.usecase.EnsureSignedInUseCase
+import com.venom7t.lolguide.domain.builds.repository.SavedBuildRepository
 import com.venom7t.lolguide.domain.favourite.repository.FavouritesRepository
 import com.venom7t.lolguide.domain.followed.repository.FollowedSummonerRepository
 import com.venom7t.lolguide.domain.sync.repository.SyncRepository
@@ -21,6 +22,7 @@ class SyncOnStartUseCase @Inject constructor(
     private val syncRepository: SyncRepository,
     private val favouritesRepository: FavouritesRepository,
     private val followedSummonerRepository: FollowedSummonerRepository,
+    private val savedBuildRepository: SavedBuildRepository,
 ) {
     suspend operator fun invoke() {
         ensureSignedIn().onFailure { return }
@@ -35,6 +37,10 @@ class SyncOnStartUseCase @Inject constructor(
                     followedSummonerRepository.followRaw(summoner)
                 }
             }
+        }
+
+        syncRepository.pullSavedBuilds().onSuccess { builds ->
+            builds.forEach { build -> savedBuildRepository.ensureBuild(build) }
         }
     }
 }

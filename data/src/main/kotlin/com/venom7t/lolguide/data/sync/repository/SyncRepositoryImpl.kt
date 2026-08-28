@@ -2,6 +2,7 @@ package com.venom7t.lolguide.data.sync.repository
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.venom7t.lolguide.domain.builds.model.SavedBuild
 import com.venom7t.lolguide.domain.common.runCatchingCancellable
 import com.venom7t.lolguide.domain.followed.model.FollowedSummoner
 import com.venom7t.lolguide.domain.onboarding.model.Region
@@ -79,6 +80,42 @@ class SyncRepositoryImpl @Inject constructor(
                 val region = Region.entries.firstOrNull { it.name == regionName } ?: return@mapNotNull null
                 val followedAt = doc.getLong("followedAtEpochMillis") ?: 0L
                 FollowedSummoner(puuid, name, tagline, region, followedAt)
+            }
+    }
+
+    override suspend fun pushSavedBuild(build: SavedBuild): Result<Unit> = runCatchingCancellable {
+        firestore.collection("users").document(requireUid())
+            .collection("savedBuilds").document(build.id)
+            .set(
+                mapOf(
+                    "id" to build.id,
+                    "championId" to build.championId,
+                    "itemIds" to build.itemIds,
+                    "level" to build.level,
+                    "savedAtEpochMillis" to build.savedAtEpochMillis,
+                ),
+            ).await()
+        Unit
+    }
+
+    override suspend fun pushDeletedSavedBuild(id: String): Result<Unit> = runCatchingCancellable {
+        firestore.collection("users").document(requireUid())
+            .collection("savedBuilds").document(id)
+            .delete().await()
+        Unit
+    }
+
+    override suspend fun pullSavedBuilds(): Result<List<SavedBuild>> = runCatchingCancellable {
+        firestore.collection("users").document(requireUid())
+            .collection("savedBuilds").get().await()
+            .documents.mapNotNull { doc ->
+                val id = doc.getString("id") ?: return@mapNotNull null
+                val championId = doc.getString("championId") ?: return@mapNotNull null
+                @Suppress("UNCHECKED_CAST")
+                val itemIds = doc.get("itemIds") as? List<String> ?: return@mapNotNull null
+                val level = doc.getLong("level")?.toInt() ?: return@mapNotNull null
+                val savedAt = doc.getLong("savedAtEpochMillis") ?: 0L
+                SavedBuild(id, championId, itemIds, level, savedAt)
             }
     }
 }

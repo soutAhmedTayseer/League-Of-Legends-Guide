@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.venom7t.lolguide.domain.builds.usecase.DeleteSavedBuildUseCase
+import com.venom7t.lolguide.domain.builds.usecase.ObserveSavedBuildsUseCase
 import com.venom7t.lolguide.domain.champion.model.ChampionStatCalculator
 import com.venom7t.lolguide.domain.champion.usecase.GetChampionDetailUseCase
 import com.venom7t.lolguide.domain.champion.usecase.GetChampionStatsAtLevelUseCase
@@ -14,6 +16,7 @@ import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
 import com.venom7t.lolguide.presentation.common.toUiText
 import com.venom7t.lolguide.presentation.navigation.ChampionDetailRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,6 +37,8 @@ class ChampionDetailViewModel @Inject constructor(
     private val toggleFavourite: ToggleFavouriteUseCase,
     private val resolvePatch: ResolvePatchUseCase,
     private val locale: AppLocale,
+    private val observeSavedBuilds: ObserveSavedBuildsUseCase,
+    private val deleteSavedBuild: DeleteSavedBuildUseCase,
 ) : ViewModel() {
 
     /**
@@ -82,6 +87,34 @@ class ChampionDetailViewModel @Inject constructor(
 
             ChampionDetailEvent.FavouriteRemovalCancelled ->
                 _state.update { it.copy(pendingFavouriteRemoval = false) }
+
+            ChampionDetailEvent.NewBuildClicked -> viewModelScope.launch {
+                _effects.send(ChampionDetailEffect.NavigateToSimulator(savedBuildId = null))
+            }
+
+            is ChampionDetailEvent.SavedBuildClicked -> viewModelScope.launch {
+                _effects.send(ChampionDetailEffect.NavigateToSimulator(savedBuildId = event.buildId))
+            }
+
+            // Deleting destroys something the user made, so it is confirmed
+            // first (AGENTS.md §13) -- same discipline as un-favouriting above.
+            is ChampionDetailEvent.SavedBuildDeleteClicked ->
+                _state.update { it.copy(pendingSavedBuildDeletionId = event.buildId) }
+
+            ChampionDetailEvent.SavedBuildDeletionConfirmed -> {
+                val id = _state.value.pendingSavedBuildDeletionId
+                _state.update { it.copy(pendingSavedBuildDeletionId = null) }
+                if (id != null) {
+                    viewModelScope.launch {
+                        deleteSavedBuild(id).onFailure { throwable ->
+                            _effects.send(ChampionDetailEffect.ShowSnackbar(throwable.toUiText()))
+                        }
+                    }
+                }
+            }
+
+            ChampionDetailEvent.SavedBuildDeletionCancelled ->
+                _state.update { it.copy(pendingSavedBuildDeletionId = null) }
         }
     }
 
@@ -89,12 +122,19 @@ class ChampionDetailViewModel @Inject constructor(
         if (hasStarted) return
         hasStarted = true
         observeFavourite()
+        observeBuilds()
         load()
     }
 
     private fun observeFavourite() {
         observeFavouriteIds()
             .onEach { ids -> _state.update { it.copy(isFavourite = championId in ids) } }
+            .launchIn(viewModelScope)
+    }
+
+    private fun observeBuilds() {
+        observeSavedBuilds(championId)
+            .onEach { builds -> _state.update { it.copy(savedBuilds = builds.toImmutableList()) } }
             .launchIn(viewModelScope)
     }
 

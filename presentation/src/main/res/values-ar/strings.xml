@@ -186,6 +186,16 @@
     <string name="assumption_default_crit">ضربات حاسمة بضرر ١٧٥%% الافتراضي</string>
     <string name="simulator_unpublished_stats">عنصر واحد أو أكثر بلا إحصائيات منشورة، لذا هذه الإجماليات أقل من البناء الفعلي.</string>
     <string name="simulator_empty">اختر بطلًا لبدء البناء.</string>
+    <string name="simulator_save_build">حفظ البناء</string>
+    <string name="simulator_build_saved">تم حفظ البناء</string>
+
+    <!-- Champion detail: saved builds -->
+    <string name="saved_builds_title">البناءات المحفوظة</string>
+    <string name="saved_build_item_count">%1$d عناصر · المستوى %2$d</string>
+    <string name="saved_build_new">بناء جديد</string>
+    <string name="saved_build_delete">حذف البناء</string>
+    <string name="saved_build_delete_confirm_title">حذف هذا البناء؟</string>
+    <string name="saved_build_delete_confirm_body">سيُزال هذا من كل جهاز تمت مزامنته معه. لا يمكن التراجع عن هذا.</string>
 
     <!-- Phase 2: runes -->
     <string name="runes_title">الرونات</string>

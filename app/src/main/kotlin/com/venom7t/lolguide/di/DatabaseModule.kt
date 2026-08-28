@@ -2,6 +2,7 @@ package com.venom7t.lolguide.di
 
 import android.content.Context
 import androidx.room.Room
+import com.venom7t.lolguide.data.builds.local.SavedBuildDao
 import com.venom7t.lolguide.data.champion.local.ChampionDao
 import com.venom7t.lolguide.data.common.local.LolGuideDatabase
 import com.venom7t.lolguide.data.favourite.local.FavouriteChampionDao
@@ -35,6 +36,7 @@ object DatabaseModule {
                 LolGuideDatabase.MIGRATION_3_4,
                 LolGuideDatabase.MIGRATION_4_5,
                 LolGuideDatabase.MIGRATION_5_6,
+                LolGuideDatabase.MIGRATION_6_7,
             )
             .build()
 
@@ -61,4 +63,7 @@ object DatabaseModule {
 
     @Provides
     fun provideLpSnapshotDao(database: LolGuideDatabase): LpSnapshotDao = database.lpSnapshotDao()
+
+    @Provides
+    fun provideSavedBuildDao(database: LolGuideDatabase): SavedBuildDao = database.savedBuildDao()
 }

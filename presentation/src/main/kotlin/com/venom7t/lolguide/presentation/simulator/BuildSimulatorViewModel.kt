@@ -1,8 +1,12 @@
 package com.venom7t.lolguide.presentation.simulator
 
 import androidx.compose.runtime.Immutable
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import com.venom7t.lolguide.domain.builds.usecase.GetSavedBuildUseCase
+import com.venom7t.lolguide.domain.builds.usecase.SaveBuildUseCase
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.model.ChampionStatCalculator
 import com.venom7t.lolguide.domain.champion.usecase.ObserveChampionsUseCase
@@ -11,6 +15,11 @@ import com.venom7t.lolguide.domain.item.model.Item
 import com.venom7t.lolguide.domain.item.usecase.BuildResult
 import com.venom7t.lolguide.domain.item.usecase.BuildSimulator
 import com.venom7t.lolguide.domain.item.usecase.ObservePurchasableItemsUseCase
+import com.venom7t.lolguide.presentation.R
+import com.venom7t.lolguide.presentation.common.UiText
+import com.venom7t.lolguide.presentation.common.toUiText
+import com.venom7t.lolguide.presentation.common.uiText
+import com.venom7t.lolguide.presentation.navigation.BuildSimulatorRoute
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -19,6 +28,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -62,18 +72,31 @@ sealed interface BuildSimulatorEvent {
     data class ItemPicked(val itemId: String) : BuildSimulatorEvent
     data class ItemSlotCleared(val slotIndex: Int) : BuildSimulatorEvent
     data class LevelChanged(val level: Int) : BuildSimulatorEvent
+    data object SaveBuildClicked : BuildSimulatorEvent
+}
+
+sealed interface BuildSimulatorEffect {
+    data class ShowSnackbar(val message: UiText) : BuildSimulatorEffect
 }
 
 @HiltViewModel
 class BuildSimulatorViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val observeChampions: ObserveChampionsUseCase,
     private val searchChampions: SearchChampionsUseCase,
     private val observeItems: ObservePurchasableItemsUseCase,
     private val simulator: BuildSimulator,
+    private val getSavedBuild: GetSavedBuildUseCase,
+    private val saveBuild: SaveBuildUseCase,
 ) : ViewModel() {
+
+    private val savedBuildId: String? = savedStateHandle.toRoute<BuildSimulatorRoute>().savedBuildId
 
     private val _state = MutableStateFlow(BuildSimulatorState())
     val state: StateFlow<BuildSimulatorState> = _state.asStateFlow()
+
+    private val _effects = Channel<BuildSimulatorEffect>(Channel.BUFFERED)
+    val effects = _effects.receiveAsFlow()
 
     private var allChampions: List<Champion> = emptyList()
     private var allItems: List<Item> = emptyList()
@@ -167,6 +190,23 @@ class BuildSimulatorViewModel @Inject constructor(
                 _state.update { it.copy(level = clamped) }
                 recompute()
             }
+
+            BuildSimulatorEvent.SaveBuildClicked -> persistCurrentBuild()
+        }
+    }
+
+    private fun persistCurrentBuild() {
+        val current = _state.value
+        val champion = current.champion ?: return
+        val itemIds = current.items.filterNotNull().map { it.id }
+        viewModelScope.launch {
+            saveBuild(championId = champion.id, itemIds = itemIds, level = current.level)
+                .onSuccess {
+                    _effects.send(BuildSimulatorEffect.ShowSnackbar(uiText(R.string.simulator_build_saved)))
+                }
+                .onFailure { throwable ->
+                    _effects.send(BuildSimulatorEffect.ShowSnackbar(throwable.toUiText()))
+                }
         }
     }
 
@@ -199,5 +239,32 @@ class BuildSimulatorViewModel @Inject constructor(
         observeItems()
             .onEach { allItems = it }
             .launchIn(viewModelScope)
+
+        savedBuildId?.let { id -> loadSavedBuild(id) }
+    }
+
+    /**
+     * Reloads a build saved from a previous simulator session (opened via
+     * Champion Detail's saved-builds list) back into the working state.
+     * Waits for the champion and item caches to have data rather than
+     * reading [allChampions]/[allItems] directly, since this can run before
+     * either [observeChampions] or [observeItems] above has emitted yet.
+     */
+    private fun loadSavedBuild(id: String) {
+        viewModelScope.launch {
+            val build = getSavedBuild(id) ?: return@launch
+            val champions = observeChampions().first { it.isNotEmpty() }
+            val items = observeItems().first { it.isNotEmpty() }
+
+            val champion = champions.firstOrNull { it.id == build.championId } ?: return@launch
+            val slots = List(ITEM_SLOT_COUNT) { index ->
+                build.itemIds.getOrNull(index)?.let { itemId -> items.firstOrNull { it.id == itemId } }
+            }
+
+            _state.update {
+                it.copy(champion = champion, items = slots.toImmutableList(), level = build.level)
+            }
+            recompute()
+        }
     }
 }

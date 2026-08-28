@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.venom7t.lolguide.data.auth.repository.AuthRepositoryImpl
+import com.venom7t.lolguide.data.builds.repository.SavedBuildRepositoryImpl
 import com.venom7t.lolguide.data.champion.repository.ChampionRepositoryImpl
 import com.venom7t.lolguide.data.clash.repository.ClashRepositoryImpl
 import com.venom7t.lolguide.data.favourite.repository.FavouritesRepositoryImpl
@@ -32,6 +33,7 @@ import com.venom7t.lolguide.data.common.di.DefaultDispatcher
 import com.venom7t.lolguide.data.common.di.IoDispatcher
 import com.venom7t.lolguide.data.patch.repository.PatchRepositoryImpl
 import com.venom7t.lolguide.domain.auth.repository.AuthRepository
+import com.venom7t.lolguide.domain.builds.repository.SavedBuildRepository
 import com.venom7t.lolguide.domain.champion.repository.ChampionRepository
 import com.venom7t.lolguide.domain.clash.repository.ClashRepository
 import com.venom7t.lolguide.domain.common.AppLocale
@@ -169,6 +171,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindGameProgressRepository(impl: GameProgressRepositoryImpl): GameProgressRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSavedBuildRepository(impl: SavedBuildRepositoryImpl): SavedBuildRepository
 }
 
 @Module

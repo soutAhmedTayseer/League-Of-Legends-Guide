@@ -1,11 +1,14 @@
 package com.venom7t.lolguide.presentation.champion.detail
 
 import androidx.compose.runtime.Immutable
+import com.venom7t.lolguide.domain.builds.model.SavedBuild
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.model.ChampionDetail
 import com.venom7t.lolguide.domain.champion.model.ChampionStatCalculator
 import com.venom7t.lolguide.domain.champion.model.ScaledStats
 import com.venom7t.lolguide.presentation.common.UiText
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
 data class ChampionDetailState(
@@ -25,6 +28,9 @@ data class ChampionDetailState(
     val scaledStats: ScaledStats? = null,
     /** Gates the confirmation dialog for un-favouriting (AGENTS.md §13). */
     val pendingFavouriteRemoval: Boolean = false,
+    val savedBuilds: ImmutableList<SavedBuild> = persistentListOf(),
+    /** Gates the confirmation dialog for deleting a saved build (AGENTS.md §13). */
+    val pendingSavedBuildDeletionId: String? = null,
     val error: UiText? = null,
 ) {
     val patchVersion: String? get() = champion?.patchVersion
@@ -47,9 +53,15 @@ sealed interface ChampionDetailEvent {
     data object FavouriteClicked : ChampionDetailEvent
     data object FavouriteRemovalConfirmed : ChampionDetailEvent
     data object FavouriteRemovalCancelled : ChampionDetailEvent
+    data object NewBuildClicked : ChampionDetailEvent
+    data class SavedBuildClicked(val buildId: String) : ChampionDetailEvent
+    data class SavedBuildDeleteClicked(val buildId: String) : ChampionDetailEvent
+    data object SavedBuildDeletionConfirmed : ChampionDetailEvent
+    data object SavedBuildDeletionCancelled : ChampionDetailEvent
 }
 
 sealed interface ChampionDetailEffect {
     data object NavigateBack : ChampionDetailEffect
     data class ShowSnackbar(val message: UiText) : ChampionDetailEffect
+    data class NavigateToSimulator(val savedBuildId: String?) : ChampionDetailEffect
 }

@@ -59,6 +59,7 @@ import com.venom7t.lolguide.presentation.voiceline.VoiceLinePanel
 @Composable
 fun ChampionDetailScreenRoot(
     onNavigateBack: () -> Unit,
+    onNavigateToSimulator: (savedBuildId: String?) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ChampionDetailViewModel = hiltViewModel(),
 ) {
@@ -76,6 +77,8 @@ fun ChampionDetailScreenRoot(
                 ChampionDetailEffect.NavigateBack -> onNavigateBack()
                 is ChampionDetailEffect.ShowSnackbar ->
                     snackbarHostState.showSnackbar(effect.message.resolve(context))
+                is ChampionDetailEffect.NavigateToSimulator ->
+                    onNavigateToSimulator(effect.savedBuildId)
             }
         }
     }
@@ -185,6 +188,13 @@ fun ChampionDetailScreen(
                 onDismiss = { onEvent(ChampionDetailEvent.FavouriteRemovalCancelled) },
             )
         }
+
+        if (state.pendingSavedBuildDeletionId != null) {
+            DeleteSavedBuildDialog(
+                onConfirm = { onEvent(ChampionDetailEvent.SavedBuildDeletionConfirmed) },
+                onDismiss = { onEvent(ChampionDetailEvent.SavedBuildDeletionCancelled) },
+            )
+        }
     }
 }
 
@@ -244,6 +254,19 @@ private fun DetailContent(
 
         item {
             AttributeBars(champion = champion)
+        }
+
+        item {
+            SectionHeader(text = stringResource(R.string.saved_builds_title), accent = accent)
+        }
+
+        item {
+            SavedBuildsSection(
+                builds = state.savedBuilds,
+                onBuildClick = { onEvent(ChampionDetailEvent.SavedBuildClicked(it)) },
+                onNewBuildClick = { onEvent(ChampionDetailEvent.NewBuildClicked) },
+                onDeleteClick = { onEvent(ChampionDetailEvent.SavedBuildDeleteClicked(it)) },
+            )
         }
 
         if (detail.lore.isNotBlank()) {

@@ -209,7 +209,7 @@ private fun LolGuideNavGraphContent(
             composable<HomeRoute> {
                 HomeScreenRoot(
                     onNavigateToWhatsNew = { navController.navigate(WhatsNewRoute) },
-                    onNavigateToSimulator = { navController.navigate(BuildSimulatorRoute) },
+                    onNavigateToSimulator = { navController.navigate(BuildSimulatorRoute()) },
                     onNavigateToRoulette = { navController.navigate(RouletteRoute) },
                     onNavigateToQuiz = { navController.navigate(QuizRoute) },
                     onNavigateToTimers = { navController.navigate(GameTimersRoute) },
@@ -268,6 +268,9 @@ private fun LolGuideNavGraphContent(
             ) {
                 ChampionDetailScreenRoot(
                     onNavigateBack = { navController.popBackStack() },
+                    onNavigateToSimulator = { savedBuildId ->
+                        navController.navigate(BuildSimulatorRoute(savedBuildId = savedBuildId))
+                    },
                 )
             }
 
@@ -299,7 +302,7 @@ private fun LolGuideNavGraphContent(
                     onNavigateToDetail = { itemId ->
                         navController.navigate(ItemDetailRoute(itemId = itemId))
                     },
-                    onNavigateToBuildSimulator = { navController.navigate(BuildSimulatorRoute) },
+                    onNavigateToBuildSimulator = { navController.navigate(BuildSimulatorRoute()) },
                     onNavigateToRunes = { navController.navigate(RunesRoute) },
                     onNavigateToSummonerSpells = { navController.navigate(SummonerSpellsRoute) },
                 )

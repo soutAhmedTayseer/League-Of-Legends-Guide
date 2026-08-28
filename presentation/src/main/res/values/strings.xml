@@ -186,6 +186,16 @@
     <string name="assumption_default_crit">critical strikes at the default 175%% damage</string>
     <string name="simulator_unpublished_stats">One or more selected items have no published stats, so these totals are lower than the real build.</string>
     <string name="simulator_empty">Pick a champion to start building.</string>
+    <string name="simulator_save_build">Save build</string>
+    <string name="simulator_build_saved">Build saved</string>
+
+    <!-- Champion detail: saved builds -->
+    <string name="saved_builds_title">Saved builds</string>
+    <string name="saved_build_item_count">%1$d items · level %2$d</string>
+    <string name="saved_build_new">New build</string>
+    <string name="saved_build_delete">Delete build</string>
+    <string name="saved_build_delete_confirm_title">Delete this build?</string>
+    <string name="saved_build_delete_confirm_body">This removes it from every device it synced to. This cannot be undone.</string>
 
     <!-- Phase 2: runes -->
     <string name="runes_title">Runes</string>
