@@ -1,43 +1,33 @@
 package com.venom7t.lolguide.data.auth.repository
 
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
 import com.venom7t.lolguide.domain.auth.model.Account
 import com.venom7t.lolguide.domain.auth.repository.AuthRepository
 import com.venom7t.lolguide.domain.common.runCatchingCancellable
-import kotlinx.coroutines.channels.awaitClose
+import dev.gitlive.firebase.auth.FirebaseAuth
+import dev.gitlive.firebase.auth.FirebaseAuthUserCollisionException
+import dev.gitlive.firebase.auth.FirebaseUser
+import dev.gitlive.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
-import javax.inject.Inject
-import javax.inject.Singleton
+import kotlinx.coroutines.flow.map
 
-@Singleton
-class AuthRepositoryImpl @Inject constructor(
+class AuthRepositoryImpl constructor(
     private val firebaseAuth: FirebaseAuth,
 ) : AuthRepository {
 
     override suspend fun ensureSignedIn(): Result<String> = runCatchingCancellable {
         firebaseAuth.currentUser?.uid?.let { return@runCatchingCancellable it }
-        val result = firebaseAuth.signInAnonymously().await()
+        val result = firebaseAuth.signInAnonymously()
         result.user?.uid ?: error("Anonymous sign-in returned no user")
     }
 
     override fun currentUserId(): String? = firebaseAuth.currentUser?.uid
 
-    override fun observeAccount(): Flow<Account?> = callbackFlow {
-        val listener = FirebaseAuth.AuthStateListener { auth ->
-            trySend(auth.currentUser?.toAccount())
-        }
-        firebaseAuth.addAuthStateListener(listener)
-        awaitClose { firebaseAuth.removeAuthStateListener(listener) }
-    }
+    override fun observeAccount(): Flow<Account?> =
+        firebaseAuth.authStateChanged.map { it?.toAccount() }
 
     override suspend fun linkOrSignInWithGoogle(idToken: String): Result<Account> =
         runCatchingCancellable {
-            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val credential = GoogleAuthProvider.credential(idToken, null)
             val currentUser = firebaseAuth.currentUser
 
             val user = if (currentUser != null && currentUser.isAnonymous) {
@@ -45,7 +35,7 @@ class AuthRepositoryImpl @Inject constructor(
                 // interface doc comment on why linking, not plain sign-in,
                 // is the default path here.
                 try {
-                    currentUser.linkWithCredential(credential).await().user
+                    currentUser.linkWithCredential(credential).user
                 } catch (collision: FirebaseAuthUserCollisionException) {
                     // This Google account already owns a different Firebase
                     // user (e.g. they signed in with it on another device
@@ -54,10 +44,10 @@ class AuthRepositoryImpl @Inject constructor(
                     // the anonymous session's local-only data is what is left
                     // behind in that case, which is the documented, expected
                     // trade-off of a same-Google-account collision.
-                    firebaseAuth.signInWithCredential(credential).await().user
+                    firebaseAuth.signInWithCredential(credential).user
                 }
             } else {
-                firebaseAuth.signInWithCredential(credential).await().user
+                firebaseAuth.signInWithCredential(credential).user
             }
 
             user?.toAccount() ?: error("Google sign-in returned no user")
@@ -70,7 +60,7 @@ class AuthRepositoryImpl @Inject constructor(
         // -- re-establishing a fresh anonymous session immediately is what
         // keeps that assumption true after a sign-out, rather than leaving
         // the app in a signed-out state nothing else here expects.
-        firebaseAuth.signInAnonymously().await()
+        firebaseAuth.signInAnonymously()
         Unit
     }
 

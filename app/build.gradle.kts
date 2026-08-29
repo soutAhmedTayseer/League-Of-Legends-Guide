@@ -4,7 +4,6 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
@@ -76,14 +75,18 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
 
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
-    ksp(libs.hilt.compiler)
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.androidx.workmanager)
 
-    // The Hilt modules in :app construct data-layer implementations, so :app
+    // The Koin module in :app constructs data-layer implementations, so :app
     // needs the libraries those constructors take as parameters.
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.kotlinx.serialization)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
     implementation(libs.kotlinx.serialization.json)
@@ -92,20 +95,20 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.androidx.hilt.work)
-    ksp(libs.androidx.hilt.compiler)
 
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.coil3.compose)
     implementation(libs.coil3.network)
     implementation(libs.timber)
 
-    // Phase 5: live service. The BoM pins every Firebase artifact's version,
-    // so individual firebase-* libraries below declare no version of their own.
+    // Phase 5: live service. The BoM pins every native Firebase artifact's
+    // version; FCM (LolGuideMessagingService) has no GitLive equivalent and
+    // stays on the native SDK. Auth/Firestore are GitLive's KMP-portable SDK
+    // (Phase 3 of the CMP/iOS migration plan) -- see :data's build file.
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.auth)
+    implementation(libs.gitlive.firebase.auth)
+    implementation(libs.gitlive.firebase.firestore)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)

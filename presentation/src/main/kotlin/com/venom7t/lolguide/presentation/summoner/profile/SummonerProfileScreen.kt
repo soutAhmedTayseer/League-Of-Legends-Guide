@@ -35,7 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.match.model.MatchSummary
@@ -58,7 +58,7 @@ fun SummonerProfileScreenRoot(
     onNavigateToLpHistory: (puuid: String, riotIdName: String, riotIdTagline: String) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SummonerProfileViewModel = hiltViewModel(),
+    viewModel: SummonerProfileViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }

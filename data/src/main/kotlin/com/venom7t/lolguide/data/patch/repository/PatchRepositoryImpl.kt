@@ -10,11 +10,8 @@ import com.venom7t.lolguide.domain.patch.repository.PatchRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class PatchRepositoryImpl @Inject constructor(
+class PatchRepositoryImpl constructor(
     private val api: DataDragonApi,
     private val local: PatchLocalDataSource,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,

@@ -31,7 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.domain.followed.model.FollowedSummoner
 import com.venom7t.lolguide.domain.onboarding.model.Region
@@ -51,7 +51,7 @@ fun FollowedSummonersScreenRoot(
     onNavigateToProfile: (name: String, tagline: String, region: Region) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FollowedSummonersViewModel = hiltViewModel(),
+    viewModel: FollowedSummonersViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.venom7t.lolguide.domain.game.model.GameMode
 import com.venom7t.lolguide.domain.game.usecase.ObserveGameStatsUseCase
 import com.venom7t.lolguide.domain.game.usecase.PickDailyChampionUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,10 +18,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class GameHubViewModel @Inject constructor(
+@KoinViewModel
+class GameHubViewModel (
     private val observeGameStats: ObserveGameStatsUseCase,
     private val pickDailyChampion: PickDailyChampionUseCase,
 ) : ViewModel() {

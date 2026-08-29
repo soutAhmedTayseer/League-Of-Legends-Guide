@@ -1,13 +1,10 @@
 package com.venom7t.lolguide.data.lptracker.worker
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.venom7t.lolguide.domain.lptracker.usecase.LpChange
 import com.venom7t.lolguide.domain.lptracker.usecase.PollFollowedSummonersLpUseCase
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import timber.log.Timber
 
 /**
@@ -21,10 +18,9 @@ import timber.log.Timber
  * is enough; there is no user-facing "sync failed" state for this feature
  * the way there is for a user-initiated screen load.
  */
-@HiltWorker
-class LpTrackerWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted workerParams: WorkerParameters,
+class LpTrackerWorker(
+    context: Context,
+    workerParams: WorkerParameters,
     private val pollFollowedSummonersLp: PollFollowedSummonersLpUseCase,
     private val notifier: LpChangeNotifier,
 ) : CoroutineWorker(context, workerParams) {

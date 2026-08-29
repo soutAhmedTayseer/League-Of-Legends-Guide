@@ -37,7 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.domain.item.model.Item
 import com.venom7t.lolguide.presentation.R
@@ -58,7 +58,7 @@ fun ItemListScreenRoot(
     onNavigateToRunes: () -> Unit,
     onNavigateToSummonerSpells: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ItemListViewModel = hiltViewModel(),
+    viewModel: ItemListViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

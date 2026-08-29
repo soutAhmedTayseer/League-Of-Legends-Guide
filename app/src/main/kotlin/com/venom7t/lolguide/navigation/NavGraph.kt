@@ -26,7 +26,7 @@ import kotlinx.coroutines.delay
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
@@ -107,7 +107,7 @@ import kotlin.reflect.KClass
 fun LolGuideNavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    appStartViewModel: AppStartViewModel = hiltViewModel(),
+    appStartViewModel: AppStartViewModel = koinViewModel(),
 ) {
     val startState by appStartViewModel.state.collectAsStateWithLifecycle()
 

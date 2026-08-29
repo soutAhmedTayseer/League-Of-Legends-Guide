@@ -23,11 +23,8 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class MatchRepositoryImpl @Inject constructor(
+class MatchRepositoryImpl constructor(
     private val api: RiotApi,
     private val dao: MatchDao,
     private val json: Json,

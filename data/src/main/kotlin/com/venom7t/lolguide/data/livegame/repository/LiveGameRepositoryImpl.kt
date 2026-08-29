@@ -12,11 +12,8 @@ import com.venom7t.lolguide.domain.livegame.repository.LiveGameRepository
 import com.venom7t.lolguide.domain.onboarding.model.Region
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class LiveGameRepositoryImpl @Inject constructor(
+class LiveGameRepositoryImpl constructor(
     private val api: RiotApi,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : LiveGameRepository {

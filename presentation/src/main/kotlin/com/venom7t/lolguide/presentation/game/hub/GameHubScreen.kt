@@ -24,7 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.domain.game.model.GameMode
 import com.venom7t.lolguide.domain.game.model.GameStats
@@ -37,7 +37,7 @@ fun GameHubScreenRoot(
     onNavigateToRound: (GameMode) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: GameHubViewModel = hiltViewModel(),
+    viewModel: GameHubViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

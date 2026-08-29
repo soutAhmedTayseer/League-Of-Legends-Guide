@@ -5,11 +5,8 @@ import com.venom7t.lolguide.domain.common.runCatchingCancellable
 import com.venom7t.lolguide.domain.voiceline.model.VoiceLine
 import com.venom7t.lolguide.domain.voiceline.model.VoiceLineAvailability
 import com.venom7t.lolguide.domain.voiceline.repository.VoiceLineRepository
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class VoiceLineRepositoryImpl @Inject constructor(
+class VoiceLineRepositoryImpl constructor(
     private val probe: VoiceLineProbe,
 ) : VoiceLineRepository {
 

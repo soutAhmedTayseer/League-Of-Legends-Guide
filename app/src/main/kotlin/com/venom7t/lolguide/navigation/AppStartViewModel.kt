@@ -7,14 +7,12 @@ import com.venom7t.lolguide.domain.auth.usecase.ObserveAccountUseCase
 import com.venom7t.lolguide.domain.onboarding.repository.OnboardingRepository
 import com.venom7t.lolguide.domain.settings.repository.SettingsRepository
 import com.venom7t.lolguide.presentation.common.FirstRunGate
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * Decides the app's start destination once, before the NavHost is created.
@@ -29,8 +27,7 @@ import javax.inject.Inject
  * so a fresh install is routed to the sign-in gate before anything else,
  * every time, rather than letting the user postpone it and lose data again.
  */
-@HiltViewModel
-class AppStartViewModel @Inject constructor(
+class AppStartViewModel(
     private val onboardingRepository: OnboardingRepository,
     private val ensureSignedIn: EnsureSignedInUseCase,
     private val observeAccount: ObserveAccountUseCase,

@@ -10,11 +10,8 @@ import com.venom7t.lolguide.domain.spell.model.SummonerSpell
 import com.venom7t.lolguide.domain.spell.repository.SummonerSpellRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class SummonerSpellRepositoryImpl @Inject constructor(
+class SummonerSpellRepositoryImpl constructor(
     private val api: DataDragonApi,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SummonerSpellRepository {

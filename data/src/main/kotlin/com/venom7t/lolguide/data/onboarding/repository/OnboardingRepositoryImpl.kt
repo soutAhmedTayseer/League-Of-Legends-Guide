@@ -11,11 +11,8 @@ import com.venom7t.lolguide.domain.onboarding.model.Region
 import com.venom7t.lolguide.domain.onboarding.repository.OnboardingRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class OnboardingRepositoryImpl @Inject constructor(
+class OnboardingRepositoryImpl constructor(
     private val dataStore: DataStore<Preferences>,
 ) : OnboardingRepository {
 

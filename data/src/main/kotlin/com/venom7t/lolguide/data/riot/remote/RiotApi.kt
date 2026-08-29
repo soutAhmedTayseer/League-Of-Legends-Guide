@@ -13,10 +13,10 @@ import com.venom7t.lolguide.data.riot.remote.dto.MatchTimelineDto
 import com.venom7t.lolguide.data.riot.remote.dto.PlatformStatusDto
 import com.venom7t.lolguide.data.riot.remote.dto.SpectatorGameDto
 import com.venom7t.lolguide.data.riot.remote.dto.SummonerDto
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
-import retrofit2.http.Url
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 
 /**
  * The keyed Riot API.
@@ -24,65 +24,48 @@ import retrofit2.http.Url
  * Riot splits requests across two host families that do not share a single
  * base URL -- platform routing (`na1.api.riotgames.com`, ...) and regional
  * routing (`americas.api.riotgames.com`, ...) -- and which host a call needs
- * depends on the endpoint, not on any URL path segment. Retrofit's
- * `baseUrl()` cannot express that, so every method here takes the fully
- * resolved absolute URL as `@Url` instead of a fixed base plus a relative
- * path; callers (the repositories) build it from `Region.platformId` or
- * `Region.regionalRoute` (Phase 4 plan §Region routing). The dummy base URL
- * configured on this Retrofit instance is never actually used for a request.
+ * depends on the endpoint, not on any URL path segment. Every method here
+ * takes the fully resolved absolute URL instead of a fixed base plus a
+ * relative path; callers (the repositories) build it from `Region.platformId`
+ * or `Region.regionalRoute` (Phase 4 plan §Region routing).
  */
-interface RiotApi {
+class RiotApi(private val client: HttpClient) {
 
-    @GET
-    suspend fun getAccountByRiotId(@Url url: String): AccountDto
+    suspend fun getAccountByRiotId(url: String): AccountDto = client.get(url).body()
 
     /** The reverse lookup of [getAccountByRiotId] -- puuid to Riot id, for payloads that only carry a puuid. */
-    @GET
-    suspend fun getAccountByPuuid(@Url url: String): AccountDto
+    suspend fun getAccountByPuuid(url: String): AccountDto = client.get(url).body()
 
-    @GET
-    suspend fun getSummonerByPuuid(@Url url: String): SummonerDto
+    suspend fun getSummonerByPuuid(url: String): SummonerDto = client.get(url).body()
 
-    @GET
-    suspend fun getLeagueEntriesBySummoner(@Url url: String): List<LeagueEntryDto>
+    suspend fun getLeagueEntriesBySummoner(url: String): List<LeagueEntryDto> = client.get(url).body()
 
-    @GET
-    suspend fun getMatchIdsByPuuid(
-        @Url url: String,
-        @Query("count") count: Int,
-        @Query("start") start: Int,
-    ): List<String>
+    suspend fun getMatchIdsByPuuid(url: String, count: Int, start: Int): List<String> =
+        client.get(url) {
+            parameter("count", count)
+            parameter("start", start)
+        }.body()
 
-    @GET
-    suspend fun getMatch(@Url url: String): MatchDto
+    suspend fun getMatch(url: String): MatchDto = client.get(url).body()
 
-    @GET
-    suspend fun getMatchTimeline(@Url url: String): MatchTimelineDto
+    suspend fun getMatchTimeline(url: String): MatchTimelineDto = client.get(url).body()
 
-    @GET
-    suspend fun getActiveGameByPuuid(@Url url: String): SpectatorGameDto
+    suspend fun getActiveGameByPuuid(url: String): SpectatorGameDto = client.get(url).body()
 
-    @GET
-    suspend fun getChampionMasteries(@Url url: String): List<ChampionMasteryDto>
+    suspend fun getChampionMasteries(url: String): List<ChampionMasteryDto> = client.get(url).body()
 
-    @GET
-    suspend fun getChampionRotation(@Url url: String): ChampionRotationDto
+    suspend fun getChampionRotation(url: String): ChampionRotationDto = client.get(url).body()
 
-    @GET
-    suspend fun getChallengerLeague(@Url url: String): LeagueListDto
+    suspend fun getChallengerLeague(url: String): LeagueListDto = client.get(url).body()
 
-    @GET
-    suspend fun getPlatformStatus(@Url url: String): PlatformStatusDto
+    suspend fun getPlatformStatus(url: String): PlatformStatusDto = client.get(url).body()
 
     /** Empty list means "not registered for any Clash team right now" -- a normal outcome. */
-    @GET
-    suspend fun getClashPlayersBySummoner(@Url url: String): List<ClashPlayerDto>
+    suspend fun getClashPlayersBySummoner(url: String): List<ClashPlayerDto> = client.get(url).body()
 
-    @GET
-    suspend fun getClashTeam(@Url url: String): ClashTeamDto
+    suspend fun getClashTeam(url: String): ClashTeamDto = client.get(url).body()
 
-    @GET
-    suspend fun getClashTournament(@Url url: String): ClashTournamentDto
+    suspend fun getClashTournament(url: String): ClashTournamentDto = client.get(url).body()
 }
 
 /**

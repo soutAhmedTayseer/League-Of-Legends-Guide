@@ -17,8 +17,7 @@ import com.venom7t.lolguide.domain.settings.model.ThemeMode
 import com.venom7t.lolguide.domain.settings.repository.SettingsRepository
 import com.venom7t.lolguide.navigation.LolGuideNavGraph
 import com.venom7t.lolguide.presentation.theme.AppTheme
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
 
 /**
  * The app's only Activity.
@@ -27,10 +26,9 @@ import javax.inject.Inject
  * previous 821-line MainActivity did -- networking, caching, screen state,
  * and every Composable in the app -- now lives in the module that owns it.
  */
-@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject lateinit var settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository by inject()
 
     private val requestNotificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* no-op either way */ }

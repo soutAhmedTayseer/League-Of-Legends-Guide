@@ -3,7 +3,6 @@ package com.venom7t.lolguide.data.riot.remote
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
-import javax.inject.Inject
 
 /**
  * Attaches the Riot API key to every request on the keyed client only --
@@ -18,7 +17,7 @@ import javax.inject.Inject
  * "your key expired" (`AppError.ApiKeyExpired`) -- conflating them into one
  * generic auth failure would send the user to fix the wrong thing.
  */
-class RiotAuthInterceptor @Inject constructor(
+class RiotAuthInterceptor constructor(
     private val apiKeyProvider: RiotApiKeyProvider,
 ) : Interceptor {
 

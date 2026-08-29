@@ -10,14 +10,13 @@ import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
 import com.venom7t.lolguide.domain.quiz.model.QuizQuestion
 import com.venom7t.lolguide.domain.quiz.model.QuizSessionState
 import com.venom7t.lolguide.domain.quiz.usecase.GenerateQuizQuestionUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @Immutable
 data class QuizState(
@@ -36,8 +35,8 @@ sealed interface QuizEvent {
     data object NextQuestionRequested : QuizEvent
 }
 
-@HiltViewModel
-class QuizViewModel @Inject constructor(
+@KoinViewModel
+class QuizViewModel (
     private val observeChampions: ObserveChampionsUseCase,
     private val resolvePatch: ResolvePatchUseCase,
     private val generateQuestion: GenerateQuizQuestionUseCase,

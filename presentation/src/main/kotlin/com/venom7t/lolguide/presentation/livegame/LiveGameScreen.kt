@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.venom7t.lolguide.domain.livegame.model.LiveGame
@@ -46,7 +46,7 @@ import com.venom7t.lolguide.presentation.theme.AppTheme
 fun LiveGameScreenRoot(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LiveGameViewModel = hiltViewModel(),
+    viewModel: LiveGameViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

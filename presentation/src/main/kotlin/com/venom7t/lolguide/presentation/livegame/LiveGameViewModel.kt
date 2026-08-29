@@ -9,7 +9,7 @@ import com.venom7t.lolguide.domain.onboarding.model.Region
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
 import com.venom7t.lolguide.presentation.common.toUiText
 import com.venom7t.lolguide.presentation.navigation.LiveGameRoute
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,10 +17,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class LiveGameViewModel @Inject constructor(
+@KoinViewModel
+class LiveGameViewModel (
     savedStateHandle: SavedStateHandle,
     private val getLiveGame: GetLiveGameUseCase,
     private val resolvePatch: ResolvePatchUseCase,

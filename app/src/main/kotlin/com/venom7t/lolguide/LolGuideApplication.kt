@@ -1,44 +1,36 @@
 package com.venom7t.lolguide
 
 import android.app.Application
-import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
-import com.venom7t.lolguide.data.common.di.ApplicationScope
+import androidx.work.WorkerFactory
+import com.venom7t.lolguide.di.APPLICATION_SCOPE
+import com.venom7t.lolguide.di.appModule
+import com.venom7t.lolguide.di.databaseModule
+import com.venom7t.lolguide.di.networkModule
+import com.venom7t.lolguide.domain.di.DomainModule
 import com.venom7t.lolguide.domain.sync.usecase.SyncOnStartUseCase
+import com.venom7t.lolguide.presentation.di.PresentationModule
 import com.venom7t.lolguide.worker.LpTrackerScheduler
 import com.venom7t.lolguide.worker.PatchSyncScheduler
-import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.get
+import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.workmanager.koin.workManagerFactory
+import org.koin.core.context.startKoin
+import org.koin.ksp.generated.module
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltAndroidApp
 class LolGuideApplication : Application(), Configuration.Provider {
 
-    // Lets WorkManager construct workers through Hilt, so a Worker (e.g.
-    // PatchSyncWorker) can take injected dependencies in its constructor
-    // exactly like anything else in the app, rather than resolving them
-    // through a manual service-locator inside doWork().
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
-
-    @Inject
-    lateinit var patchSyncScheduler: PatchSyncScheduler
-
-    @Inject
-    lateinit var lpTrackerScheduler: LpTrackerScheduler
-
-    @Inject
-    lateinit var syncOnStart: SyncOnStartUseCase
-
-    @Inject
-    @ApplicationScope
-    lateinit var applicationScope: CoroutineScope
-
+    // Read lazily: WorkManager's own lazy init (triggered the first time
+    // something calls WorkManager.getInstance(), e.g. inside the schedulers
+    // below) queries this getter, and that always happens after startKoin()
+    // has already run in onCreate() -- so the Koin-provided WorkerFactory is
+    // guaranteed to exist by the time this is evaluated.
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
-            .setWorkerFactory(workerFactory)
+            .setWorkerFactory(get<WorkerFactory>())
             .build()
 
     override fun onCreate() {
@@ -50,13 +42,27 @@ class LolGuideApplication : Application(), Configuration.Provider {
             Timber.plant(Timber.DebugTree())
         }
 
-        patchSyncScheduler.schedule()
-        lpTrackerScheduler.schedule()
+        startKoin {
+            androidContext(this@LolGuideApplication)
+            workManagerFactory()
+            modules(
+                appModule,
+                databaseModule,
+                networkModule,
+                DomainModule().module,
+                PresentationModule().module,
+            )
+        }
+
+        get<PatchSyncScheduler>().schedule()
+        get<LpTrackerScheduler>().schedule()
 
         // Phase 5: pull remote favourites/followed-summoners once per
         // process start. Off the main thread and best-effort -- see
         // SyncOnStartUseCase's doc comment on why a failure here is
         // swallowed rather than surfaced.
+        val applicationScope: CoroutineScope = get(qualifier = APPLICATION_SCOPE)
+        val syncOnStart: SyncOnStartUseCase = get()
         applicationScope.launch { syncOnStart() }
     }
 }

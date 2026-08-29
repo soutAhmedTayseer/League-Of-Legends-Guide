@@ -16,11 +16,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class SavedBuildRepositoryImpl @Inject constructor(
+class SavedBuildRepositoryImpl constructor(
     private val dao: SavedBuildDao,
     private val syncRepository: SyncRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,

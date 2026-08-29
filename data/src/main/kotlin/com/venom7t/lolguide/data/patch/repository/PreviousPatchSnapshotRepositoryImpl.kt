@@ -15,8 +15,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Stores exactly one prior generation of the champion and item caches, so the
@@ -29,8 +27,7 @@ import javax.inject.Singleton
  * parse, and it means adding a field to Champion or Item never requires a
  * migration here.
  */
-@Singleton
-class PreviousPatchSnapshotRepositoryImpl @Inject constructor(
+class PreviousPatchSnapshotRepositoryImpl constructor(
     private val dao: PreviousPatchSnapshotDao,
     private val json: Json,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,

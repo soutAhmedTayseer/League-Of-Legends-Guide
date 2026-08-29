@@ -12,11 +12,8 @@ import com.venom7t.lolguide.domain.rune.model.RuneTree
 import com.venom7t.lolguide.domain.rune.repository.RuneRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class RuneRepositoryImpl @Inject constructor(
+class RuneRepositoryImpl constructor(
     private val api: DataDragonApi,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : RuneRepository {

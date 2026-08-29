@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.venom7t.lolguide.domain.lptracker.usecase.ObserveLpHistoryUseCase
 import com.venom7t.lolguide.presentation.navigation.LpHistoryRoute
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,11 +17,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class LpHistoryViewModel @Inject constructor(
+@KoinViewModel
+class LpHistoryViewModel (
     savedStateHandle: SavedStateHandle,
     private val observeLpHistory: ObserveLpHistoryUseCase,
 ) : ViewModel() {

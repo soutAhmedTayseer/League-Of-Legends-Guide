@@ -6,8 +6,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Persists the last successfully resolved patch version.
@@ -16,8 +14,7 @@ import javax.inject.Singleton
  * must be readable before the database is opened so the UI can paint cached
  * content without waiting on anything.
  */
-@Singleton
-class PatchLocalDataSource @Inject constructor(
+class PatchLocalDataSource constructor(
     private val dataStore: DataStore<Preferences>,
 ) {
 

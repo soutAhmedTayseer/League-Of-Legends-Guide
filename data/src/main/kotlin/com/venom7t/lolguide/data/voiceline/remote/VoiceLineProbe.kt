@@ -6,8 +6,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Best-effort discovery of a champion's split voice-line audio files on
@@ -29,8 +27,7 @@ import javax.inject.Singleton
  * retry, per the honesty requirement in `AGENTS.md` §1: no line is ever
  * claimed playable without being confirmed.
  */
-@Singleton
-class VoiceLineProbe @Inject constructor(
+class VoiceLineProbe constructor(
     // Reuses the keyless Data Dragon OkHttp client (no auth interceptor) --
     // Community Dragon is the same trust tier as Data Dragon (AGENTS.md §8.1).
     @DataDragonRetrofit private val httpClient: OkHttpClient,

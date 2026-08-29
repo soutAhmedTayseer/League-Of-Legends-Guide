@@ -14,11 +14,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class FavouritesRepositoryImpl @Inject constructor(
+class FavouritesRepositoryImpl constructor(
     private val dao: FavouriteChampionDao,
     private val syncRepository: SyncRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,

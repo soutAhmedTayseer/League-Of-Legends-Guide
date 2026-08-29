@@ -10,11 +10,8 @@ import com.venom7t.lolguide.domain.ladder.repository.LadderRepository
 import com.venom7t.lolguide.domain.onboarding.model.Region
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class LadderRepositoryImpl @Inject constructor(
+class LadderRepositoryImpl constructor(
     private val api: RiotApi,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : LadderRepository {

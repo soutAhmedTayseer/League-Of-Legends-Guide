@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.venom7t.lolguide.domain.onboarding.model.PrimaryRole
 import com.venom7t.lolguide.domain.onboarding.model.Region
 import com.venom7t.lolguide.domain.onboarding.repository.OnboardingRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 enum class OnboardingStep { WELCOME, REGION, ROLE }
 
@@ -43,8 +42,8 @@ sealed interface OnboardingEffect {
  * OnboardingPreferences): skipping at any step is always available and
  * leaves the rest of the app fully functional with neutral defaults.
  */
-@HiltViewModel
-class OnboardingViewModel @Inject constructor(
+@KoinViewModel
+class OnboardingViewModel (
     private val onboardingRepository: OnboardingRepository,
 ) : ViewModel() {
 

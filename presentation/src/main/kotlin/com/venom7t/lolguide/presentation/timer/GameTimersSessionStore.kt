@@ -7,8 +7,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableMap
-import javax.inject.Inject
-import javax.inject.Singleton
+import org.koin.core.annotation.Single
 
 /**
  * Running objective and enemy-spell timers, held outside the ViewModel so
@@ -21,8 +20,8 @@ import javax.inject.Singleton
  * ticking while the screen is gone -- reopening simply re-derives elapsed
  * time from the wall clock.
  */
-@Singleton
-class GameTimersSessionStore @Inject constructor() {
+@Single
+class GameTimersSessionStore {
     var running: ImmutableList<GameTimer> = persistentListOf()
     var laneSlots: ImmutableMap<EnemyLane, ImmutableList<SpellTimer?>> = EnemyLane.entries
         .associateWith { persistentListOf<SpellTimer?>(null, null) }

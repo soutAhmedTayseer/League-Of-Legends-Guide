@@ -18,7 +18,7 @@ import com.venom7t.lolguide.domain.summoner.usecase.GetRankedEntriesUseCase
 import com.venom7t.lolguide.domain.summoner.usecase.SearchSummonerUseCase
 import com.venom7t.lolguide.presentation.common.toUiText
 import com.venom7t.lolguide.presentation.navigation.SummonerProfileRoute
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,10 +27,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class SummonerProfileViewModel @Inject constructor(
+@KoinViewModel
+class SummonerProfileViewModel (
     savedStateHandle: SavedStateHandle,
     private val searchSummoner: SearchSummonerUseCase,
     private val getRankedEntries: GetRankedEntriesUseCase,
