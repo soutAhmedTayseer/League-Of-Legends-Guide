@@ -3,8 +3,8 @@ package com.venom7t.lolguide
 import android.Manifest
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -26,9 +26,16 @@ import javax.inject.Inject
  * It does nothing but install the theme and the NavHost. Everything the
  * previous 821-line MainActivity did -- networking, caching, screen state,
  * and every Composable in the app -- now lives in the module that owns it.
+ *
+ * Extends AppCompatActivity, not ComponentActivity: AppCompatDelegate
+ * .setApplicationLocales() (the Account screen's language switch) only
+ * actually re-applies resources below API 33 through AppCompatActivity's
+ * locale-aware attachBaseContext -- on a plain ComponentActivity it silently
+ * stores the preference without ever changing what's on screen pre-33
+ * (AGENTS.md §10's Arabic support).
  */
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
     @Inject lateinit var settingsRepository: SettingsRepository
 

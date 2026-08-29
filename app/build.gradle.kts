@@ -63,6 +63,10 @@ dependencies {
     implementation(project(":presentation"))
 
     implementation(libs.androidx.core.ktx)
+    // AppCompatActivity is required for AppCompatDelegate.setApplicationLocales()
+    // to actually re-apply resources below API 33 -- a plain ComponentActivity
+    // silently no-ops the locale switch pre-33 (AGENTS.md §10's Arabic support).
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)

@@ -72,6 +72,22 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <!--
+             Lets AppCompat auto-persist the per-app language chosen via
+             AppCompatDelegate.setApplicationLocales() (Account screen) across
+             process death on API < 33, where there is no framework
+             LocaleManager to remember it. Required by AppCompat's per-app
+             language support, not optional (AGENTS.md §10's Arabic support).
+        -->
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
     </application>
 
 </manifest>
