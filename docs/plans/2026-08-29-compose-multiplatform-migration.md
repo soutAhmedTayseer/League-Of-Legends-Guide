@@ -116,6 +116,36 @@ migrations that must be preserved exactly** — existing installs depend on them
 DataStore config change. Firebase → GitLive.
 *Highest chance of silent data bugs. Test reinstall + restore explicitly.*
 
+**Status (2026-08-29, on throwaway branch `spike/cmp-phase0`):**
+- ✅ **Retrofit → Ktor** — done. `DataDragonApi`/`RiotApi` are now plain
+  classes wrapping an `HttpClient`; every repository call site was
+  unaffected since method signatures didn't change. `ErrorMapper.kt` now
+  classifies `ResponseException` instead of `HttpException`.
+- ✅ **Firebase → GitLive** — done, verified against GitLive's actual SDK
+  source (not assumed from memory) before writing call sites, since a
+  wrong field mapping here means silent data loss, not a compile error.
+  `:data` now compiles at JVM 17 (GitLive's reified `get<T>()`/`set<T>()`
+  are inline functions built with JVM 17 bytecode). **Not independently
+  verified**: an actual round-trip against a live Firestore project, or
+  Google sign-in against a real account — no working emulator/device in
+  this environment to exercise either.
+- ⏸️ **Room → Room KMP — turned out to need no source changes at all**,
+  and is not the real remaining task. Room 2.8.3+ already ships its
+  multiplatform support under the *same* `androidx.room:room-runtime`
+  coordinate this project already pins (2.8.4) — the Android-specific
+  `Room.databaseBuilder(context, ...)` overload, all 8 entities/DAOs, and
+  all 6 migrations work completely unchanged as long as `:data` stays an
+  `android-library`. (The plan's original "Room 3.x" framing above was
+  stale; 3.0 turned out to be a separate relocated artifact under
+  `androidx.room3`, not the KMP-enabling release.)
+
+  The actual blocker is converting `:data` itself into a KMP module,
+  which is what would let Room's other platforms matter at all — and
+  that conversion runs straight into the unresolved product decision
+  below (WorkManager has no iOS story), not an engineering gap. Owner
+  decision on 2026-08-29: **stop Phase 3 here** rather than push through
+  that decision speculatively. `:data` remains an Android-library.
+
 **Phase 4 — `:presentation` → CMP (4–6 days)**
 Jetpack Compose → Compose Multiplatform imports. Resource migration (the 324
 call sites). `expect`/`actual` for WebView, locale switching, audio, palette.
