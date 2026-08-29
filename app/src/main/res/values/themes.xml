@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.LOLGuide" parent="android:Theme.Material.Light.NoActionBar" />
+    <!--
+         Must descend from a Theme.AppCompat theme, not a raw platform theme:
+         AppCompatActivity (needed for per-app language switching to work
+         below API 33) throws IllegalStateException at setContentView()
+         otherwise. Compose's own AppTheme composable still drives all real
+         colors and dark mode; this only satisfies AppCompatActivity's
+         window decor setup before Compose content is attached.
+    -->
+    <style name="Theme.LOLGuide" parent="Theme.AppCompat.DayNight.NoActionBar" />
 </resources>
