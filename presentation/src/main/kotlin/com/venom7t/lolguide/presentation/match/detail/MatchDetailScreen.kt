@@ -1,6 +1,5 @@
 package com.venom7t.lolguide.presentation.match.detail
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,8 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,17 +24,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
+import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.match.model.MatchDetail
 import com.venom7t.lolguide.domain.match.model.MatchParticipant
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.DataDragonUrls
+import com.venom7t.lolguide.presentation.common.components.CutSurface
 import com.venom7t.lolguide.presentation.common.components.ErrorContent
-import com.venom7t.lolguide.presentation.common.components.LoadingContent
+import com.venom7t.lolguide.presentation.common.components.DetailHeaderSkeleton
+import com.venom7t.lolguide.presentation.common.components.HextechFrame
+import com.venom7t.lolguide.presentation.common.components.rememberMinimumVisibleLoading
 import com.venom7t.lolguide.presentation.theme.AppTheme
 
 @Composable
@@ -85,8 +84,9 @@ fun MatchDetailScreen(
             )
         },
     ) { padding ->
+        val showSkeleton = rememberMinimumVisibleLoading(state.isLoading)
         when {
-            state.isLoading -> LoadingContent(modifier = Modifier.padding(padding))
+            showSkeleton -> DetailHeaderSkeleton(modifier = Modifier.padding(padding))
             state.error != null -> ErrorContent(
                 message = state.error,
                 onRetry = { onEvent(MatchDetailEvent.Retry) },
@@ -96,6 +96,7 @@ fun MatchDetailScreen(
                 detail = state.detail,
                 viewingPuuid = state.viewingPuuid,
                 patchVersion = state.patchVersion,
+                championsByKey = state.championsByKey,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
@@ -109,6 +110,7 @@ private fun MatchDetailContent(
     detail: MatchDetail,
     viewingPuuid: String,
     patchVersion: String?,
+    championsByKey: Map<String, Champion>,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -124,7 +126,12 @@ private fun MatchDetailContent(
             )
         }
         items(detail.blueTeam) { participant ->
-            ParticipantRow(participant, participant.puuid == viewingPuuid, patchVersion)
+            ParticipantRow(
+                participant = participant,
+                isViewingSummoner = participant.puuid == viewingPuuid,
+                patchVersion = patchVersion,
+                champion = championsByKey[participant.championId],
+            )
         }
         item {
             Text(
@@ -134,7 +141,12 @@ private fun MatchDetailContent(
             )
         }
         items(detail.redTeam) { participant ->
-            ParticipantRow(participant, participant.puuid == viewingPuuid, patchVersion)
+            ParticipantRow(
+                participant = participant,
+                isViewingSummoner = participant.puuid == viewingPuuid,
+                patchVersion = patchVersion,
+                champion = championsByKey[participant.championId],
+            )
         }
     }
 }
@@ -144,13 +156,9 @@ private fun ParticipantRow(
     participant: MatchParticipant,
     isViewingSummoner: Boolean,
     patchVersion: String?,
+    champion: Champion?,
 ) {
-    Card(
-        colors = CardDefaults.cardColors(
-            containerColor = if (isViewingSummoner) AppTheme.colors.surfaceElevated else AppTheme.colors.surface,
-        ),
-        shape = AppTheme.shapes.medium,
-    ) {
+    CutSurface(highlighted = isViewingSummoner, modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -158,14 +166,11 @@ private fun ParticipantRow(
             verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
         ) {
-            if (patchVersion != null) {
-                AsyncImage(
-                    model = DataDragonUrls.championIconById(patchVersion, participant.championId),
-                    contentDescription = participant.championId,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.small),
+            if (patchVersion != null && champion != null) {
+                HextechFrame(
+                    model = DataDragonUrls.championIcon(patchVersion, champion.imageFileName),
+                    contentDescription = champion.name,
+                    modifier = Modifier.size(40.dp),
                 )
             }
             Column(modifier = Modifier.weight(1f)) {
@@ -176,7 +181,7 @@ private fun ParticipantRow(
                     maxLines = 1,
                 )
                 Text(
-                    text = participant.championId,
+                    text = champion?.name ?: participant.championId,
                     style = AppTheme.typography.caption,
                     color = AppTheme.colors.textSecondary,
                 )

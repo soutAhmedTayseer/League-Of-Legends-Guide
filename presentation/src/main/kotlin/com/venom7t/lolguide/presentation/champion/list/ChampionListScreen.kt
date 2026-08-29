@@ -39,7 +39,8 @@ import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.components.ChampionRow
 import com.venom7t.lolguide.presentation.common.components.EmptyContent
 import com.venom7t.lolguide.presentation.common.components.ErrorContent
-import com.venom7t.lolguide.presentation.common.components.LoadingContent
+import com.venom7t.lolguide.presentation.common.components.ChampionListSkeleton
+import com.venom7t.lolguide.presentation.common.components.rememberMinimumVisibleLoading
 import com.venom7t.lolguide.presentation.common.components.PatchBadge
 import com.venom7t.lolguide.presentation.common.uiText
 import com.venom7t.lolguide.presentation.theme.AppTheme
@@ -163,8 +164,9 @@ fun ChampionListScreen(
                 ),
             )
 
+            val showSkeleton = rememberMinimumVisibleLoading(state.isLoading)
             when {
-                state.isLoading -> LoadingContent()
+                showSkeleton -> ChampionListSkeleton()
 
                 state.error != null && state.champions.isEmpty() -> ErrorContent(
                     message = state.error,

@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.venom7t.lolguide.domain.auth.usecase.EnsureSignedInUseCase
 import com.venom7t.lolguide.domain.auth.usecase.ObserveAccountUseCase
 import com.venom7t.lolguide.domain.onboarding.repository.OnboardingRepository
+import com.venom7t.lolguide.domain.settings.repository.SettingsRepository
+import com.venom7t.lolguide.presentation.common.FirstRunGate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +34,7 @@ class AppStartViewModel @Inject constructor(
     private val onboardingRepository: OnboardingRepository,
     private val ensureSignedIn: EnsureSignedInUseCase,
     private val observeAccount: ObserveAccountUseCase,
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<AppStartState>(AppStartState.Loading)
@@ -47,6 +50,15 @@ class AppStartViewModel @Inject constructor(
 
             val account = observeAccount().first()
             val hasCompleted = onboardingRepository.observePreferences().first().hasCompletedOnboarding
+
+            // Decided once, here, before any real screen mounts -- see
+            // FirstRunGate's doc comment for why this lives outside DI.
+            val hasCompletedFirstRun = settingsRepository.observeHasCompletedFirstRun().first()
+            FirstRunGate.setIsFirstRun(!hasCompletedFirstRun)
+            if (!hasCompletedFirstRun) {
+                settingsRepository.markFirstRunCompleted()
+            }
+
             _state.update {
                 AppStartState.Ready(
                     needsGoogleSignIn = account == null || account.isAnonymous,

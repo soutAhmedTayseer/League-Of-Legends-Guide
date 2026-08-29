@@ -1,6 +1,5 @@
 package com.venom7t.lolguide.data.riot.remote
 
-import com.venom7t.lolguide.data.common.di.RiotApiKey
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
@@ -20,10 +19,11 @@ import javax.inject.Inject
  * generic auth failure would send the user to fix the wrong thing.
  */
 class RiotAuthInterceptor @Inject constructor(
-    @RiotApiKey private val apiKey: String,
+    private val apiKeyProvider: RiotApiKeyProvider,
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
+        val apiKey = apiKeyProvider.currentKey
         if (apiKey.isBlank()) {
             throw MissingApiKeyException()
         }

@@ -6,12 +6,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,21 +20,29 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.domain.ladder.model.LadderEntry
 import com.venom7t.lolguide.domain.onboarding.model.Region
+import com.venom7t.lolguide.domain.summoner.model.Summoner
 import com.venom7t.lolguide.presentation.R
+import com.venom7t.lolguide.presentation.common.DataDragonUrls
+import com.venom7t.lolguide.presentation.common.components.CutSurface
 import com.venom7t.lolguide.presentation.common.components.ErrorContent
-import com.venom7t.lolguide.presentation.common.components.LoadingContent
+import com.venom7t.lolguide.presentation.common.components.HextechFrame
+import com.venom7t.lolguide.presentation.common.components.LadderSkeleton
+import com.venom7t.lolguide.presentation.common.components.rememberMinimumVisibleLoading
 import com.venom7t.lolguide.presentation.theme.AppTheme
 
 @Composable
@@ -103,42 +110,73 @@ fun LadderScreen(
             )
         },
     ) { padding ->
+        val showSkeleton = rememberMinimumVisibleLoading(state.isLoading)
         when {
-            state.isLoading -> LoadingContent(modifier = Modifier.padding(padding))
+            showSkeleton -> LadderSkeleton(modifier = Modifier.padding(padding))
             state.error != null -> ErrorContent(
                 message = state.error,
                 onRetry = { onEvent(LadderEvent.Retry) },
                 modifier = Modifier.padding(padding),
             )
-            else -> LazyColumn(
+            else -> PullToRefreshBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = { onEvent(LadderEvent.Retry) },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
-                contentPadding = PaddingValues(AppTheme.dimens.spaceMd),
-                verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
             ) {
-                items(state.entries) { entry -> LadderRow(entry) }
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(AppTheme.dimens.spaceMd),
+                    verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
+                ) {
+                    items(state.entries, key = { it.puuid }) { entry ->
+                        LadderRow(
+                            entry = entry,
+                            resolved = state.resolvedProfiles[entry.puuid],
+                            patchVersion = state.patchVersion,
+                        )
+                    }
+                }
             }
         }
     }
 }
 
+/**
+ * [resolved] is only populated for the top rows (see
+ * LadderViewModel.resolveTopEntries) -- a row past that cutoff, or one whose
+ * lookup hasn't landed yet, falls back to rank and puuid-based placeholder
+ * text with no icon rather than blocking on a fetch nobody asked for.
+ */
 @Composable
-private fun LadderRow(entry: LadderEntry) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = AppTheme.colors.surface),
-        shape = AppTheme.shapes.medium,
-    ) {
+private fun LadderRow(
+    entry: LadderEntry,
+    resolved: Summoner?,
+    patchVersion: String?,
+) {
+    CutSurface(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(AppTheme.dimens.spaceMd),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
         ) {
+            if (resolved != null && patchVersion != null) {
+                HextechFrame(
+                    model = DataDragonUrls.profileIcon(patchVersion, resolved.profileIconId),
+                    contentDescription = null,
+                    modifier = Modifier.size(AppTheme.dimens.abilityIcon),
+                )
+            }
             Text(
-                text = "#${entry.rank}  ${entry.summonerName ?: "—"}",
+                text = "#${entry.rank}  ${resolved?.riotId ?: entry.summonerName ?: "—"}",
                 style = AppTheme.typography.bodyLarge,
                 color = AppTheme.colors.textPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
             )
             Text(
                 text = "${entry.leaguePoints} LP · ${entry.winRatePercent}%",

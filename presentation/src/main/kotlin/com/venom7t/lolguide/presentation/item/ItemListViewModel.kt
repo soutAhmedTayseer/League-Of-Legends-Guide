@@ -37,6 +37,7 @@ data class ItemListState(
      */
     val availableTags: ImmutableList<String> = persistentListOf(),
     val patchVersion: String? = null,
+    val isFilterSheetOpen: Boolean = false,
     val error: UiText? = null,
 ) {
     val isEmpty: Boolean
@@ -52,6 +53,8 @@ sealed interface ItemListEvent {
     data class QueryChanged(val query: String) : ItemListEvent
     data class TagToggled(val tag: String) : ItemListEvent
     data object FiltersCleared : ItemListEvent
+    data object FilterSheetOpened : ItemListEvent
+    data object FilterSheetDismissed : ItemListEvent
     data class ItemClicked(val itemId: String) : ItemListEvent
 }
 
@@ -100,6 +103,9 @@ class ItemListViewModel @Inject constructor(
                 _state.update { it.copy(selectedTags = emptySet(), query = "") }
                 recomputeVisible()
             }
+
+            ItemListEvent.FilterSheetOpened -> _state.update { it.copy(isFilterSheetOpen = true) }
+            ItemListEvent.FilterSheetDismissed -> _state.update { it.copy(isFilterSheetOpen = false) }
 
             is ItemListEvent.ItemClicked -> viewModelScope.launch {
                 _effects.send(ItemListEffect.NavigateToDetail(event.itemId))

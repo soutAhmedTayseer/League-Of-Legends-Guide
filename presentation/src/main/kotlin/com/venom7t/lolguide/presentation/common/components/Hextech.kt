@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,8 +20,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.theme.AppTheme
 
 /**
@@ -39,7 +43,9 @@ fun HextechFrame(
     modifier: Modifier = Modifier,
     isSelected: Boolean = false,
     contentScale: ContentScale = ContentScale.Crop,
+    alignment: Alignment = Alignment.Center,
     onClick: (() -> Unit)? = null,
+    onState: ((coil3.compose.AsyncImagePainter.State) -> Unit)? = null,
 ) {
     val shape = AppTheme.shapes.medium
     Box(
@@ -60,6 +66,8 @@ fun HextechFrame(
             model = model,
             contentDescription = contentDescription,
             contentScale = contentScale,
+            alignment = alignment,
+            onState = onState,
             modifier = Modifier
                 .fillMaxSize()
                 .clip(AppTheme.shapes.small),
@@ -150,4 +158,62 @@ fun CutSurface(
     ) {
         content()
     }
+}
+
+/**
+ * The one confirm/destructive dialog shape for the whole app (AGENTS.md
+ * §13): dark surface, gold hairline via the default [AlertDialog] shape
+ * override, a themed title/body, and a confirm action coloured by
+ * [destructive] so "leave a game" and "delete something" read differently
+ * from "cancel" without a second dialog variant to maintain.
+ */
+@Composable
+fun HextechConfirmDialog(
+    title: String,
+    body: String,
+    confirmLabel: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+    dismissLabel: String? = null,
+    destructive: Boolean = true,
+) {
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismiss,
+        containerColor = AppTheme.colors.surface,
+        shape = AppTheme.shapes.medium,
+        title = {
+            Text(
+                text = title,
+                style = AppTheme.typography.titleMedium,
+                color = AppTheme.colors.textPrimary,
+            )
+        },
+        text = {
+            Text(
+                text = body,
+                style = AppTheme.typography.bodyMedium,
+                color = AppTheme.colors.textSecondary,
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(
+                    text = confirmLabel,
+                    style = AppTheme.typography.label,
+                    color = if (destructive) AppTheme.colors.error else AppTheme.colors.accent,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(
+                    text = dismissLabel ?: stringResource(R.string.action_cancel),
+                    style = AppTheme.typography.label,
+                    color = AppTheme.colors.textSecondary,
+                )
+            }
+        },
+    )
 }

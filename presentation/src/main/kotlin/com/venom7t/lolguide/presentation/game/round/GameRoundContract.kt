@@ -25,6 +25,8 @@ data class GameRoundState(
     val stats: GameStats? = null,
     /** Gates the give-up confirmation dialog (AGENTS.md §13). */
     val pendingGiveUp: Boolean = false,
+    /** Gates the leave-mid-round confirmation dialog (AGENTS.md §13). */
+    val pendingBack: Boolean = false,
     val error: UiText? = null,
 ) {
     val isFinished: Boolean get() = outcome != RoundOutcome.IN_PROGRESS
@@ -42,6 +44,8 @@ sealed interface GameRoundEvent {
     data class QueryChanged(val query: String) : GameRoundEvent
     data class SuggestionSelected(val champion: Champion) : GameRoundEvent
     data object BackClicked : GameRoundEvent
+    data object BackConfirmed : GameRoundEvent
+    data object BackCancelled : GameRoundEvent
     data object PlayAgainDismissed : GameRoundEvent
     data object GiveUpClicked : GameRoundEvent
     data object GiveUpConfirmed : GameRoundEvent

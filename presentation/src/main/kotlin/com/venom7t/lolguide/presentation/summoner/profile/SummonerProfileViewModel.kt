@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.venom7t.lolguide.domain.champion.usecase.ObserveChampionsUseCase
 import com.venom7t.lolguide.domain.clash.usecase.GetClashTeamUseCase
 import com.venom7t.lolguide.domain.followed.usecase.ToggleFollowedSummonerUseCase
 import com.venom7t.lolguide.domain.livegame.usecase.GetLiveGameUseCase
@@ -22,6 +23,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -40,6 +42,7 @@ class SummonerProfileViewModel @Inject constructor(
     private val resolvePatch: ResolvePatchUseCase,
     private val toggleFollowed: ToggleFollowedSummonerUseCase,
     private val followedRepository: com.venom7t.lolguide.domain.followed.repository.FollowedSummonerRepository,
+    private val observeChampions: ObserveChampionsUseCase,
 ) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<SummonerProfileRoute>()
@@ -98,7 +101,16 @@ class SummonerProfileViewModel @Inject constructor(
 
     private fun load() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
+            // A pull-to-refresh on an already-shown profile should not
+            // flash the full skeleton back in -- only a cold load does.
+            val alreadyShowing = resolvedSummoner != null
+            _state.update {
+                it.copy(
+                    isLoading = !alreadyShowing,
+                    isRefreshing = alreadyShowing,
+                    error = null,
+                )
+            }
 
             // Only used for versioning champion/profile icons here -- a
             // failed patch lookup should not block a profile that has no art
@@ -106,9 +118,14 @@ class SummonerProfileViewModel @Inject constructor(
             val patch = resolvePatch().getOrNull()?.version
             _state.update { it.copy(patchVersion = patch) }
 
+            val championsByKey = observeChampions().first().associateBy { it.key }
+            _state.update { it.copy(championsByKey = championsByKey) }
+
             val summoner = searchSummoner("${route.riotIdName}#${route.riotIdTagline}", region)
                 .getOrElse { throwable ->
-                    _state.update { it.copy(isLoading = false, error = throwable.toUiText()) }
+                    _state.update {
+                        it.copy(isLoading = false, isRefreshing = false, error = throwable.toUiText())
+                    }
                     return@launch
                 }
             resolvedSummoner = summoner
@@ -132,6 +149,7 @@ class SummonerProfileViewModel @Inject constructor(
             _state.update {
                 it.copy(
                     isLoading = false,
+                    isRefreshing = false,
                     summoner = summoner,
                     rankedEntries = ranked,
                     matches = matches,

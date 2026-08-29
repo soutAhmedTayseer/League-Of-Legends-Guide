@@ -6,9 +6,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,10 +32,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -48,6 +53,7 @@ import com.venom7t.lolguide.presentation.common.components.EmptyContent
 import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.common.uiText
 import com.venom7t.lolguide.presentation.theme.AppTheme
+import kotlinx.coroutines.delay
 
 @Composable
 fun RouletteScreenRoot(
@@ -129,11 +135,14 @@ fun RouletteScreen(
 }
 
 /**
- * The result is a full-bleed splash, same language as Home's hero: the art
- * fills the frame, a scrim resolving to the page background carries the
- * name so it stays legible over any splash, and rolling again cross-fades
- * rather than hard-cutting so consecutive rolls read as one continuous
- * reveal instead of a flicker.
+ * The result shows the splash art whole, framed like every other piece of
+ * art in the app -- a full-bleed crop was cutting off most of the
+ * illustration on a portrait screen, and "premium" here means showing the
+ * artist's full composition in a border, not spilling it edge to edge.
+ *
+ * A roll spins through [RouletteState.spinSequence] like a slot machine --
+ * each frame swap slows down towards the end, so the wheel visibly settles
+ * on the landing champion instead of just cutting to it.
  */
 @Composable
 private fun RouletteResult(
@@ -141,52 +150,63 @@ private fun RouletteResult(
     onEvent: (RouletteEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
-        AnimatedContent(
-            targetState = state.result,
-            modifier = Modifier.fillMaxSize(),
-            transitionSpec = {
-                fadeIn(tween(ROLL_TRANSITION_MILLIS)) togetherWith fadeOut(tween(ROLL_TRANSITION_MILLIS))
-            },
-            label = "roulette_result",
-        ) { result ->
-            if (result != null) {
-                RouletteSplash(result = result)
-            } else {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(AppTheme.colors.background),
-                )
+    var displayed by remember { mutableStateOf(state.result) }
+    var isSpinning by remember { mutableStateOf(false) }
+
+    LaunchedEffect(state.spinSequence) {
+        val frames = state.spinSequence
+        if (frames.isEmpty()) return@LaunchedEffect
+        isSpinning = true
+        frames.forEachIndexed { index, champion ->
+            displayed = champion
+            // Eases out: fast flicker at the start, slowing to a stop on the
+            // last frame -- a constant rate reads as a list scrolling, not a
+            // wheel landing.
+            val progress = index.toFloat() / (frames.size - 1).coerceAtLeast(1)
+            val delayMillis = (SPIN_MIN_FRAME_MILLIS + progress * progress * SPIN_MAX_EXTRA_MILLIS).toLong()
+            delay(delayMillis)
+        }
+        isSpinning = false
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(AppTheme.dimens.spaceLg),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+            AnimatedContent(
+                targetState = displayed,
+                transitionSpec = {
+                    fadeIn(tween(ROLL_TRANSITION_MILLIS)) togetherWith fadeOut(tween(ROLL_TRANSITION_MILLIS))
+                },
+                label = "roulette_result",
+            ) { result ->
+                if (result != null) {
+                    RouletteSplash(result = result)
+                } else {
+                    Text(
+                        text = stringResource(R.string.roulette_prompt),
+                        style = AppTheme.typography.bodyLarge,
+                        color = AppTheme.colors.textSecondary,
+                        textAlign = TextAlign.Center,
+                    )
+                }
             }
         }
 
-        if (state.result == null) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(AppTheme.dimens.spaceLg),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = stringResource(R.string.roulette_prompt),
-                    style = AppTheme.typography.bodyLarge,
-                    color = AppTheme.colors.textSecondary,
-                    textAlign = TextAlign.Center,
-                )
-            }
-        }
-
-        Column(
+        Row(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(AppTheme.dimens.spaceLg),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
+                .padding(top = AppTheme.dimens.spaceLg),
+            horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
         ) {
             Button(
                 onClick = { onEvent(RouletteEvent.Rolled) },
+                enabled = !isSpinning,
+                modifier = Modifier.weight(1f),
                 shape = AppTheme.shapes.medium,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = AppTheme.colors.primary,
@@ -210,6 +230,8 @@ private fun RouletteResult(
             if (state.result != null) {
                 OutlinedButton(
                     onClick = { onEvent(RouletteEvent.ViewChampionClicked) },
+                    enabled = !isSpinning,
+                    modifier = Modifier.weight(1f),
                     shape = AppTheme.shapes.medium,
                 ) {
                     Text(
@@ -225,50 +247,56 @@ private fun RouletteResult(
 
 @Composable
 private fun RouletteSplash(result: Champion, modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxSize()) {
-        AsyncImage(
-            model = DataDragonUrls.championSplash(result.id),
-            contentDescription = stringResource(R.string.champion_detail_portrait, result.name),
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize(),
-        )
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        0f to Color.Transparent,
-                        0.4f to Color.Transparent,
-                        0.72f to AppTheme.colors.background.copy(alpha = 0.94f),
-                        1f to AppTheme.colors.background,
-                    ),
+                .fillMaxWidth()
+                // Data Dragon splash art is a fixed 1215x717 canvas -- fitting
+                // to that ratio (rather than cropping to the screen's own)
+                // is what keeps the whole illustration inside the frame.
+                .aspectRatio(SPLASH_ASPECT_RATIO)
+                .clip(AppTheme.shapes.large)
+                .background(AppTheme.colors.surfaceElevated)
+                .border(
+                    width = AppTheme.dimens.borderWidth,
+                    color = AppTheme.colors.primary,
+                    shape = AppTheme.shapes.large,
                 ),
-        )
+        ) {
+            AsyncImage(
+                model = DataDragonUrls.championSplash(result.id),
+                contentDescription = stringResource(R.string.champion_detail_portrait, result.name),
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
         Column(
             modifier = Modifier
-                .align(Alignment.BottomStart)
                 .fillMaxWidth()
-                .padding(
-                    start = AppTheme.dimens.spaceLg,
-                    end = AppTheme.dimens.spaceLg,
-                    // Clears the two-button stack RouletteResult overlays at
-                    // the bottom of the same Box -- title text sitting under
-                    // "Roll again" was the bug here, not a stylistic margin.
-                    bottom = 176.dp,
-                ),
+                .padding(top = AppTheme.dimens.spaceLg),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = result.name,
                 style = AppTheme.typography.displayLarge,
                 color = AppTheme.colors.textPrimary,
+                textAlign = TextAlign.Center,
             )
             Text(
                 text = result.title,
                 style = AppTheme.typography.bodyMedium,
                 color = AppTheme.colors.textSecondary,
+                textAlign = TextAlign.Center,
             )
         }
     }
 }
 
+private const val SPLASH_ASPECT_RATIO = 1215f / 717f
+
 private const val ROLL_TRANSITION_MILLIS = 220
+private const val SPIN_MIN_FRAME_MILLIS = 40
+private const val SPIN_MAX_EXTRA_MILLIS = 260

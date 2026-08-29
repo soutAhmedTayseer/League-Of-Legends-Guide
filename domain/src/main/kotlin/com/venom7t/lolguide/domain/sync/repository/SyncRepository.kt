@@ -2,6 +2,8 @@ package com.venom7t.lolguide.domain.sync.repository
 
 import com.venom7t.lolguide.domain.builds.model.SavedBuild
 import com.venom7t.lolguide.domain.followed.model.FollowedSummoner
+import com.venom7t.lolguide.domain.game.model.GameMode
+import com.venom7t.lolguide.domain.game.model.GameStats
 
 /**
  * Cross-device sync for the two pieces of user-authored local state Phase 5
@@ -35,4 +37,21 @@ interface SyncRepository {
     suspend fun pushDeletedSavedBuild(id: String): Result<Unit>
 
     suspend fun pullSavedBuilds(): Result<List<SavedBuild>>
+
+    /**
+     * Lifetime game stats (streaks, win counts) per riddle mode -- the one
+     * piece of real progress a player would otherwise lose on reinstall,
+     * same failure shape favourites had before Phase 5 (Phase 6 follow-up).
+     */
+    suspend fun pushGameStats(mode: GameMode, stats: GameStats): Result<Unit>
+
+    /**
+     * Only ever adopted when the local record is still at its untouched
+     * default (see GameProgressSyncUseCase) -- merging two devices' streaks
+     * field-by-field is not something a max-of-counters merge can do
+     * correctly (a streak depends on *which* days were won, not just how
+     * many), so this restores after data loss rather than reconciling
+     * concurrent play.
+     */
+    suspend fun pullGameStats(): Result<Map<GameMode, GameStats>>
 }

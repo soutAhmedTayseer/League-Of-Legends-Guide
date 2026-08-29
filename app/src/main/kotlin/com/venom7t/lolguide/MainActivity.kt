@@ -7,12 +7,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.venom7t.lolguide.domain.settings.model.ThemeMode
+import com.venom7t.lolguide.domain.settings.repository.SettingsRepository
 import com.venom7t.lolguide.navigation.LolGuideNavGraph
 import com.venom7t.lolguide.presentation.theme.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * The app's only Activity.
@@ -23,6 +29,8 @@ import dagger.hilt.android.AndroidEntryPoint
  */
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject lateinit var settingsRepository: SettingsRepository
 
     private val requestNotificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* no-op either way */ }
@@ -46,7 +54,14 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            AppTheme {
+            val themeMode by settingsRepository.observeThemeMode()
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.SYSTEM)
+            val useDarkTheme = when (themeMode) {
+                ThemeMode.SYSTEM -> isSystemInDarkTheme()
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+            }
+            AppTheme(useDarkTheme = useDarkTheme) {
                 LolGuideNavGraph(modifier = Modifier.fillMaxSize())
             }
         }

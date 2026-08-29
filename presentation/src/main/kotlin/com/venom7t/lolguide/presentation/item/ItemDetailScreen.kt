@@ -42,7 +42,8 @@ import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.DataDragonUrls
 import com.venom7t.lolguide.presentation.common.components.ErrorContent
 import com.venom7t.lolguide.presentation.common.components.HextechFrame
-import com.venom7t.lolguide.presentation.common.components.LoadingContent
+import com.venom7t.lolguide.presentation.common.components.DetailHeaderSkeleton
+import com.venom7t.lolguide.presentation.common.components.rememberMinimumVisibleLoading
 import com.venom7t.lolguide.presentation.common.components.PatchBadge
 import com.venom7t.lolguide.presentation.common.abilityText
 import com.venom7t.lolguide.presentation.theme.AppTheme
@@ -114,8 +115,9 @@ fun ItemDetailScreen(
         },
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            val showSkeleton = rememberMinimumVisibleLoading(state.isLoading)
             when {
-                state.isLoading -> LoadingContent()
+                showSkeleton -> DetailHeaderSkeleton()
 
                 state.error != null -> ErrorContent(
                     message = state.error,

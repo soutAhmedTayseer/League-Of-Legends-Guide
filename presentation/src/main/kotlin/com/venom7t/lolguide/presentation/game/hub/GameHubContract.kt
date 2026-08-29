@@ -7,6 +7,8 @@ import com.venom7t.lolguide.domain.game.model.GameStats
 @Immutable
 data class GameHubState(
     val stats: Map<GameMode, GameStats> = emptyMap(),
+    /** Time left until today's daily puzzles reset, at UTC midnight. */
+    val millisUntilReset: Long = 0L,
 )
 
 sealed interface GameHubEvent {

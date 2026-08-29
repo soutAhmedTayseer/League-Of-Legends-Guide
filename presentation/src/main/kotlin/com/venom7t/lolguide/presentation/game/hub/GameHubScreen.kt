@@ -95,6 +95,8 @@ fun GameHubScreen(
             contentPadding = PaddingValues(AppTheme.dimens.spaceMd),
             verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
         ) {
+            item { ResetCountdownCard(millisUntilReset = state.millisUntilReset) }
+
             items(GameMode.entries) { mode ->
                 GameModeCard(
                     mode = mode,
@@ -104,6 +106,37 @@ fun GameHubScreen(
             }
         }
     }
+}
+
+@Composable
+private fun ResetCountdownCard(millisUntilReset: Long, modifier: Modifier = Modifier) {
+    CutSurface(modifier = modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(AppTheme.dimens.spaceMd),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = stringResource(R.string.game_hub_resets_label),
+                style = AppTheme.typography.bodyMedium,
+                color = AppTheme.colors.textSecondary,
+            )
+            Text(
+                text = millisUntilReset.formatCountdown(),
+                style = AppTheme.typography.statValue,
+                color = AppTheme.colors.accent,
+            )
+        }
+    }
+}
+
+private fun Long.formatCountdown(): String {
+    val totalSeconds = (this / 1000L).coerceAtLeast(0L)
+    val hours = totalSeconds / 3600
+    val minutes = (totalSeconds % 3600) / 60
+    val seconds = totalSeconds % 60
+    return "%02d:%02d:%02d".format(hours, minutes, seconds)
 }
 
 @Composable

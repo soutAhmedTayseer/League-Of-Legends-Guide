@@ -1,5 +1,6 @@
 package com.venom7t.lolguide.navigation
 
+import com.venom7t.lolguide.SplashScreen
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,7 +17,12 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -33,10 +39,10 @@ import androidx.navigation.toRoute
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.champion.detail.ChampionDetailScreenRoot
 import com.venom7t.lolguide.presentation.champion.list.ChampionListScreenRoot
-import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.compare.CompareScreenRoot
 import com.venom7t.lolguide.presentation.favourite.FavouritesScreenRoot
 import com.venom7t.lolguide.presentation.account.AccountScreenRoot
+import com.venom7t.lolguide.presentation.apikey.RiotDeveloperPortalScreen
 import com.venom7t.lolguide.presentation.account.SignInGateScreenRoot
 import com.venom7t.lolguide.presentation.followed.FollowedSummonersScreenRoot
 import com.venom7t.lolguide.presentation.game.hub.GameHubScreenRoot
@@ -55,6 +61,7 @@ import com.venom7t.lolguide.presentation.navigation.ChampionListRoute
 import com.venom7t.lolguide.presentation.navigation.CompareRoute
 import com.venom7t.lolguide.presentation.navigation.FavouritesRoute
 import com.venom7t.lolguide.presentation.navigation.AccountRoute
+import com.venom7t.lolguide.presentation.navigation.RiotDeveloperPortalRoute
 import com.venom7t.lolguide.presentation.navigation.SignInGateRoute
 import com.venom7t.lolguide.presentation.navigation.FollowedSummonersRoute
 import com.venom7t.lolguide.presentation.navigation.GameHubRoute
@@ -104,21 +111,37 @@ fun LolGuideNavGraph(
 ) {
     val startState by appStartViewModel.state.collectAsStateWithLifecycle()
 
+    // Held for a minimum stretch regardless of how fast AppStartViewModel
+    // actually resolves -- on a warm, cache-backed launch that can be near
+    // instant, and a splash that flickers for one frame reads as a glitch,
+    // not as "the app opened". Every launch, not just the first: this is
+    // the app announcing itself, not a first-run-only intro (that's
+    // Onboarding's job).
+    var minSplashElapsed by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(700L)
+        minSplashElapsed = true
+    }
+
     // The NavHost's start destination cannot change after first composition,
     // so onboarding completion must be known before the NavHost exists at
     // all. This is the one deliberate blocking read in the app's launch path.
-    val readyState = startState as? AppStartState.Ready ?: run {
-        LoadingContent()
+    val readyState = (startState as? AppStartState.Ready)?.takeIf { minSplashElapsed } ?: run {
+        SplashScreen(modifier = modifier)
         return
     }
 
     LolGuideNavGraphContent(
+        // Onboarding now runs before the sign-in gate (owner decision): a
+        // fresh install should feel like the app introducing itself first,
+        // not demanding a Google account before the user has seen anything.
+        // Sign-in is still mandatory -- it just comes after, not on cold open.
         startDestination = when {
+            !readyState.hasCompletedOnboarding -> OnboardingRoute
             readyState.needsGoogleSignIn -> SignInGateRoute
-            readyState.hasCompletedOnboarding -> HomeRoute
-            else -> OnboardingRoute
+            else -> HomeRoute
         },
-        hasCompletedOnboarding = readyState.hasCompletedOnboarding,
+        needsGoogleSignIn = readyState.needsGoogleSignIn,
         modifier = modifier,
         navController = navController,
     )
@@ -127,7 +150,7 @@ fun LolGuideNavGraph(
 @Composable
 private fun LolGuideNavGraphContent(
     startDestination: Any,
-    hasCompletedOnboarding: Boolean,
+    needsGoogleSignIn: Boolean,
     modifier: Modifier = Modifier,
     navController: NavHostController,
 ) {
@@ -197,8 +220,10 @@ private fun LolGuideNavGraphContent(
         ) {
             composable<SignInGateRoute> {
                 SignInGateScreenRoot(
+                    // Onboarding always runs before this gate now, so signing
+                    // in always lands on Home from here.
                     onSignedIn = {
-                        navController.navigate(if (hasCompletedOnboarding) HomeRoute else OnboardingRoute) {
+                        navController.navigate(HomeRoute) {
                             popUpTo(SignInGateRoute) { inclusive = true }
                         }
                     },
@@ -208,7 +233,7 @@ private fun LolGuideNavGraphContent(
             composable<OnboardingRoute> {
                 OnboardingScreenRoot(
                     onFinished = {
-                        navController.navigate(HomeRoute) {
+                        navController.navigate(if (needsGoogleSignIn) SignInGateRoute else HomeRoute) {
                             popUpTo(OnboardingRoute) { inclusive = true }
                         }
                     },
@@ -241,7 +266,14 @@ private fun LolGuideNavGraphContent(
             }
 
             composable<AccountRoute> {
-                AccountScreenRoot(onBack = { navController.popBackStack() })
+                AccountScreenRoot(
+                    onBack = { navController.popBackStack() },
+                    onNavigateToApiKeyPortal = { navController.navigate(RiotDeveloperPortalRoute) },
+                )
+            }
+
+            composable<RiotDeveloperPortalRoute> {
+                RiotDeveloperPortalScreen(onBack = { navController.popBackStack() })
             }
 
             composable<GameHubRoute> {

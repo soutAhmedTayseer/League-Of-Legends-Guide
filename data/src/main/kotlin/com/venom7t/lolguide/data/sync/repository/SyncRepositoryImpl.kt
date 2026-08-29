@@ -5,6 +5,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.venom7t.lolguide.domain.builds.model.SavedBuild
 import com.venom7t.lolguide.domain.common.runCatchingCancellable
 import com.venom7t.lolguide.domain.followed.model.FollowedSummoner
+import com.venom7t.lolguide.domain.game.model.GameMode
+import com.venom7t.lolguide.domain.game.model.GameStats
 import com.venom7t.lolguide.domain.onboarding.model.Region
 import com.venom7t.lolguide.domain.sync.repository.SyncRepository
 import kotlinx.coroutines.tasks.await
@@ -117,5 +119,38 @@ class SyncRepositoryImpl @Inject constructor(
                 val savedAt = doc.getLong("savedAtEpochMillis") ?: 0L
                 SavedBuild(id, championId, itemIds, level, savedAt)
             }
+    }
+
+    override suspend fun pushGameStats(mode: GameMode, stats: GameStats): Result<Unit> = runCatchingCancellable {
+        firestore.collection("users").document(requireUid())
+            .collection("gameStats").document(mode.name)
+            .set(
+                mapOf(
+                    "played" to stats.played,
+                    "won" to stats.won,
+                    "currentStreak" to stats.currentStreak,
+                    "bestStreak" to stats.bestStreak,
+                    "lastCompletedEpochDay" to stats.lastCompletedEpochDay,
+                ),
+            ).await()
+        Unit
+    }
+
+    override suspend fun pullGameStats(): Result<Map<GameMode, GameStats>> = runCatchingCancellable {
+        firestore.collection("users").document(requireUid())
+            .collection("gameStats").get().await()
+            .documents.mapNotNull { doc ->
+                val mode = GameMode.entries.firstOrNull { it.name == doc.id } ?: return@mapNotNull null
+                val stats = GameStats(
+                    mode = mode,
+                    played = doc.getLong("played")?.toInt() ?: 0,
+                    won = doc.getLong("won")?.toInt() ?: 0,
+                    currentStreak = doc.getLong("currentStreak")?.toInt() ?: 0,
+                    bestStreak = doc.getLong("bestStreak")?.toInt() ?: 0,
+                    lastCompletedEpochDay = doc.getLong("lastCompletedEpochDay"),
+                )
+                mode to stats
+            }
+            .toMap()
     }
 }

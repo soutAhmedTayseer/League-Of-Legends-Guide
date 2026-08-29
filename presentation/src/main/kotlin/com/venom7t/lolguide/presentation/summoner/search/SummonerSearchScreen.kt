@@ -9,8 +9,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -43,6 +41,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.domain.onboarding.model.Region
 import com.venom7t.lolguide.presentation.R
+import com.venom7t.lolguide.presentation.common.components.CutSurface
+import com.venom7t.lolguide.presentation.common.components.SectionRule
 import com.venom7t.lolguide.presentation.theme.AppTheme
 
 @Composable
@@ -56,6 +56,7 @@ fun SummonerSearchScreenRoot(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
+    LaunchedEffect(Unit) { viewModel.onEvent(SummonerSearchEvent.ScreenOpened) }
     LaunchedEffect(Unit) {
         viewModel.effects.collect { effect ->
             when (effect) {
@@ -120,99 +121,106 @@ fun SummonerSearchScreen(
                 .padding(AppTheme.dimens.spaceMd),
             verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
         ) {
-            OutlinedTextField(
-                value = state.query,
-                onValueChange = { onEvent(SummonerSearchEvent.QueryChanged(it)) },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(stringResource(R.string.summoner_search_hint)) },
-                placeholder = { Text("Name#TAG") },
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = AppTheme.colors.textPrimary,
-                    unfocusedTextColor = AppTheme.colors.textPrimary,
-                ),
-            )
-
-            var regionMenuExpanded by remember { mutableStateOf(false) }
-            ExposedDropdownMenuBox(
-                expanded = regionMenuExpanded,
-                onExpandedChange = { regionMenuExpanded = it },
-            ) {
-                OutlinedTextField(
-                    value = state.region.name,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text(stringResource(R.string.summoner_search_region)) },
+            CutSurface(modifier = Modifier.fillMaxWidth()) {
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = regionMenuExpanded)
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = AppTheme.colors.textPrimary,
-                        unfocusedTextColor = AppTheme.colors.textPrimary,
-                    ),
-                )
-                DropdownMenu(
-                    expanded = regionMenuExpanded,
-                    onDismissRequest = { regionMenuExpanded = false },
+                        .padding(AppTheme.dimens.spaceMd),
+                    verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
                 ) {
-                    Region.entries.forEach { region ->
-                        DropdownMenuItem(
-                            text = { Text(region.name) },
-                            onClick = {
-                                onEvent(SummonerSearchEvent.RegionSelected(region))
-                                regionMenuExpanded = false
+                    OutlinedTextField(
+                        value = state.query,
+                        onValueChange = { onEvent(SummonerSearchEvent.QueryChanged(it)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.summoner_search_hint)) },
+                        placeholder = { Text("Name#TAG") },
+                        singleLine = true,
+                        shape = AppTheme.shapes.medium,
+                        colors = summonerFieldColors(),
+                    )
+
+                    var regionMenuExpanded by remember { mutableStateOf(false) }
+                    ExposedDropdownMenuBox(
+                        expanded = regionMenuExpanded,
+                        onExpandedChange = { regionMenuExpanded = it },
+                    ) {
+                        OutlinedTextField(
+                            value = state.region.name,
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(stringResource(R.string.summoner_search_region)) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                            shape = AppTheme.shapes.medium,
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = regionMenuExpanded)
                             },
+                            colors = summonerFieldColors(),
+                        )
+                        DropdownMenu(
+                            expanded = regionMenuExpanded,
+                            onDismissRequest = { regionMenuExpanded = false },
+                            containerColor = AppTheme.colors.surface,
+                        ) {
+                            Region.entries.forEach { region ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            text = region.name,
+                                            style = AppTheme.typography.bodyMedium,
+                                            color = AppTheme.colors.textPrimary,
+                                        )
+                                    },
+                                    onClick = {
+                                        onEvent(SummonerSearchEvent.RegionSelected(region))
+                                        regionMenuExpanded = false
+                                    },
+                                )
+                            }
+                        }
+                    }
+
+                    Button(
+                        onClick = { onEvent(SummonerSearchEvent.SearchClicked) },
+                        enabled = state.canSearch,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = AppTheme.shapes.medium,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppTheme.colors.primary,
+                            contentColor = AppTheme.colors.onPrimary,
+                        ),
+                    ) {
+                        if (state.isSearching) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.fillMaxWidth(),
+                                color = AppTheme.colors.onPrimary,
+                            )
+                        } else {
+                            Text(
+                                text = stringResource(R.string.summoner_search_action),
+                                style = AppTheme.typography.label,
+                            )
+                        }
+                    }
+
+                    state.error?.let {
+                        Text(
+                            text = it.asString(),
+                            style = AppTheme.typography.bodyMedium,
+                            color = AppTheme.colors.error,
                         )
                     }
                 }
             }
 
-            Button(
-                onClick = { onEvent(SummonerSearchEvent.SearchClicked) },
-                enabled = state.canSearch,
-                modifier = Modifier.fillMaxWidth(),
-                shape = AppTheme.shapes.medium,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = AppTheme.colors.primary,
-                    contentColor = AppTheme.colors.onPrimary,
-                ),
-            ) {
-                if (state.isSearching) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.fillMaxWidth(),
-                        color = AppTheme.colors.onPrimary,
-                    )
-                } else {
-                    Text(stringResource(R.string.summoner_search_action), style = AppTheme.typography.label)
-                }
-            }
-
-            state.error?.let {
-                Text(
-                    text = it.asString(),
-                    style = AppTheme.typography.bodyMedium,
-                    color = AppTheme.colors.error,
-                )
-            }
-
             if (state.recentSearches.isNotEmpty()) {
-                Text(
-                    text = stringResource(R.string.summoner_search_recent),
-                    style = AppTheme.typography.titleMedium,
-                    color = AppTheme.colors.textPrimary,
-                )
+                SectionRule(title = stringResource(R.string.summoner_search_recent))
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
                 ) {
                     items(state.recentSearches) { recent ->
-                        Card(
-                            onClick = { onEvent(SummonerSearchEvent.RecentSearchClicked(recent)) },
-                            colors = CardDefaults.cardColors(containerColor = AppTheme.colors.surface),
-                            shape = AppTheme.shapes.medium,
-                        ) {
+                        CutSurface(onClick = { onEvent(SummonerSearchEvent.RecentSearchClicked(recent)) }) {
                             Text(
                                 text = "${recent.riotIdName}#${recent.riotIdTagline}",
                                 style = AppTheme.typography.bodyMedium,
@@ -226,3 +234,18 @@ fun SummonerSearchScreen(
         }
     }
 }
+
+@Composable
+private fun summonerFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedTextColor = AppTheme.colors.textPrimary,
+    unfocusedTextColor = AppTheme.colors.textPrimary,
+    focusedBorderColor = AppTheme.colors.primary,
+    unfocusedBorderColor = AppTheme.colors.border,
+    focusedLabelColor = AppTheme.colors.primary,
+    unfocusedLabelColor = AppTheme.colors.textSecondary,
+    cursorColor = AppTheme.colors.primary,
+    focusedPlaceholderColor = AppTheme.colors.textDisabled,
+    unfocusedPlaceholderColor = AppTheme.colors.textDisabled,
+    focusedTrailingIconColor = AppTheme.colors.textSecondary,
+    unfocusedTrailingIconColor = AppTheme.colors.textSecondary,
+)

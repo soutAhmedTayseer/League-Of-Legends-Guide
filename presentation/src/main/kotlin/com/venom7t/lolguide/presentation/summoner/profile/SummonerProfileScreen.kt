@@ -1,9 +1,9 @@
 package com.venom7t.lolguide.presentation.summoner.profile
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,18 +11,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -35,19 +33,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
+import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.match.model.MatchSummary
 import com.venom7t.lolguide.domain.summoner.model.RankedEntry
 import com.venom7t.lolguide.domain.summoner.model.Summoner
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.DataDragonUrls
+import com.venom7t.lolguide.presentation.common.components.CutSurface
 import com.venom7t.lolguide.presentation.common.components.ErrorContent
-import com.venom7t.lolguide.presentation.common.components.LoadingContent
+import com.venom7t.lolguide.presentation.common.components.HextechFrame
+import com.venom7t.lolguide.presentation.common.components.SummonerProfileSkeleton
+import com.venom7t.lolguide.presentation.common.components.rememberMinimumVisibleLoading
 import com.venom7t.lolguide.presentation.theme.AppTheme
 
 @Composable
@@ -113,18 +113,24 @@ fun SummonerProfileScreen(
             )
         },
     ) { padding ->
+        val showSkeleton = rememberMinimumVisibleLoading(state.isLoading)
         when {
-            state.isLoading -> LoadingContent(modifier = Modifier.padding(padding))
+            showSkeleton -> SummonerProfileSkeleton(modifier = Modifier.padding(padding))
             state.error != null -> ErrorContent(
                 message = state.error,
                 onRetry = { onEvent(SummonerProfileEvent.Retry) },
                 modifier = Modifier.padding(padding),
             )
-            state.summoner != null -> LazyColumn(
+            state.summoner != null -> PullToRefreshBox(
+                isRefreshing = state.isRefreshing,
+                onRefresh = { onEvent(SummonerProfileEvent.Retry) },
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(AppTheme.dimens.spaceMd),
+            ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(AppTheme.dimens.spaceMd),
                 verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
             ) {
                 item {
@@ -192,6 +198,7 @@ fun SummonerProfileScreen(
                     MatchRow(
                         match = match,
                         patchVersion = state.patchVersion,
+                        champion = state.championsByKey[match.championId],
                         onClick = { onEvent(SummonerProfileEvent.MatchClicked(match.matchId)) },
                     )
                 }
@@ -217,6 +224,7 @@ fun SummonerProfileScreen(
                     }
                 }
             }
+            }
         }
     }
 }
@@ -230,20 +238,14 @@ private fun SummonerHeader(
     onFollowClick: () -> Unit,
     onLiveGameClick: () -> Unit,
 ) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = AppTheme.colors.surface),
-        shape = AppTheme.shapes.medium,
-    ) {
+    CutSurface(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(AppTheme.dimens.spaceMd)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (patchVersion != null) {
-                    AsyncImage(
+                    HextechFrame(
                         model = DataDragonUrls.profileIcon(patchVersion, summoner.profileIconId),
                         contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(AppTheme.dimens.championThumb)
-                            .background(AppTheme.colors.surfaceElevated, CircleShape),
+                        modifier = Modifier.size(AppTheme.dimens.championThumb),
                     )
                 }
                 Column(
@@ -301,10 +303,7 @@ private fun SummonerHeader(
 
 @Composable
 private fun ClashCard(team: com.venom7t.lolguide.domain.clash.model.ClashTeam) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = AppTheme.colors.surface),
-        shape = AppTheme.shapes.medium,
-    ) {
+    CutSurface(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(AppTheme.dimens.spaceMd)) {
             Text(
                 text = stringResource(R.string.clash_title),
@@ -327,20 +326,18 @@ private fun ClashCard(team: com.venom7t.lolguide.domain.clash.model.ClashTeam) {
 
 @Composable
 private fun DuoStatsRow(duo: com.venom7t.lolguide.domain.match.model.DuoStats) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = AppTheme.colors.surface),
-        shape = AppTheme.shapes.medium,
-    ) {
-        Row(
+    CutSurface(modifier = Modifier.fillMaxWidth()) {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(AppTheme.dimens.spaceMd),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceXs),
         ) {
             Text(
                 text = "${duo.teammateRiotIdName}#${duo.teammateRiotIdTagline}",
                 style = AppTheme.typography.bodyLarge,
                 color = AppTheme.colors.textPrimary,
+                maxLines = 1,
             )
             Text(
                 text = stringResource(R.string.duo_stats_win_rate, duo.winRatePercent, duo.sampleSize),
@@ -353,10 +350,7 @@ private fun DuoStatsRow(duo: com.venom7t.lolguide.domain.match.model.DuoStats) {
 
 @Composable
 private fun RankedEntryCard(entry: RankedEntry) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = AppTheme.colors.surface),
-        shape = AppTheme.shapes.medium,
-    ) {
+    CutSurface(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -393,19 +387,10 @@ private fun RankedEntryCard(entry: RankedEntry) {
 private fun MatchRow(
     match: MatchSummary,
     patchVersion: String?,
+    champion: Champion?,
     onClick: () -> Unit,
 ) {
-    Card(
-        onClick = onClick,
-        colors = CardDefaults.cardColors(
-            containerColor = if (match.win) {
-                AppTheme.colors.surfaceElevated
-            } else {
-                AppTheme.colors.surface
-            },
-        ),
-        shape = AppTheme.shapes.medium,
-    ) {
+    CutSurface(onClick = onClick, highlighted = match.win, modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -413,19 +398,18 @@ private fun MatchRow(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceMd),
         ) {
-            if (patchVersion != null) {
-                AsyncImage(
-                    model = DataDragonUrls.championIconById(patchVersion, match.championId),
-                    contentDescription = match.championId,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(AppTheme.dimens.championThumb)
-                        .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.small),
+            if (patchVersion != null && champion != null) {
+                HextechFrame(
+                    model = DataDragonUrls.championIcon(patchVersion, champion.imageFileName),
+                    contentDescription = champion.name,
+                    modifier = Modifier.size(AppTheme.dimens.championThumb),
                 )
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = match.championId,
+                    // The numeric id is a legible fallback only while the
+                    // champion cache hasn't loaded yet -- not a permanent state.
+                    text = champion?.name ?: match.championId,
                     style = AppTheme.typography.bodyLarge,
                     color = AppTheme.colors.textPrimary,
                 )

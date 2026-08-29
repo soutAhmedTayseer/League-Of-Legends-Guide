@@ -1,5 +1,6 @@
 package com.venom7t.lolguide.presentation.game.round
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.North
 import androidx.compose.material.icons.filled.South
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,6 +57,7 @@ import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.DataDragonUrls
 import com.venom7t.lolguide.presentation.common.components.CutSurface
 import com.venom7t.lolguide.presentation.common.components.ErrorContent
+import com.venom7t.lolguide.presentation.common.components.HextechConfirmDialog
 import com.venom7t.lolguide.presentation.common.components.HextechFrame
 import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.common.components.SectionRule
@@ -89,6 +90,8 @@ fun GameRoundScreen(
     onEvent: (GameRoundEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    BackHandler { onEvent(GameRoundEvent.BackClicked) }
+
     Scaffold(
         modifier = modifier,
         containerColor = AppTheme.colors.background,
@@ -166,41 +169,23 @@ fun GameRoundScreen(
     }
 
     if (state.pendingGiveUp) {
-        AlertDialog(
-            onDismissRequest = { onEvent(GameRoundEvent.GiveUpCancelled) },
-            containerColor = AppTheme.colors.surface,
-            title = {
-                Text(
-                    text = stringResource(R.string.game_round_give_up_confirm_title),
-                    style = AppTheme.typography.titleMedium,
-                    color = AppTheme.colors.textPrimary,
-                )
-            },
-            text = {
-                Text(
-                    text = stringResource(R.string.game_round_give_up_confirm_body),
-                    style = AppTheme.typography.bodyMedium,
-                    color = AppTheme.colors.textSecondary,
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = { onEvent(GameRoundEvent.GiveUpConfirmed) }) {
-                    Text(
-                        text = stringResource(R.string.game_round_give_up),
-                        style = AppTheme.typography.label,
-                        color = AppTheme.colors.error,
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { onEvent(GameRoundEvent.GiveUpCancelled) }) {
-                    Text(
-                        text = stringResource(R.string.action_cancel),
-                        style = AppTheme.typography.label,
-                        color = AppTheme.colors.textSecondary,
-                    )
-                }
-            },
+        HextechConfirmDialog(
+            title = stringResource(R.string.game_round_give_up_confirm_title),
+            body = stringResource(R.string.game_round_give_up_confirm_body),
+            confirmLabel = stringResource(R.string.game_round_give_up),
+            onConfirm = { onEvent(GameRoundEvent.GiveUpConfirmed) },
+            onDismiss = { onEvent(GameRoundEvent.GiveUpCancelled) },
+        )
+    }
+
+    if (state.pendingBack) {
+        HextechConfirmDialog(
+            title = stringResource(R.string.game_round_leave_confirm_title),
+            body = stringResource(R.string.game_round_leave_confirm_body),
+            confirmLabel = stringResource(R.string.action_leave),
+            destructive = false,
+            onConfirm = { onEvent(GameRoundEvent.BackConfirmed) },
+            onDismiss = { onEvent(GameRoundEvent.BackCancelled) },
         )
     }
 }
@@ -212,11 +197,13 @@ private fun RoundPrompt(state: GameRoundState) {
 
         GameMode.ABILITY -> {
             if (state.patchVersion != null && state.abilityIconFileName != null) {
-                HextechFrame(
-                    model = DataDragonUrls.spellIcon(state.patchVersion, state.abilityIconFileName),
-                    contentDescription = null,
-                    modifier = Modifier.size(120.dp),
-                )
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    HextechFrame(
+                        model = DataDragonUrls.spellIcon(state.patchVersion, state.abilityIconFileName),
+                        contentDescription = null,
+                        modifier = Modifier.size(120.dp),
+                    )
+                }
             }
         }
 

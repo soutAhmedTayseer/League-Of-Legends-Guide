@@ -7,12 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Calculate
@@ -21,8 +22,6 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -46,7 +45,8 @@ import com.venom7t.lolguide.presentation.common.DataDragonUrls
 import com.venom7t.lolguide.presentation.common.components.EmptyContent
 import com.venom7t.lolguide.presentation.common.components.ErrorContent
 import com.venom7t.lolguide.presentation.common.components.HextechFrame
-import com.venom7t.lolguide.presentation.common.components.LoadingContent
+import com.venom7t.lolguide.presentation.common.components.ItemListSkeleton
+import com.venom7t.lolguide.presentation.common.components.rememberMinimumVisibleLoading
 import com.venom7t.lolguide.presentation.common.components.PatchBadge
 import com.venom7t.lolguide.presentation.common.uiText
 import com.venom7t.lolguide.presentation.theme.AppTheme
@@ -188,32 +188,18 @@ fun ItemListScreen(
             )
 
             if (state.availableTags.isNotEmpty()) {
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = AppTheme.dimens.spaceMd),
-                    horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
-                ) {
-                    items(items = state.availableTags, key = { it }) { tag ->
-                        val selected = tag in state.selectedTags
-                        FilterChip(
-                            selected = selected,
-                            onClick = { onEvent(ItemListEvent.TagToggled(tag)) },
-                            label = {
-                                Text(text = tag, style = AppTheme.typography.caption)
-                            },
-                            shape = AppTheme.shapes.pill,
-                            colors = FilterChipDefaults.filterChipColors(
-                                containerColor = AppTheme.colors.surface,
-                                labelColor = AppTheme.colors.textSecondary,
-                                selectedContainerColor = AppTheme.colors.primary,
-                                selectedLabelColor = AppTheme.colors.onPrimary,
-                            ),
-                        )
-                    }
-                }
+                ItemActiveFilterBar(
+                    selectedTags = state.selectedTags,
+                    onOpenFilters = { onEvent(ItemListEvent.FilterSheetOpened) },
+                    onClearFilters = { onEvent(ItemListEvent.FiltersCleared) },
+                    modifier = Modifier.padding(horizontal = AppTheme.dimens.spaceMd),
+                )
+                Spacer(modifier = Modifier.height(AppTheme.dimens.spaceSm))
             }
 
+            val showSkeleton = rememberMinimumVisibleLoading(state.isLoading)
             when {
-                state.isLoading -> LoadingContent()
+                showSkeleton -> ItemListSkeleton()
 
                 state.error != null && state.items.isEmpty() -> ErrorContent(
                     message = state.error,
@@ -238,6 +224,16 @@ fun ItemListScreen(
                 }
             }
         }
+    }
+
+    if (state.isFilterSheetOpen) {
+        ItemFilterSheet(
+            availableTags = state.availableTags,
+            selectedTags = state.selectedTags,
+            onTagToggled = { onEvent(ItemListEvent.TagToggled(it)) },
+            onClearFilters = { onEvent(ItemListEvent.FiltersCleared) },
+            onDismiss = { onEvent(ItemListEvent.FilterSheetDismissed) },
+        )
     }
 }
 

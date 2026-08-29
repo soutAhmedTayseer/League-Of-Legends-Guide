@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom7t.lolguide.domain.ladder.usecase.GetChallengerLadderUseCase
 import com.venom7t.lolguide.domain.onboarding.model.Region
+import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
+import com.venom7t.lolguide.domain.summoner.usecase.GetSummonerByPuuidUseCase
 import com.venom7t.lolguide.presentation.common.toUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -18,6 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LadderViewModel @Inject constructor(
     private val getChallengerLadder: GetChallengerLadderUseCase,
+    private val getSummonerByPuuid: GetSummonerByPuuidUseCase,
+    private val resolvePatch: ResolvePatchUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(LadderState())
@@ -50,12 +54,52 @@ class LadderViewModel @Inject constructor(
 
     private fun load() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
-            getChallengerLadder(_state.value.region)
-                .onSuccess { entries -> _state.update { it.copy(isLoading = false, entries = entries) } }
+            val alreadyShowing = _state.value.entries.isNotEmpty()
+            _state.update {
+                it.copy(
+                    isLoading = !alreadyShowing,
+                    isRefreshing = alreadyShowing,
+                    resolvedProfiles = emptyMap(),
+                    error = null,
+                )
+            }
+
+            val region = _state.value.region
+            resolvePatch().onSuccess { patch -> _state.update { it.copy(patchVersion = patch.version) } }
+
+            getChallengerLadder(region)
+                .onSuccess { entries ->
+                    _state.update { it.copy(isLoading = false, isRefreshing = false, entries = entries) }
+                    resolveTopEntries(entries, region)
+                }
                 .onFailure { throwable ->
-                    _state.update { it.copy(isLoading = false, error = throwable.toUiText()) }
+                    _state.update {
+                        it.copy(isLoading = false, isRefreshing = false, error = throwable.toUiText())
+                    }
                 }
         }
+    }
+
+    /**
+     * LEAGUE-V4's ladder payload never carries a name or icon (Riot dropped
+     * that for privacy) -- only [RESOLVE_COUNT] rows are worth spending a
+     * puuid lookup on. The ladder can run to a few hundred entries; resolving
+     * all of them would be a few hundred extra keyed requests just to open
+     * this screen, which risks the dev key's rate limit far more than it's
+     * worth. The rest keep the "#N —" placeholder, a real degraded state
+     * rather than a bug (AGENTS.md §8.2).
+     */
+    private fun resolveTopEntries(entries: List<com.venom7t.lolguide.domain.ladder.model.LadderEntry>, region: Region) {
+        entries.take(RESOLVE_COUNT).forEach { entry ->
+            viewModelScope.launch {
+                getSummonerByPuuid(entry.puuid, region).onSuccess { resolved ->
+                    _state.update { it.copy(resolvedProfiles = it.resolvedProfiles + (entry.puuid to resolved)) }
+                }
+            }
+        }
+    }
+
+    private companion object {
+        const val RESOLVE_COUNT = 25
     }
 }

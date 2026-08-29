@@ -24,8 +24,10 @@ import com.venom7t.lolguide.data.onboarding.repository.OnboardingRepositoryImpl
 import com.venom7t.lolguide.data.patch.repository.PreviousPatchSnapshotRepositoryImpl
 import com.venom7t.lolguide.data.rotation.repository.RotationRepositoryImpl
 import com.venom7t.lolguide.data.rune.repository.RuneRepositoryImpl
+import com.venom7t.lolguide.data.settings.repository.SettingsRepositoryImpl
 import com.venom7t.lolguide.data.spell.repository.SummonerSpellRepositoryImpl
 import com.venom7t.lolguide.data.status.repository.ServerStatusRepositoryImpl
+import com.venom7t.lolguide.data.summoner.repository.RecentSearchRepositoryImpl
 import com.venom7t.lolguide.data.summoner.repository.SummonerRepositoryImpl
 import com.venom7t.lolguide.data.voiceline.repository.VoiceLineRepositoryImpl
 import com.venom7t.lolguide.data.common.di.ApplicationScope
@@ -51,8 +53,10 @@ import com.venom7t.lolguide.domain.onboarding.repository.OnboardingRepository
 import com.venom7t.lolguide.domain.patch.repository.PreviousPatchSnapshotRepository
 import com.venom7t.lolguide.domain.rotation.repository.RotationRepository
 import com.venom7t.lolguide.domain.rune.repository.RuneRepository
+import com.venom7t.lolguide.domain.settings.repository.SettingsRepository
 import com.venom7t.lolguide.domain.spell.repository.SummonerSpellRepository
 import com.venom7t.lolguide.domain.status.repository.ServerStatusRepository
+import com.venom7t.lolguide.domain.summoner.repository.RecentSearchRepository
 import com.venom7t.lolguide.domain.summoner.repository.SummonerRepository
 import com.venom7t.lolguide.domain.voiceline.repository.VoiceLineRepository
 import com.venom7t.lolguide.domain.patch.repository.PatchRepository
@@ -116,11 +120,19 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
+    abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
+    @Binds
+    @Singleton
     abstract fun bindVoiceLineRepository(impl: VoiceLineRepositoryImpl): VoiceLineRepository
 
     @Binds
     @Singleton
     abstract fun bindSummonerRepository(impl: SummonerRepositoryImpl): SummonerRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindRecentSearchRepository(impl: RecentSearchRepositoryImpl): RecentSearchRepository
 
     @Binds
     @Singleton

@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.venom7t.lolguide" />
+                  <option name="mobileSdkAppId" value="1:404574107891:android:a8af870e1965aaa4c21f86" />
+                  <option name="projectId" value="lol-guide-c5ce3" />
+                  <option name="projectNumber" value="404574107891" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

@@ -11,10 +11,13 @@ import kotlin.math.absoluteValue
  *
  * The pool is the cached champion list, and each [GameMode] hashes
  * separately so the three modes do not all land on the same champion.
- * [epochDay] is computed from wall-clock time plus the device's UTC offset
- * rather than `java.time.LocalDate`, since `minSdk` is 24 and `java.time`
- * needs API 26+ or desugaring -- not worth adding for one date calculation
- * (Phase 6 plan).
+ * [epochDay] resets at UTC midnight for every player everywhere, the same
+ * way LoLdle-style dailies do -- a local-timezone reset would mean two
+ * players see different puzzles at the same instant depending on where they
+ * live, and would even change what day the *same* player is on when they
+ * travel. `System.currentTimeMillis() / MILLIS_PER_DAY` is already a UTC day
+ * count (the Unix epoch is UTC), so this needs no `java.time` (which would
+ * need API 26+ or desugaring -- not worth adding for one date calculation).
  *
  * **Known consequence**, documented in the plan: the pool changes size when
  * Riot ships a champion, which shifts the modulo and can change what a past
@@ -33,9 +36,13 @@ class PickDailyChampionUseCase @Inject constructor() {
         return sorted[index]
     }
 
-    fun currentEpochDay(): Long {
-        val offsetMillis = java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis())
-        return (System.currentTimeMillis() + offsetMillis) / MILLIS_PER_DAY
+    fun currentEpochDay(): Long = System.currentTimeMillis() / MILLIS_PER_DAY
+
+    /** Milliseconds until the next UTC-midnight reset, for a countdown display. */
+    fun millisUntilNextReset(): Long {
+        val now = System.currentTimeMillis()
+        val nextResetMillis = (currentEpochDay() + 1) * MILLIS_PER_DAY
+        return nextResetMillis - now
     }
 
     /** A simple, deterministic string+long hash -- not cryptographic, just stable across runs. */

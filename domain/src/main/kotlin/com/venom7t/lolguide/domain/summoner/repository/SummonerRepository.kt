@@ -14,5 +14,12 @@ interface SummonerRepository {
      */
     suspend fun searchByRiotId(name: String, tagline: String, region: Region): Result<Summoner>
 
+    /**
+     * The reverse of [searchByRiotId] -- resolves a full [Summoner] from a
+     * puuid alone, for payloads (match/ladder/spectator) that only carry a
+     * puuid and never a Riot id.
+     */
+    suspend fun getByPuuid(puuid: String, region: Region): Result<Summoner>
+
     suspend fun getRankedEntries(summoner: Summoner): Result<List<RankedEntry>>
 }

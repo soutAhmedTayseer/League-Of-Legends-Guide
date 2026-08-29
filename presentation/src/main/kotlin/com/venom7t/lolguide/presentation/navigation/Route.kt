@@ -96,6 +96,10 @@ data object FollowedSummonersRoute
 @Serializable
 data object AccountRoute
 
+/** In-app browser to the Riot developer portal, for getting a new API key. */
+@Serializable
+data object RiotDeveloperPortalRoute
+
 /** The mandatory sign-in gate a fresh install lands on before anything else. */
 @Serializable
 data object SignInGateRoute

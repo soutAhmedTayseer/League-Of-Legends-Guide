@@ -7,6 +7,7 @@ import com.venom7t.lolguide.domain.game.model.GuessResult
 import com.venom7t.lolguide.domain.game.model.RoundOutcome
 import com.venom7t.lolguide.domain.game.model.RoundProgress
 import com.venom7t.lolguide.domain.game.repository.GameProgressRepository
+import com.venom7t.lolguide.domain.sync.repository.SyncRepository
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -39,6 +40,7 @@ class StartOrResumeRoundUseCase @Inject constructor(
 class SubmitGuessUseCase @Inject constructor(
     private val repository: GameProgressRepository,
     private val evaluateGuess: EvaluateGuessUseCase,
+    private val syncRepository: SyncRepository,
 ) {
     suspend operator fun invoke(
         round: RoundProgress,
@@ -55,7 +57,11 @@ class SubmitGuessUseCase @Inject constructor(
 
         if (updated.isFinished) {
             val stats = repository.observeStats(round.mode).first()
-            repository.saveStats(stats.applyResult(round.epochDay, won = outcome == RoundOutcome.WON))
+                .applyResult(round.epochDay, won = outcome == RoundOutcome.WON)
+            repository.saveStats(stats)
+            // Best-effort: losing this to being offline is fine, the local
+            // record (the source of truth for this device) is already saved.
+            syncRepository.pushGameStats(round.mode, stats)
         }
 
         return updated to result
@@ -69,13 +75,15 @@ class SubmitGuessUseCase @Inject constructor(
  */
 class GiveUpRoundUseCase @Inject constructor(
     private val repository: GameProgressRepository,
+    private val syncRepository: SyncRepository,
 ) {
     suspend operator fun invoke(round: RoundProgress): RoundProgress {
         val updated = round.copy(outcome = RoundOutcome.GAVE_UP)
         repository.saveRound(updated)
 
-        val stats = repository.observeStats(round.mode).first()
-        repository.saveStats(stats.applyResult(round.epochDay, won = false))
+        val stats = repository.observeStats(round.mode).first().applyResult(round.epochDay, won = false)
+        repository.saveStats(stats)
+        syncRepository.pushGameStats(round.mode, stats)
 
         return updated
     }

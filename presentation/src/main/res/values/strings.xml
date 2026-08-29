@@ -75,6 +75,7 @@
     <string name="filter_section_difficulty">Difficulty</string>
     <string name="filter_section_damage">Damage type</string>
     <string name="filter_favourites_only">Favourites only</string>
+    <string name="items_filter_section_tags">Tags</string>
 
     <string name="role_assassin">Assassin</string>
     <string name="role_fighter">Fighter</string>
@@ -229,6 +230,9 @@
     <string name="timers_pick_spell">Which spell did they use?</string>
     <string name="timers_clear_spell_title">Clear this timer?</string>
     <string name="timers_clear_spell_body">This stops tracking the spell\'s cooldown for this slot.</string>
+    <string name="timers_reset_all">Reset all</string>
+    <string name="timers_reset_all_confirm_title">Reset all timers?</string>
+    <string name="timers_reset_all_confirm_body">This clears every running objective and enemy spell timer. This cannot be undone.</string>
     <string name="lane_top">Top</string>
     <string name="lane_jungle">Jungle</string>
     <string name="lane_mid">Mid</string>
@@ -252,6 +256,7 @@
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_continue">Continue</string>
     <string name="onboarding_finish">Done</string>
+    <string name="onboarding_back">Back</string>
     <string name="role_top">Top</string>
     <string name="role_jungle">Jungle</string>
     <string name="role_mid">Mid</string>
@@ -363,6 +368,7 @@
     <string name="game_hub_streak">Streak %1$d</string>
     <string name="game_hub_best_streak">Best %1$d</string>
     <string name="game_hub_win_rate">%1$d%% wins</string>
+    <string name="game_hub_resets_label">Today\'s puzzles reset in (UTC)</string>
     <string name="game_mode_classic">Classic</string>
     <string name="game_mode_classic_description">Guess the champion. Every guess scores five attributes against the answer.</string>
     <string name="game_mode_ability">Ability</string>
@@ -377,6 +383,9 @@
     <string name="game_round_give_up">Give up</string>
     <string name="game_round_give_up_confirm_title">Give up this round?</string>
     <string name="game_round_give_up_confirm_body">This reveals the answer and counts as a loss for today\'s streak. This cannot be undone.</string>
+    <string name="game_round_leave_confirm_title">Leave this round?</string>
+    <string name="game_round_leave_confirm_body">Your guesses are saved -- you can pick up right where you left off.</string>
+    <string name="action_leave">Leave</string>
     <string name="game_round_column_champion">Champion</string>
     <string name="game_round_column_role">Role</string>
     <string name="game_round_column_resource">Resource</string>
@@ -403,5 +412,26 @@
     <string name="account_sign_in_benefit">Sign in to keep your favourites and followed summoners if you switch phones.</string>
     <string name="sign_in_gate_title">Sign in to continue</string>
     <string name="sign_in_gate_body">A Google sign-in keeps your favourites and followed summoners safe -- without it, uninstalling the app loses them for good.</string>
+    <string name="account_sign_out_confirm_title">Sign out?</string>
+    <string name="account_sign_out_confirm_body">You\'ll need to sign in again to sync your favourites and followed summoners.</string>
+    <string name="settings_appearance_title">Appearance</string>
+    <string name="settings_theme_label">Theme</string>
+    <string name="settings_theme_system">System</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_language_label">Language</string>
+    <string name="settings_language_system">System</string>
+    <string name="api_key_portal_title">Riot developer portal</string>
+    <string name="settings_api_key_title">Riot API key</string>
+    <string name="settings_api_key_body">The app\'s built-in key expires every 24 hours. If features stop loading, get a new development key and paste it here.</string>
+    <string name="settings_api_key_hint">Paste your API key</string>
+    <string name="settings_api_key_get_new">Get a new key</string>
+    <string name="settings_api_key_save">Save key</string>
+    <string name="settings_api_key_clear">Use the app\'s key instead</string>
+    <string name="settings_api_key_active">Using your own key</string>
+    <string name="settings_api_key_saved">API key saved</string>
+    <string name="settings_summoner_setup_title">Summoner setup</string>
+    <string name="settings_region_label">Region</string>
+    <string name="settings_role_label">Main role</string>
 
 </resources>

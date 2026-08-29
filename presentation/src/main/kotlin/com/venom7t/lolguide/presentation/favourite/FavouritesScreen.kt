@@ -20,9 +20,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.presentation.R
+import com.venom7t.lolguide.presentation.common.components.ChampionListSkeleton
 import com.venom7t.lolguide.presentation.common.components.ChampionRow
 import com.venom7t.lolguide.presentation.common.components.EmptyContent
-import com.venom7t.lolguide.presentation.common.components.LoadingContent
+import com.venom7t.lolguide.presentation.common.components.rememberMinimumVisibleLoading
 import com.venom7t.lolguide.presentation.common.uiText
 import com.venom7t.lolguide.presentation.theme.AppTheme
 
@@ -75,8 +76,9 @@ fun FavouritesScreen(
         },
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            val showSkeleton = rememberMinimumVisibleLoading(state.isLoading)
             when {
-                state.isLoading -> LoadingContent()
+                showSkeleton -> ChampionListSkeleton()
 
                 state.champions.isEmpty() -> EmptyContent(
                     message = uiText(R.string.favourites_empty),

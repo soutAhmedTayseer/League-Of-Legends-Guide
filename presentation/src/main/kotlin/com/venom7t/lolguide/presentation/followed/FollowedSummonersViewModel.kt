@@ -2,8 +2,11 @@ package com.venom7t.lolguide.presentation.followed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.venom7t.lolguide.domain.followed.model.FollowedSummoner
 import com.venom7t.lolguide.domain.followed.repository.FollowedSummonerRepository
 import com.venom7t.lolguide.domain.followed.usecase.ObserveFollowedSummonersUseCase
+import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
+import com.venom7t.lolguide.domain.summoner.usecase.SearchSummonerUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +23,8 @@ import javax.inject.Inject
 class FollowedSummonersViewModel @Inject constructor(
     private val observeFollowedSummoners: ObserveFollowedSummonersUseCase,
     private val followedRepository: FollowedSummonerRepository,
+    private val searchSummoner: SearchSummonerUseCase,
+    private val resolvePatch: ResolvePatchUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(FollowedSummonersState())
@@ -57,8 +62,39 @@ class FollowedSummonersViewModel @Inject constructor(
     private fun start() {
         if (hasStarted) return
         hasStarted = true
+
+        viewModelScope.launch {
+            resolvePatch().onSuccess { patch -> _state.update { it.copy(patchVersion = patch.version) } }
+        }
+
         observeFollowedSummoners()
-            .onEach { followed -> _state.update { it.copy(followed = followed) } }
+            .onEach { followed ->
+                _state.update { it.copy(isLoading = false, followed = followed) }
+                resolveProfiles(followed)
+            }
             .launchIn(viewModelScope)
+    }
+
+    /**
+     * A followed record only stores the Riot id, not a profile icon or level
+     * (Phase 4 decision: local-only, no per-row fetch by default) -- this is
+     * the one place that's worth the extra call anyway, since the list a
+     * player actually follows is small (a handful of summoners), unlike the
+     * few-hundred-row Challenger ladder where the same idea would not scale.
+     * A row whose lookup fails just keeps showing the fallback avatar
+     * (AGENTS.md §8.2) -- it never blocks or errors the rest of the list.
+     */
+    private fun resolveProfiles(followed: List<FollowedSummoner>) {
+        followed.forEach { summoner ->
+            if (_state.value.resolvedProfiles.containsKey(summoner.puuid)) return@forEach
+            viewModelScope.launch {
+                searchSummoner("${summoner.riotIdName}#${summoner.riotIdTagline}", summoner.region)
+                    .onSuccess { resolved ->
+                        _state.update {
+                            it.copy(resolvedProfiles = it.resolvedProfiles + (summoner.puuid to resolved))
+                        }
+                    }
+            }
+        }
     }
 }

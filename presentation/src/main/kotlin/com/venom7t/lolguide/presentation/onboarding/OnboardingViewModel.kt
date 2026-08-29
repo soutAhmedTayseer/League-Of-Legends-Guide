@@ -27,6 +27,7 @@ data class OnboardingState(
 
 sealed interface OnboardingEvent {
     data object ContinueClicked : OnboardingEvent
+    data object BackClicked : OnboardingEvent
     data object SkipClicked : OnboardingEvent
     data class RegionPicked(val region: Region) : OnboardingEvent
     data class RolePicked(val role: PrimaryRole) : OnboardingEvent
@@ -57,12 +58,13 @@ class OnboardingViewModel @Inject constructor(
         when (event) {
             OnboardingEvent.ContinueClicked -> advance()
 
+            OnboardingEvent.BackClicked -> goBack()
+
             OnboardingEvent.SkipClicked -> finish()
 
             is OnboardingEvent.RegionPicked -> {
                 _state.update { it.copy(selectedRegion = event.region) }
                 viewModelScope.launch { onboardingRepository.setRegion(event.region) }
-                advance()
             }
 
             is OnboardingEvent.RolePicked -> {
@@ -84,6 +86,17 @@ class OnboardingViewModel @Inject constructor(
             finish()
         } else {
             _state.update { it.copy(step = next) }
+        }
+    }
+
+    private fun goBack() {
+        val previous = when (_state.value.step) {
+            OnboardingStep.WELCOME -> null
+            OnboardingStep.REGION -> OnboardingStep.WELCOME
+            OnboardingStep.ROLE -> OnboardingStep.REGION
+        }
+        if (previous != null) {
+            _state.update { it.copy(step = previous) }
         }
     }
 

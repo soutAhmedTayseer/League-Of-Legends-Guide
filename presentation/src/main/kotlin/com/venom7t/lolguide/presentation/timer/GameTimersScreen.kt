@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,6 +50,7 @@ import com.venom7t.lolguide.domain.timer.model.SpellTimer
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.DataDragonUrls
 import com.venom7t.lolguide.presentation.common.components.EmptyContent
+import com.venom7t.lolguide.presentation.common.components.HextechConfirmDialog
 import com.venom7t.lolguide.presentation.common.components.HextechFrame
 import com.venom7t.lolguide.presentation.common.components.SectionRule
 import com.venom7t.lolguide.presentation.common.uiText
@@ -100,6 +100,15 @@ fun GameTimersScreen(
                         style = AppTheme.typography.titleLarge,
                         color = AppTheme.colors.textPrimary,
                     )
+                },
+                actions = {
+                    TextButton(onClick = { onEvent(GameTimersEvent.ResetAllClicked) }) {
+                        Text(
+                            text = stringResource(R.string.timers_reset_all),
+                            style = AppTheme.typography.label,
+                            color = AppTheme.colors.error,
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = AppTheme.colors.background),
             )
@@ -165,41 +174,22 @@ fun GameTimersScreen(
     }
 
     if (state.pendingCancelTarget != null) {
-        AlertDialog(
-            onDismissRequest = { onEvent(GameTimersEvent.SpellCancelDismissed) },
-            containerColor = AppTheme.colors.surface,
-            title = {
-                Text(
-                    text = stringResource(R.string.timers_clear_spell_title),
-                    style = AppTheme.typography.titleMedium,
-                    color = AppTheme.colors.textPrimary,
-                )
-            },
-            text = {
-                Text(
-                    text = stringResource(R.string.timers_clear_spell_body),
-                    style = AppTheme.typography.bodyMedium,
-                    color = AppTheme.colors.textSecondary,
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = { onEvent(GameTimersEvent.SpellCancelConfirmed) }) {
-                    Text(
-                        text = stringResource(R.string.action_remove),
-                        style = AppTheme.typography.label,
-                        color = AppTheme.colors.error,
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { onEvent(GameTimersEvent.SpellCancelDismissed) }) {
-                    Text(
-                        text = stringResource(R.string.action_cancel),
-                        style = AppTheme.typography.label,
-                        color = AppTheme.colors.textSecondary,
-                    )
-                }
-            },
+        HextechConfirmDialog(
+            title = stringResource(R.string.timers_clear_spell_title),
+            body = stringResource(R.string.timers_clear_spell_body),
+            confirmLabel = stringResource(R.string.action_remove),
+            onConfirm = { onEvent(GameTimersEvent.SpellCancelConfirmed) },
+            onDismiss = { onEvent(GameTimersEvent.SpellCancelDismissed) },
+        )
+    }
+
+    if (state.pendingResetAll) {
+        HextechConfirmDialog(
+            title = stringResource(R.string.timers_reset_all_confirm_title),
+            body = stringResource(R.string.timers_reset_all_confirm_body),
+            confirmLabel = stringResource(R.string.timers_reset_all),
+            onConfirm = { onEvent(GameTimersEvent.ResetAllConfirmed) },
+            onDismiss = { onEvent(GameTimersEvent.ResetAllCancelled) },
         )
     }
 }

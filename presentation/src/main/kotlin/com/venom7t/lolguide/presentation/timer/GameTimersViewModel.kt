@@ -43,6 +43,8 @@ data class GameTimersState(
     val pickingTarget: SpellSlotTarget? = null,
     /** Gates the confirmation dialog for clearing a running spell timer (AGENTS.md §13). */
     val pendingCancelTarget: SpellSlotTarget? = null,
+    /** Gates the confirmation dialog for the "Reset all" action (AGENTS.md §13). */
+    val pendingResetAll: Boolean = false,
 )
 
 sealed interface GameTimersEvent {
@@ -53,6 +55,9 @@ sealed interface GameTimersEvent {
     data class SpellPicked(val spell: SummonerSpell) : GameTimersEvent
     data object SpellCancelConfirmed : GameTimersEvent
     data object SpellCancelDismissed : GameTimersEvent
+    data object ResetAllClicked : GameTimersEvent
+    data object ResetAllConfirmed : GameTimersEvent
+    data object ResetAllCancelled : GameTimersEvent
 }
 
 /**
@@ -67,9 +72,12 @@ class GameTimersViewModel @Inject constructor(
     private val spellRepository: SummonerSpellRepository,
     private val resolvePatch: ResolvePatchUseCase,
     private val locale: AppLocale,
+    private val sessionStore: GameTimersSessionStore,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(GameTimersState())
+    private val _state = MutableStateFlow(
+        GameTimersState(running = sessionStore.running, laneSlots = sessionStore.laneSlots),
+    )
     val state: StateFlow<GameTimersState> = _state.asStateFlow()
 
     private var nextId = 0L
@@ -79,7 +87,7 @@ class GameTimersViewModel @Inject constructor(
             while (isActive) {
                 delay(TICK_MILLIS)
                 val now = System.currentTimeMillis()
-                _state.update { current ->
+                updateState { current ->
                     current.copy(
                         nowEpochMillis = now,
                         // Expired timers drop off on their own tick rather
@@ -93,6 +101,13 @@ class GameTimersViewModel @Inject constructor(
             }
         }
         loadSpells()
+    }
+
+    /** Mutates [_state], then mirrors the persistent bits into [sessionStore]. */
+    private inline fun updateState(transform: (GameTimersState) -> GameTimersState) {
+        _state.update(transform)
+        sessionStore.running = _state.value.running
+        sessionStore.laneSlots = _state.value.laneSlots
     }
 
     private fun loadSpells() {
@@ -113,7 +128,7 @@ class GameTimersViewModel @Inject constructor(
 
     fun onEvent(event: GameTimersEvent) {
         when (event) {
-            is GameTimersEvent.PresetStarted -> _state.update { current ->
+            is GameTimersEvent.PresetStarted -> updateState { current ->
                 val timer = GameTimer(
                     id = nextId++,
                     preset = event.preset,
@@ -122,7 +137,7 @@ class GameTimersViewModel @Inject constructor(
                 current.copy(running = (current.running + timer).toImmutableList())
             }
 
-            is GameTimersEvent.TimerCancelled -> _state.update { current ->
+            is GameTimersEvent.TimerCancelled -> updateState { current ->
                 current.copy(
                     running = current.running.filterNot { it.id == event.timerId }.toImmutableList(),
                 )
@@ -133,6 +148,9 @@ class GameTimersViewModel @Inject constructor(
             is GameTimersEvent.SpellPicked -> onSpellPicked(event.spell)
             GameTimersEvent.SpellCancelConfirmed -> onCancelConfirmed()
             GameTimersEvent.SpellCancelDismissed -> _state.update { it.copy(pendingCancelTarget = null) }
+            GameTimersEvent.ResetAllClicked -> _state.update { it.copy(pendingResetAll = true) }
+            GameTimersEvent.ResetAllCancelled -> _state.update { it.copy(pendingResetAll = false) }
+            GameTimersEvent.ResetAllConfirmed -> onResetAllConfirmed()
         }
     }
 
@@ -156,7 +174,7 @@ class GameTimersViewModel @Inject constructor(
             startedAtEpochMillis = System.currentTimeMillis(),
             durationSeconds = spell.cooldownSeconds.toInt(),
         )
-        _state.update { current ->
+        updateState { current ->
             current.copy(
                 pickingTarget = null,
                 laneSlots = current.laneSlots.withSlot(target, timer),
@@ -166,10 +184,21 @@ class GameTimersViewModel @Inject constructor(
 
     private fun onCancelConfirmed() {
         val target = _state.value.pendingCancelTarget ?: return
-        _state.update { current ->
+        updateState { current ->
             current.copy(
                 pendingCancelTarget = null,
                 laneSlots = current.laneSlots.withSlot(target, null),
+            )
+        }
+    }
+
+    private fun onResetAllConfirmed() {
+        sessionStore.resetAll()
+        updateState {
+            it.copy(
+                pendingResetAll = false,
+                running = sessionStore.running,
+                laneSlots = sessionStore.laneSlots,
             )
         }
     }

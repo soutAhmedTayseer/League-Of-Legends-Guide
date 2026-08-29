@@ -75,6 +75,7 @@
     <string name="filter_section_difficulty">الصعوبة</string>
     <string name="filter_section_damage">نوع الضرر</string>
     <string name="filter_favourites_only">المفضلة فقط</string>
+    <string name="items_filter_section_tags">الوسوم</string>
 
     <string name="role_assassin">قاتل</string>
     <string name="role_fighter">مقاتل</string>
@@ -229,6 +230,9 @@
     <string name="timers_pick_spell">ما التعويذة التي استخدمها؟</string>
     <string name="timers_clear_spell_title">مسح هذا المؤقت؟</string>
     <string name="timers_clear_spell_body">سيتوقف تتبع زمن انتظار التعويذة لهذه الخانة.</string>
+    <string name="timers_reset_all">إعادة تعيين الكل</string>
+    <string name="timers_reset_all_confirm_title">إعادة تعيين كل المؤقتات؟</string>
+    <string name="timers_reset_all_confirm_body">سيؤدي هذا إلى مسح كل مؤقتات الأهداف وتعويذات الخصم الجارية. لا يمكن التراجع عن هذا.</string>
     <string name="lane_top">أعلى</string>
     <string name="lane_jungle">الأدغال</string>
     <string name="lane_mid">الوسط</string>
@@ -252,6 +256,7 @@
     <string name="onboarding_skip">تخطي</string>
     <string name="onboarding_continue">متابعة</string>
     <string name="onboarding_finish">تم</string>
+    <string name="onboarding_back">رجوع</string>
     <string name="role_top">أعلى</string>
     <string name="role_jungle">الغابة</string>
     <string name="role_mid">الوسط</string>
@@ -363,6 +368,7 @@
     <string name="game_hub_streak">سلسلة %1$d</string>
     <string name="game_hub_best_streak">الأفضل %1$d</string>
     <string name="game_hub_win_rate">%1$d%% فوز</string>
+    <string name="game_hub_resets_label">تُعاد ألغاز اليوم بعد (بتوقيت UTC)</string>
     <string name="game_mode_classic">كلاسيكي</string>
     <string name="game_mode_classic_description">خمّن البطل. كل تخمين يقارن خمس خصائص مع الإجابة.</string>
     <string name="game_mode_ability">مهارة</string>
@@ -377,6 +383,9 @@
     <string name="game_round_give_up">استسلام</string>
     <string name="game_round_give_up_confirm_title">الاستسلام عن هذه الجولة؟</string>
     <string name="game_round_give_up_confirm_body">سيكشف هذا الإجابة ويُحتسب كخسارة لسلسلة اليوم. لا يمكن التراجع عن هذا.</string>
+    <string name="game_round_leave_confirm_title">مغادرة هذه الجولة؟</string>
+    <string name="game_round_leave_confirm_body">تخميناتك محفوظة -- يمكنك المتابعة من حيث توقفت.</string>
+    <string name="action_leave">مغادرة</string>
     <string name="game_round_column_champion">البطل</string>
     <string name="game_round_column_role">الدور</string>
     <string name="game_round_column_resource">المورد</string>
@@ -400,5 +409,26 @@
     <string name="account_sign_in_benefit">سجّل الدخول للاحتفاظ بمفضلتك واللاعبين المتابَعين عند تغيير هاتفك.</string>
     <string name="sign_in_gate_title">سجّل الدخول للمتابعة</string>
     <string name="sign_in_gate_body">يحافظ تسجيل الدخول عبر Google على مفضلتك واللاعبين المتابَعين -- بدونه، سيؤدي حذف التطبيق إلى فقدانهم نهائيًا.</string>
+    <string name="account_sign_out_confirm_title">تسجيل الخروج؟</string>
+    <string name="account_sign_out_confirm_body">ستحتاج إلى تسجيل الدخول مرة أخرى لمزامنة مفضلتك واللاعبين المتابَعين.</string>
+    <string name="settings_appearance_title">المظهر</string>
+    <string name="settings_theme_label">السمة</string>
+    <string name="settings_theme_system">النظام</string>
+    <string name="settings_theme_light">فاتح</string>
+    <string name="settings_theme_dark">داكن</string>
+    <string name="settings_language_label">اللغة</string>
+    <string name="settings_language_system">النظام</string>
+    <string name="api_key_portal_title">بوابة مطوري Riot</string>
+    <string name="settings_api_key_title">مفتاح Riot API</string>
+    <string name="settings_api_key_body">مفتاح التطبيق المدمج تنتهي صلاحيته كل 24 ساعة. إذا توقفت الميزات عن التحميل، احصل على مفتاح تطوير جديد والصقه هنا.</string>
+    <string name="settings_api_key_hint">الصق مفتاح API الخاص بك</string>
+    <string name="settings_api_key_get_new">الحصول على مفتاح جديد</string>
+    <string name="settings_api_key_save">حفظ المفتاح</string>
+    <string name="settings_api_key_clear">استخدام مفتاح التطبيق بدلاً من ذلك</string>
+    <string name="settings_api_key_active">تستخدم مفتاحك الخاص</string>
+    <string name="settings_api_key_saved">تم حفظ مفتاح API</string>
+    <string name="settings_summoner_setup_title">إعداد اللاعب</string>
+    <string name="settings_region_label">المنطقة</string>
+    <string name="settings_role_label">الدور الرئيسي</string>
 
 </resources>

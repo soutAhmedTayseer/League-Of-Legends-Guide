@@ -11,6 +11,7 @@ import com.venom7t.lolguide.domain.champion.usecase.SearchChampionsUseCase
 import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.game.model.GameMode
 import com.venom7t.lolguide.domain.game.model.RoundProgress
+import com.venom7t.lolguide.domain.game.usecase.EvaluateGuessUseCase
 import com.venom7t.lolguide.domain.game.usecase.GiveUpRoundUseCase
 import com.venom7t.lolguide.domain.game.usecase.ObserveGameStatsUseCase
 import com.venom7t.lolguide.domain.game.usecase.StartOrResumeRoundUseCase
@@ -39,6 +40,7 @@ class GameRoundViewModel @Inject constructor(
     private val startOrResumeRound: StartOrResumeRoundUseCase,
     private val submitGuess: SubmitGuessUseCase,
     private val giveUpRound: GiveUpRoundUseCase,
+    private val evaluateGuess: EvaluateGuessUseCase,
     private val observeGameStats: ObserveGameStatsUseCase,
     private val getChampionDetail: GetChampionDetailUseCase,
     private val resolvePatch: ResolvePatchUseCase,
@@ -62,14 +64,32 @@ class GameRoundViewModel @Inject constructor(
             GameRoundEvent.ScreenOpened -> start()
             is GameRoundEvent.QueryChanged -> onQueryChanged(event.query)
             is GameRoundEvent.SuggestionSelected -> onGuess(event.champion)
-            GameRoundEvent.BackClicked -> viewModelScope.launch {
+            GameRoundEvent.BackClicked -> onBackClicked()
+            GameRoundEvent.BackConfirmed -> viewModelScope.launch {
+                _state.update { it.copy(pendingBack = false) }
                 _effects.send(GameRoundEffect.NavigateBack)
             }
+            GameRoundEvent.BackCancelled -> _state.update { it.copy(pendingBack = false) }
             GameRoundEvent.PlayAgainDismissed -> Unit
 
             GameRoundEvent.GiveUpClicked -> _state.update { it.copy(pendingGiveUp = true) }
             GameRoundEvent.GiveUpCancelled -> _state.update { it.copy(pendingGiveUp = false) }
             GameRoundEvent.GiveUpConfirmed -> onGiveUp()
+        }
+    }
+
+    /**
+     * Progress is saved regardless (the round persists), so this confirm is
+     * about not losing your place by accident mid-guess, not about losing
+     * data -- it only fires once there is actually something to walk away
+     * from.
+     */
+    private fun onBackClicked() {
+        val currentRound = round
+        if (currentRound == null || currentRound.isFinished || currentRound.guessedIds.isEmpty()) {
+            viewModelScope.launch { _effects.send(GameRoundEffect.NavigateBack) }
+        } else {
+            _state.update { it.copy(pendingBack = true) }
         }
     }
 
@@ -117,6 +137,19 @@ class GameRoundViewModel @Inject constructor(
             round = startedRound
             answer = champions.firstOrNull { it.id == startedRound.answerChampionId }
 
+            // Reconstruct the clue grid for a resumed round -- only the
+            // champion ids survive persistence, not their scored clues, so
+            // re-scoring them here is how "I closed the app mid-round" comes
+            // back looking the same as "I never left".
+            val resumedGuesses = if (startedRound.guessedIds.isNotEmpty() && answer != null) {
+                startedRound.guessedIds.mapNotNull { id ->
+                    val guessChampion = champions.firstOrNull { it.id == id } ?: return@mapNotNull null
+                    evaluateGuess(guessChampion, answer!!)
+                }
+            } else {
+                emptyList()
+            }
+
             var abilityIcon: String? = null
             if (mode == GameMode.ABILITY) {
                 val championAnswer = answer
@@ -140,6 +173,7 @@ class GameRoundViewModel @Inject constructor(
                     patchVersion = patch,
                     answerChampionId = startedRound.answerChampionId,
                     outcome = startedRound.outcome,
+                    guesses = resumedGuesses,
                     abilityIconFileName = abilityIcon,
                     revealedAnswerName = if (startedRound.isFinished) answer?.name else null,
                 )

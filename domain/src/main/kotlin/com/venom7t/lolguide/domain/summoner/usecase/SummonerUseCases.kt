@@ -25,6 +25,13 @@ class SearchSummonerUseCase @Inject constructor(
     }
 }
 
+class GetSummonerByPuuidUseCase @Inject constructor(
+    private val repository: SummonerRepository,
+) {
+    suspend operator fun invoke(puuid: String, region: Region): Result<Summoner> =
+        repository.getByPuuid(puuid, region)
+}
+
 class GetRankedEntriesUseCase @Inject constructor(
     private val repository: SummonerRepository,
 ) {

@@ -150,9 +150,10 @@ fun ChampionFilterSheet(
     }
 }
 
+/** Public so other filter sheets (e.g. item filters) share the same section chrome. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun FilterSection(
+fun FilterSection(
     title: String,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
@@ -175,9 +176,10 @@ private fun FilterSection(
     }
 }
 
+/** Public so other filter sheets (e.g. item filters) share the same chip styling. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ChipOption(
+fun ChipOption(
     label: String,
     selected: Boolean,
     onClick: () -> Unit,

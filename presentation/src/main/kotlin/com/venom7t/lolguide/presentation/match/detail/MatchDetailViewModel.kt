@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.venom7t.lolguide.domain.champion.usecase.ObserveChampionsUseCase
 import com.venom7t.lolguide.domain.match.usecase.GetMatchDetailUseCase
 import com.venom7t.lolguide.domain.onboarding.model.Region
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
@@ -14,6 +15,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,6 +26,7 @@ class MatchDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getMatchDetail: GetMatchDetailUseCase,
     private val resolvePatch: ResolvePatchUseCase,
+    private val observeChampions: ObserveChampionsUseCase,
 ) : ViewModel() {
 
     private val route = savedStateHandle.toRoute<MatchDetailRoute>()
@@ -57,9 +60,17 @@ class MatchDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
             val patch = resolvePatch().getOrNull()?.version
+            val championsByKey = observeChampions().first().associateBy { it.key }
             getMatchDetail(route.matchId, region)
                 .onSuccess { detail ->
-                    _state.update { it.copy(isLoading = false, detail = detail, patchVersion = patch) }
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            detail = detail,
+                            patchVersion = patch,
+                            championsByKey = championsByKey,
+                        )
+                    }
                 }
                 .onFailure { throwable ->
                     _state.update { it.copy(isLoading = false, error = throwable.toUiText()) }

@@ -36,6 +36,10 @@ interface RiotApi {
     @GET
     suspend fun getAccountByRiotId(@Url url: String): AccountDto
 
+    /** The reverse lookup of [getAccountByRiotId] -- puuid to Riot id, for payloads that only carry a puuid. */
+    @GET
+    suspend fun getAccountByPuuid(@Url url: String): AccountDto
+
     @GET
     suspend fun getSummonerByPuuid(@Url url: String): SummonerDto
 
@@ -90,6 +94,9 @@ object RiotApiUrls {
     fun accountByRiotId(regionalRoute: String, name: String, tagline: String): String =
         "https://$regionalRoute.api.riotgames.com/riot/account/v1/accounts/by-riot-id/" +
             "${name.encode()}/${tagline.encode()}"
+
+    fun accountByPuuid(regionalRoute: String, puuid: String): String =
+        "https://$regionalRoute.api.riotgames.com/riot/account/v1/accounts/by-puuid/$puuid"
 
     fun summonerByPuuid(platformId: String, puuid: String): String =
         "https://$platformId.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/$puuid"

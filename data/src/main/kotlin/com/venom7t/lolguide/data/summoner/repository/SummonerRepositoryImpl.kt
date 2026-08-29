@@ -49,6 +49,28 @@ class SummonerRepositoryImpl @Inject constructor(
         }.recoverCatching { throwable -> throw throwable.toAppError() }
     }
 
+    override suspend fun getByPuuid(puuid: String, region: Region): Result<Summoner> =
+        withContext(ioDispatcher) {
+            runCatchingCancellable {
+                val account = api.getAccountByPuuid(
+                    RiotApiUrls.accountByPuuid(region.regionalRoute, puuid)
+                )
+                val summoner = api.getSummonerByPuuid(
+                    RiotApiUrls.summonerByPuuid(region.platformId, puuid)
+                )
+
+                Summoner(
+                    puuid = account.puuid,
+                    summonerId = summoner.id,
+                    riotIdName = account.gameName,
+                    riotIdTagline = account.tagLine,
+                    summonerLevel = summoner.summonerLevel,
+                    profileIconId = summoner.profileIconId,
+                    region = region,
+                )
+            }.recoverCatching { throwable -> throw throwable.toAppError() }
+        }
+
     override suspend fun getRankedEntries(summoner: Summoner): Result<List<RankedEntry>> =
         withContext(ioDispatcher) {
             runCatchingCancellable {

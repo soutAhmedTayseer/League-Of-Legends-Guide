@@ -36,12 +36,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.quiz.model.QuizQuestion
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.DataDragonUrls
 import com.venom7t.lolguide.presentation.common.components.EmptyContent
+import com.venom7t.lolguide.presentation.common.components.HextechFrame
 import com.venom7t.lolguide.presentation.common.components.LoadingContent
 import com.venom7t.lolguide.presentation.common.uiText
 import com.venom7t.lolguide.presentation.theme.AppTheme
@@ -186,7 +186,7 @@ private fun QuizContent(
 @Composable
 private fun QuestionArt(question: QuizQuestion, modifier: Modifier = Modifier) {
     when (question) {
-        is QuizQuestion.AbilityIconGuess -> AsyncImage(
+        is QuizQuestion.AbilityIconGuess -> HextechFrame(
             model = DataDragonUrls.spellIcon(
                 version = question.abilityPatchVersion,
                 imageFileName = question.abilityImageFileName,
@@ -194,11 +194,10 @@ private fun QuestionArt(question: QuizQuestion, modifier: Modifier = Modifier) {
             contentDescription = null,
             modifier = modifier
                 .fillMaxWidth()
-                .aspectRatio(1f)
-                .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.large),
+                .aspectRatio(1f),
         )
 
-        is QuizQuestion.SplashCropGuess -> AsyncImage(
+        is QuizQuestion.SplashCropGuess -> HextechFrame(
             model = DataDragonUrls.championSplash(
                 championId = question.correctChampion.id,
                 skinNum = question.skinNum,
@@ -213,8 +212,7 @@ private fun QuestionArt(question: QuizQuestion, modifier: Modifier = Modifier) {
             ),
             modifier = modifier
                 .fillMaxWidth()
-                .aspectRatio(1.5f)
-                .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.large),
+                .aspectRatio(1.5f),
         )
     }
 }

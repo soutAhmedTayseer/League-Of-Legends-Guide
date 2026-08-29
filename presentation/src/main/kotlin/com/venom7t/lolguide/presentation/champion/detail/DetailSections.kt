@@ -26,13 +26,14 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateSetOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
 import com.venom7t.lolguide.domain.builds.model.SavedBuild
 import com.venom7t.lolguide.domain.champion.model.ChampionStatCalculator
 import com.venom7t.lolguide.domain.champion.model.ScaledStats
@@ -64,21 +65,27 @@ fun SkinsSection(
     val safeIndex = selectedIndex.coerceIn(0, skins.lastIndex)
     val selected = skins[safeIndex]
 
+    // Not every skin's loading art actually exists on Data Dragon's CDN. A
+    // failed id is removed from the list the strip renders -- not just its
+    // own tile made invisible -- so LazyRow never lays out a blank slot
+    // where that tile used to be; conditionally emitting nothing from
+    // inside items() left exactly that kind of gap.
+    val failedIds = remember(championId) { mutableStateSetOf<String>() }
+    val visibleSkins = skins.filterNot { it.id in failedIds }
+
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
     ) {
-        AsyncImage(
+        HextechFrame(
             model = DataDragonUrls.championSplash(championId, selected.num),
             contentDescription = stringResource(
                 R.string.skin_splash,
                 skinDisplayName(selected.name, championName),
             ),
-            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(16f / 9f)
-                .background(AppTheme.colors.surfaceElevated, AppTheme.shapes.large),
+                .aspectRatio(16f / 9f),
         )
 
         Row(
@@ -109,7 +116,7 @@ fun SkinsSection(
             horizontalArrangement = Arrangement.spacedBy(AppTheme.dimens.spaceSm),
             contentPadding = PaddingValues(vertical = AppTheme.dimens.spaceXs),
         ) {
-            items(items = skins, key = { it.id }) { skin ->
+            items(items = visibleSkins, key = { it.id }) { skin ->
                 val index = skins.indexOf(skin)
                 val isSelected = index == safeIndex
                 HextechFrame(
@@ -120,6 +127,9 @@ fun SkinsSection(
                     modifier = Modifier
                         .width(AppTheme.dimens.abilityIcon)
                         .height(AppTheme.dimens.championThumb),
+                    onState = { state ->
+                        if (state is AsyncImagePainter.State.Error) failedIds += skin.id
+                    },
                 )
             }
         }

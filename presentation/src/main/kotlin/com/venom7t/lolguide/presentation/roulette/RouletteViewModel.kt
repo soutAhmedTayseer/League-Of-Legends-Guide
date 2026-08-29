@@ -23,6 +23,13 @@ data class RouletteState(
     val isLoading: Boolean = true,
     val result: Champion? = null,
     val poolSize: Int = 0,
+    /**
+     * The frames a roll spins through before landing on [result] (which is
+     * always the last entry) -- a slot-machine cycle reads as "rolling",
+     * where jumping straight to the answer reads as nothing happening.
+     * Empty before the first roll.
+     */
+    val spinSequence: List<Champion> = emptyList(),
 )
 
 sealed interface RouletteEvent {
@@ -60,7 +67,9 @@ class RouletteViewModel @Inject constructor(
                 // Excluding the previous result means a reroll always visibly
                 // changes something, which is the whole point of pressing it.
                 val next = randomChampion(pool = pool, excludeId = _state.value.result?.id)
-                _state.update { it.copy(result = next) }
+                _state.update {
+                    it.copy(result = next, spinSequence = buildSpinSequence(next))
+                }
             }
 
             RouletteEvent.ViewChampionClicked -> {
@@ -76,6 +85,17 @@ class RouletteViewModel @Inject constructor(
         }
     }
 
+    /**
+     * A short run of random champions from the pool, ending in [landing] --
+     * the visual "spin" before the wheel stops. Frames can repeat; nothing
+     * about which one is shown mid-spin is meaningful, only the landing spot.
+     */
+    private fun buildSpinSequence(landing: Champion?): List<Champion> {
+        if (landing == null || pool.isEmpty()) return emptyList()
+        val frames = (1 until SPIN_FRAME_COUNT).map { pool.random() }
+        return frames + landing
+    }
+
     private fun start() {
         if (hasStarted) return
         hasStarted = true
@@ -86,5 +106,9 @@ class RouletteViewModel @Inject constructor(
                 _state.update { it.copy(isLoading = false, poolSize = champions.size) }
             }
             .launchIn(viewModelScope)
+    }
+
+    private companion object {
+        const val SPIN_FRAME_COUNT = 14
     }
 }

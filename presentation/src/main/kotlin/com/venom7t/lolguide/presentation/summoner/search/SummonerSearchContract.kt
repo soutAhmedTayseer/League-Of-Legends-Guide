@@ -23,6 +23,7 @@ data class RecentSearch(
 )
 
 sealed interface SummonerSearchEvent {
+    data object ScreenOpened : SummonerSearchEvent
     data class QueryChanged(val query: String) : SummonerSearchEvent
     data class RegionSelected(val region: Region) : SummonerSearchEvent
     data object SearchClicked : SummonerSearchEvent

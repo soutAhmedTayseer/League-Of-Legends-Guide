@@ -4,7 +4,9 @@ import com.venom7t.lolguide.domain.auth.usecase.EnsureSignedInUseCase
 import com.venom7t.lolguide.domain.builds.repository.SavedBuildRepository
 import com.venom7t.lolguide.domain.favourite.repository.FavouritesRepository
 import com.venom7t.lolguide.domain.followed.repository.FollowedSummonerRepository
+import com.venom7t.lolguide.domain.game.repository.GameProgressRepository
 import com.venom7t.lolguide.domain.sync.repository.SyncRepository
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 /**
@@ -23,6 +25,7 @@ class SyncOnStartUseCase @Inject constructor(
     private val favouritesRepository: FavouritesRepository,
     private val followedSummonerRepository: FollowedSummonerRepository,
     private val savedBuildRepository: SavedBuildRepository,
+    private val gameProgressRepository: GameProgressRepository,
 ) {
     suspend operator fun invoke() {
         ensureSignedIn().onFailure { return }
@@ -41,6 +44,18 @@ class SyncOnStartUseCase @Inject constructor(
 
         syncRepository.pullSavedBuilds().onSuccess { builds ->
             builds.forEach { build -> savedBuildRepository.ensureBuild(build) }
+        }
+
+        // Only restores into a mode whose local record is still untouched
+        // (never played on this device/install) -- see SyncRepository's doc
+        // comment on why this is a restore, not a merge, of concurrent play.
+        syncRepository.pullGameStats().onSuccess { remoteStatsByMode ->
+            remoteStatsByMode.forEach { (mode, remoteStats) ->
+                val localStats = gameProgressRepository.observeStats(mode).first()
+                if (localStats.played == 0) {
+                    gameProgressRepository.saveStats(remoteStats)
+                }
+            }
         }
     }
 }

@@ -83,7 +83,7 @@ class CompareViewModel @Inject constructor(
                 it.copy(
                     pickingFor = event.slot,
                     pickerQuery = "",
-                    pickerResults = allChampions.toImmutableList(),
+                    pickerResults = allChampions.excludingOppositeSlot(event.slot, it).toImmutableList(),
                 )
             }
 
@@ -91,10 +91,11 @@ class CompareViewModel @Inject constructor(
                 it.copy(pickingFor = null, pickerQuery = "")
             }
 
-            is CompareEvent.PickerQueryChanged -> _state.update {
-                it.copy(
+            is CompareEvent.PickerQueryChanged -> _state.update { current ->
+                val matches = searchChampions(allChampions, event.query)
+                current.copy(
                     pickerQuery = event.query,
-                    pickerResults = searchChampions(allChampions, event.query).toImmutableList(),
+                    pickerResults = matches.excludingOppositeSlot(current.pickingFor, current).toImmutableList(),
                 )
             }
 
@@ -112,6 +113,20 @@ class CompareViewModel @Inject constructor(
                 current.copy(left = current.right, right = current.left).withComparison()
             }
         }
+    }
+
+    /**
+     * Drops whichever champion already occupies the *other* slot -- picking
+     * the same champion on both sides would compare it against itself, which
+     * is never a useful comparison.
+     */
+    private fun List<Champion>.excludingOppositeSlot(slot: CompareSlot?, state: CompareState): List<Champion> {
+        val opposite = when (slot) {
+            CompareSlot.LEFT -> state.right
+            CompareSlot.RIGHT -> state.left
+            null -> null
+        } ?: return this
+        return filterNot { it.id == opposite.id }
     }
 
     private fun pick(championId: String) {

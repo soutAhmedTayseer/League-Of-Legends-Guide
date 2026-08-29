@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.usecase.ObserveChampionsUseCase
+import com.venom7t.lolguide.domain.champion.usecase.RefreshChampionsUseCase
+import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.item.usecase.ObservePurchasableItemsUseCase
 import com.venom7t.lolguide.domain.onboarding.model.Region
 import com.venom7t.lolguide.domain.onboarding.repository.OnboardingRepository
@@ -66,6 +68,8 @@ class HomeViewModel @Inject constructor(
     private val computePatchDiff: ComputePatchDiffUseCase,
     private val getCurrentRotation: GetCurrentRotationUseCase,
     private val onboardingRepository: OnboardingRepository,
+    private val refreshChampions: RefreshChampionsUseCase,
+    private val locale: AppLocale,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
@@ -89,7 +93,18 @@ class HomeViewModel @Inject constructor(
             val patch = resolvePatch().getOrNull() ?: return@launch
             _state.update { it.copy(patchVersion = patch.version, isPatchStale = patch.isStale) }
 
-            val champions = observeChampions().first()
+            // Champion data only ever reaches Room through RefreshChampionsUseCase,
+            // which normally runs from ChampionListViewModel -- landing here
+            // first (a fresh install, or straight into Home before ever
+            // opening the Champions tab) would otherwise read an empty cache
+            // here and never pick a daily champion until something else
+            // happened to populate it (same failure shape as the Favourites
+            // bug this mirrors the fix for).
+            var champions = observeChampions().first()
+            if (champions.isEmpty()) {
+                refreshChampions(patch.version, locale)
+                champions = observeChampions().first()
+            }
             _state.update { it.copy(dailyChampion = champions.pickForToday()) }
 
             val items = observeItems().first()
