@@ -1,11 +1,12 @@
 package com.venom7t.lolguide.domain.item.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.item.model.Item
 import com.venom7t.lolguide.domain.item.repository.ItemRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 /**
  * Items that belong in a browse list.
@@ -15,7 +16,8 @@ import javax.inject.Inject
  * would make the browser useless, so the filter is applied here once rather
  * than being re-derived by every caller.
  */
-class ObservePurchasableItemsUseCase @Inject constructor(
+@Factory
+class ObservePurchasableItemsUseCase(
     private val repository: ItemRepository,
 ) {
     operator fun invoke(): Flow<List<Item>> =
@@ -27,7 +29,8 @@ class ObservePurchasableItemsUseCase @Inject constructor(
         }
 }
 
-class RefreshItemsUseCase @Inject constructor(
+@Factory
+class RefreshItemsUseCase(
     private val repository: ItemRepository,
 ) {
     suspend operator fun invoke(version: String, locale: AppLocale): Result<Unit> =
@@ -43,7 +46,8 @@ class RefreshItemsUseCase @Inject constructor(
  * is what a player actually asks -- "what do I buy first" and "where does this
  * go".
  */
-class GetBuildPathUseCase @Inject constructor(
+@Factory
+class GetBuildPathUseCase(
     private val repository: ItemRepository,
 ) {
     suspend operator fun invoke(item: Item): BuildPath = BuildPath(

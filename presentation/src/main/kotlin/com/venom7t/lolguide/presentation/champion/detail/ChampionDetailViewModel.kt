@@ -15,7 +15,7 @@ import com.venom7t.lolguide.domain.favourite.usecase.ToggleFavouriteUseCase
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
 import com.venom7t.lolguide.presentation.common.toUiText
 import com.venom7t.lolguide.presentation.navigation.ChampionDetailRoute
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,10 +26,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ChampionDetailViewModel @Inject constructor(
+@KoinViewModel
+class ChampionDetailViewModel (
     savedStateHandle: SavedStateHandle,
     private val getChampionDetail: GetChampionDetailUseCase,
     private val getStatsAtLevel: GetChampionStatsAtLevelUseCase,

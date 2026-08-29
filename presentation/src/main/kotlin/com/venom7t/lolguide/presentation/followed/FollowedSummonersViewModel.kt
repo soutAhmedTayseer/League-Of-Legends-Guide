@@ -7,7 +7,7 @@ import com.venom7t.lolguide.domain.followed.repository.FollowedSummonerRepositor
 import com.venom7t.lolguide.domain.followed.usecase.ObserveFollowedSummonersUseCase
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
 import com.venom7t.lolguide.domain.summoner.usecase.SearchSummonerUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,10 +17,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class FollowedSummonersViewModel @Inject constructor(
+@KoinViewModel
+class FollowedSummonersViewModel (
     private val observeFollowedSummoners: ObserveFollowedSummonersUseCase,
     private val followedRepository: FollowedSummonerRepository,
     private val searchSummoner: SearchSummonerUseCase,

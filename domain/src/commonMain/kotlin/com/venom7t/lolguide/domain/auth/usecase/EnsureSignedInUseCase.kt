@@ -1,9 +1,11 @@
 package com.venom7t.lolguide.domain.auth.usecase
 
-import com.venom7t.lolguide.domain.auth.repository.AuthRepository
-import javax.inject.Inject
+import org.koin.core.annotation.Factory
 
-class EnsureSignedInUseCase @Inject constructor(
+import com.venom7t.lolguide.domain.auth.repository.AuthRepository
+
+@Factory
+class EnsureSignedInUseCase(
     private val repository: AuthRepository,
 ) {
     suspend operator fun invoke(): Result<String> = repository.ensureSignedIn()

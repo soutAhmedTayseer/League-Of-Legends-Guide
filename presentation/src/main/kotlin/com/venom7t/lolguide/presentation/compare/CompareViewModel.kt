@@ -9,7 +9,7 @@ import com.venom7t.lolguide.domain.champion.usecase.CompareChampionsUseCase
 import com.venom7t.lolguide.domain.champion.usecase.ChampionComparison
 import com.venom7t.lolguide.domain.champion.usecase.ObserveChampionsUseCase
 import com.venom7t.lolguide.domain.champion.usecase.SearchChampionsUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /** Which side of the comparison the picker is currently choosing for. */
 enum class CompareSlot { LEFT, RIGHT }
@@ -55,8 +54,8 @@ sealed interface CompareEffect {
     data object NavigateBack : CompareEffect
 }
 
-@HiltViewModel
-class CompareViewModel @Inject constructor(
+@KoinViewModel
+class CompareViewModel (
     private val observeChampions: ObserveChampionsUseCase,
     private val searchChampions: SearchChampionsUseCase,
     private val compareChampions: CompareChampionsUseCase,

@@ -20,7 +20,7 @@ import com.venom7t.lolguide.presentation.common.UiText
 import com.venom7t.lolguide.presentation.common.toUiText
 import com.venom7t.lolguide.presentation.common.uiText
 import com.venom7t.lolguide.presentation.navigation.BuildSimulatorRoute
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /** Which panel the item picker fills when open. Null closes it. */
 sealed interface SimulatorPicker {
@@ -79,8 +78,8 @@ sealed interface BuildSimulatorEffect {
     data class ShowSnackbar(val message: UiText) : BuildSimulatorEffect
 }
 
-@HiltViewModel
-class BuildSimulatorViewModel @Inject constructor(
+@KoinViewModel
+class BuildSimulatorViewModel (
     savedStateHandle: SavedStateHandle,
     private val observeChampions: ObserveChampionsUseCase,
     private val searchChampions: SearchChampionsUseCase,

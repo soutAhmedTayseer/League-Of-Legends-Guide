@@ -1,5 +1,7 @@
 package com.venom7t.lolguide.domain.patch.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.model.ChampionStats
 import com.venom7t.lolguide.domain.item.model.Item
@@ -8,7 +10,6 @@ import com.venom7t.lolguide.domain.patch.model.ItemChange
 import com.venom7t.lolguide.domain.patch.model.PatchDiff
 import com.venom7t.lolguide.domain.patch.model.StatDelta
 import com.venom7t.lolguide.domain.patch.repository.PreviousPatchSnapshotRepository
-import javax.inject.Inject
 
 /**
  * Builds the "what's new" diff by comparing the current cache against the one
@@ -19,7 +20,8 @@ import javax.inject.Inject
  * a distinct, expected state, not an error: the UI shows "check back after the
  * next patch" rather than a failure.
  */
-class ComputePatchDiffUseCase @Inject constructor(
+@Factory
+class ComputePatchDiffUseCase(
     private val snapshots: PreviousPatchSnapshotRepository,
 ) {
 

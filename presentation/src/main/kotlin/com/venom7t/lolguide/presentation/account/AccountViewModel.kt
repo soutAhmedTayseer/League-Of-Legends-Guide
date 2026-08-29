@@ -13,7 +13,7 @@ import com.venom7t.lolguide.domain.sync.usecase.SyncOnStartUseCase
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.toUiText
 import com.venom7t.lolguide.presentation.common.uiText
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,10 +23,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class AccountViewModel @Inject constructor(
+@KoinViewModel
+class AccountViewModel (
     private val observeAccount: ObserveAccountUseCase,
     private val signInWithGoogle: SignInWithGoogleUseCase,
     private val signOut: SignOutUseCase,

@@ -25,7 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.match.model.MatchDetail
@@ -43,7 +43,7 @@ import com.venom7t.lolguide.presentation.theme.AppTheme
 fun MatchDetailScreenRoot(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: MatchDetailViewModel = hiltViewModel(),
+    viewModel: MatchDetailViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

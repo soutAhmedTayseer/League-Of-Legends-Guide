@@ -1,7 +1,5 @@
 package com.venom7t.lolguide.di
 
-import android.content.Context
-import androidx.work.WorkManager
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
@@ -11,16 +9,20 @@ import com.venom7t.lolguide.data.builds.repository.SavedBuildRepositoryImpl
 import com.venom7t.lolguide.data.champion.repository.ChampionRepositoryImpl
 import com.venom7t.lolguide.data.clash.repository.ClashRepositoryImpl
 import com.venom7t.lolguide.data.favourite.repository.FavouritesRepositoryImpl
-import com.venom7t.lolguide.data.game.repository.GameProgressRepositoryImpl
-import com.venom7t.lolguide.data.lptracker.repository.LpTrackerRepositoryImpl
-import com.venom7t.lolguide.data.sync.repository.SyncRepositoryImpl
 import com.venom7t.lolguide.data.followed.repository.FollowedSummonerRepositoryImpl
+import com.venom7t.lolguide.data.game.repository.GameProgressRepositoryImpl
 import com.venom7t.lolguide.data.item.repository.ItemRepositoryImpl
+import com.venom7t.lolguide.data.lptracker.worker.LpChangeNotifier
+import com.venom7t.lolguide.data.lptracker.worker.LpTrackerWorker
+import com.venom7t.lolguide.data.patch.worker.PatchSyncWorker
 import com.venom7t.lolguide.data.ladder.repository.LadderRepositoryImpl
 import com.venom7t.lolguide.data.livegame.repository.LiveGameRepositoryImpl
+import com.venom7t.lolguide.data.lptracker.repository.LpTrackerRepositoryImpl
 import com.venom7t.lolguide.data.mastery.repository.MasteryRepositoryImpl
 import com.venom7t.lolguide.data.match.repository.MatchRepositoryImpl
 import com.venom7t.lolguide.data.onboarding.repository.OnboardingRepositoryImpl
+import com.venom7t.lolguide.data.patch.local.PatchLocalDataSource
+import com.venom7t.lolguide.data.patch.repository.PatchRepositoryImpl
 import com.venom7t.lolguide.data.patch.repository.PreviousPatchSnapshotRepositoryImpl
 import com.venom7t.lolguide.data.rotation.repository.RotationRepositoryImpl
 import com.venom7t.lolguide.data.rune.repository.RuneRepositoryImpl
@@ -29,27 +31,25 @@ import com.venom7t.lolguide.data.spell.repository.SummonerSpellRepositoryImpl
 import com.venom7t.lolguide.data.status.repository.ServerStatusRepositoryImpl
 import com.venom7t.lolguide.data.summoner.repository.RecentSearchRepositoryImpl
 import com.venom7t.lolguide.data.summoner.repository.SummonerRepositoryImpl
+import com.venom7t.lolguide.data.sync.repository.SyncRepositoryImpl
+import com.venom7t.lolguide.data.voiceline.remote.VoiceLineProbe
 import com.venom7t.lolguide.data.voiceline.repository.VoiceLineRepositoryImpl
-import com.venom7t.lolguide.data.common.di.ApplicationScope
-import com.venom7t.lolguide.data.common.di.DefaultDispatcher
-import com.venom7t.lolguide.data.common.di.IoDispatcher
-import com.venom7t.lolguide.data.patch.repository.PatchRepositoryImpl
 import com.venom7t.lolguide.domain.auth.repository.AuthRepository
 import com.venom7t.lolguide.domain.builds.repository.SavedBuildRepository
 import com.venom7t.lolguide.domain.champion.repository.ChampionRepository
 import com.venom7t.lolguide.domain.clash.repository.ClashRepository
 import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.favourite.repository.FavouritesRepository
-import com.venom7t.lolguide.domain.game.repository.GameProgressRepository
-import com.venom7t.lolguide.domain.lptracker.repository.LpTrackerRepository
-import com.venom7t.lolguide.domain.sync.repository.SyncRepository
 import com.venom7t.lolguide.domain.followed.repository.FollowedSummonerRepository
+import com.venom7t.lolguide.domain.game.repository.GameProgressRepository
 import com.venom7t.lolguide.domain.item.repository.ItemRepository
 import com.venom7t.lolguide.domain.ladder.repository.LadderRepository
 import com.venom7t.lolguide.domain.livegame.repository.LiveGameRepository
+import com.venom7t.lolguide.domain.lptracker.repository.LpTrackerRepository
 import com.venom7t.lolguide.domain.mastery.repository.MasteryRepository
 import com.venom7t.lolguide.domain.match.repository.MatchRepository
 import com.venom7t.lolguide.domain.onboarding.repository.OnboardingRepository
+import com.venom7t.lolguide.domain.patch.repository.PatchRepository
 import com.venom7t.lolguide.domain.patch.repository.PreviousPatchSnapshotRepository
 import com.venom7t.lolguide.domain.rotation.repository.RotationRepository
 import com.venom7t.lolguide.domain.rune.repository.RuneRepository
@@ -58,18 +58,28 @@ import com.venom7t.lolguide.domain.spell.repository.SummonerSpellRepository
 import com.venom7t.lolguide.domain.status.repository.ServerStatusRepository
 import com.venom7t.lolguide.domain.summoner.repository.RecentSearchRepository
 import com.venom7t.lolguide.domain.summoner.repository.SummonerRepository
+import com.venom7t.lolguide.domain.sync.repository.SyncRepository
 import com.venom7t.lolguide.domain.voiceline.repository.VoiceLineRepository
-import com.venom7t.lolguide.domain.patch.repository.PatchRepository
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
+import com.venom7t.lolguide.navigation.AppStartViewModel
+import com.venom7t.lolguide.worker.LpTrackerScheduler
+import com.venom7t.lolguide.worker.PatchSyncScheduler
+import androidx.work.WorkManager
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.workmanager.dsl.workerOf
+import org.koin.core.module.dsl.viewModel
+import org.koin.core.qualifier.named
+import org.koin.dsl.module
 import java.util.Locale
-import javax.inject.Singleton
+
+private const val PREFERENCES_NAME = "lol_guide_preferences"
+
+val IO_DISPATCHER = named("io")
+val DEFAULT_DISPATCHER = named("default")
+val APPLICATION_SCOPE = named("applicationScope")
 
 /**
  * Binds data-layer implementations to the domain interfaces they satisfy.
@@ -78,181 +88,26 @@ import javax.inject.Singleton
  * `:presentation` from being able to import a repository implementation
  * (AGENTS.md §3).
  */
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class RepositoryModule {
+val appModule = module {
 
-    @Binds
-    @Singleton
-    abstract fun bindChampionRepository(impl: ChampionRepositoryImpl): ChampionRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindPatchRepository(impl: PatchRepositoryImpl): PatchRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindFavouritesRepository(impl: FavouritesRepositoryImpl): FavouritesRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindItemRepository(impl: ItemRepositoryImpl): ItemRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindRuneRepository(impl: RuneRepositoryImpl): RuneRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindSummonerSpellRepository(
-        impl: SummonerSpellRepositoryImpl,
-    ): SummonerSpellRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindPreviousPatchSnapshotRepository(
-        impl: PreviousPatchSnapshotRepositoryImpl,
-    ): PreviousPatchSnapshotRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindOnboardingRepository(impl: OnboardingRepositoryImpl): OnboardingRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindVoiceLineRepository(impl: VoiceLineRepositoryImpl): VoiceLineRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindSummonerRepository(impl: SummonerRepositoryImpl): SummonerRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindRecentSearchRepository(impl: RecentSearchRepositoryImpl): RecentSearchRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindMatchRepository(impl: MatchRepositoryImpl): MatchRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindLiveGameRepository(impl: LiveGameRepositoryImpl): LiveGameRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindMasteryRepository(impl: MasteryRepositoryImpl): MasteryRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindLadderRepository(impl: LadderRepositoryImpl): LadderRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindServerStatusRepository(impl: ServerStatusRepositoryImpl): ServerStatusRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindRotationRepository(impl: RotationRepositoryImpl): RotationRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindFollowedSummonerRepository(
-        impl: FollowedSummonerRepositoryImpl,
-    ): FollowedSummonerRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindSyncRepository(impl: SyncRepositoryImpl): SyncRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindLpTrackerRepository(impl: LpTrackerRepositoryImpl): LpTrackerRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindClashRepository(impl: ClashRepositoryImpl): ClashRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindGameProgressRepository(impl: GameProgressRepositoryImpl): GameProgressRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindSavedBuildRepository(impl: SavedBuildRepositoryImpl): SavedBuildRepository
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-object DispatcherModule {
-
-    @Provides
-    @IoDispatcher
-    fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
-
-    @Provides
-    @DefaultDispatcher
-    fun provideDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
-
-    @Provides
-    @Singleton
-    @ApplicationScope
-    fun provideApplicationScope(
-        @IoDispatcher ioDispatcher: CoroutineDispatcher,
-    ): kotlinx.coroutines.CoroutineScope =
-        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + ioDispatcher)
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-object DataStoreModule {
-
-    private const val PREFERENCES_NAME = "lol_guide_preferences"
-
-    @Provides
-    @Singleton
-    fun providePreferencesDataStore(
-        @ApplicationContext context: Context,
-    ): DataStore<Preferences> = PreferenceDataStoreFactory.create {
-        context.preferencesDataStoreFile(PREFERENCES_NAME)
+    single<DataStore<Preferences>> {
+        PreferenceDataStoreFactory.create {
+            androidContext().preferencesDataStoreFile(PREFERENCES_NAME)
+        }
     }
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-object WorkManagerModule {
+    single(IO_DISPATCHER) { Dispatchers.IO as CoroutineDispatcher }
+    single(DEFAULT_DISPATCHER) { Dispatchers.Default as CoroutineDispatcher }
+    single(APPLICATION_SCOPE) {
+        CoroutineScope(SupervisorJob() + get<CoroutineDispatcher>(IO_DISPATCHER))
+    }
 
-    @Provides
-    @Singleton
-    fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
-        WorkManager.getInstance(context)
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-object FirebaseModule {
-
-    @Provides
-    @Singleton
-    fun provideFirebaseAuth(): com.google.firebase.auth.FirebaseAuth =
+    single {
         com.google.firebase.auth.FirebaseAuth.getInstance()
-
-    @Provides
-    @Singleton
-    fun provideFirebaseFirestore(): com.google.firebase.firestore.FirebaseFirestore =
+    }
+    single {
         com.google.firebase.firestore.FirebaseFirestore.getInstance()
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-object LocaleModule {
+    }
 
     /**
      * The locale to request content in.
@@ -264,7 +119,53 @@ object LocaleModule {
      * Not a singleton: an in-app language switch recreates the activity, and
      * this must be re-read rather than frozen at process start.
      */
-    @Provides
-    fun provideAppLocale(): AppLocale =
-        AppLocale.fromLanguageTag(Locale.getDefault().language)
+    factory { AppLocale.fromLanguageTag(Locale.getDefault().language) }
+
+    single { WorkManager.getInstance(androidContext()) }
+
+    single { PatchLocalDataSource(get()) }
+    single { VoiceLineProbe(get(DATA_DRAGON_RETROFIT), get(IO_DISPATCHER)) }
+
+    single<ChampionRepository> { ChampionRepositoryImpl(get(), get(), get(), get(IO_DISPATCHER)) }
+    single<PatchRepository> { PatchRepositoryImpl(get(), get(), get(IO_DISPATCHER)) }
+    single<FavouritesRepository> {
+        FavouritesRepositoryImpl(get(), get(), get(IO_DISPATCHER), get(APPLICATION_SCOPE))
+    }
+    single<ItemRepository> { ItemRepositoryImpl(get(), get(), get(), get(IO_DISPATCHER)) }
+    single<RuneRepository> { RuneRepositoryImpl(get(), get(IO_DISPATCHER)) }
+    single<SummonerSpellRepository> { SummonerSpellRepositoryImpl(get(), get(IO_DISPATCHER)) }
+    single<PreviousPatchSnapshotRepository> {
+        PreviousPatchSnapshotRepositoryImpl(get(), get(), get(IO_DISPATCHER))
+    }
+    single<OnboardingRepository> { OnboardingRepositoryImpl(get()) }
+    single<SettingsRepository> { SettingsRepositoryImpl(get()) }
+    single<VoiceLineRepository> { VoiceLineRepositoryImpl(get()) }
+    single<SummonerRepository> { SummonerRepositoryImpl(get(), get(IO_DISPATCHER)) }
+    single<RecentSearchRepository> { RecentSearchRepositoryImpl(get()) }
+    single<MatchRepository> { MatchRepositoryImpl(get(), get(), get(), get(IO_DISPATCHER)) }
+    single<LiveGameRepository> { LiveGameRepositoryImpl(get(), get(IO_DISPATCHER)) }
+    single<MasteryRepository> { MasteryRepositoryImpl(get(), get(IO_DISPATCHER)) }
+    single<LadderRepository> { LadderRepositoryImpl(get(), get(IO_DISPATCHER)) }
+    single<ServerStatusRepository> { ServerStatusRepositoryImpl(get(), get(IO_DISPATCHER)) }
+    single<RotationRepository> { RotationRepositoryImpl(get(), get(IO_DISPATCHER)) }
+    single<FollowedSummonerRepository> {
+        FollowedSummonerRepositoryImpl(get(), get(), get(IO_DISPATCHER), get(APPLICATION_SCOPE))
+    }
+    single<AuthRepository> { AuthRepositoryImpl(get()) }
+    single<SyncRepository> { SyncRepositoryImpl(get(), get()) }
+    single<LpTrackerRepository> { LpTrackerRepositoryImpl(get(), get(IO_DISPATCHER)) }
+    single<ClashRepository> { ClashRepositoryImpl(get(), get(IO_DISPATCHER)) }
+    single<GameProgressRepository> { GameProgressRepositoryImpl(get(), get()) }
+    single<SavedBuildRepository> {
+        SavedBuildRepositoryImpl(get(), get(), get(IO_DISPATCHER), get(APPLICATION_SCOPE))
+    }
+
+    single { PatchSyncScheduler(get()) }
+    single { LpTrackerScheduler(get()) }
+    single { LpChangeNotifier(androidContext()) }
+
+    workerOf(::PatchSyncWorker)
+    workerOf(::LpTrackerWorker)
+
+    viewModel { AppStartViewModel(get(), get(), get(), get()) }
 }

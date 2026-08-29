@@ -9,8 +9,6 @@ import com.venom7t.lolguide.domain.summoner.model.RecentSummonerSearch
 import com.venom7t.lolguide.domain.summoner.repository.RecentSearchRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Encoded as a single delimited string rather than pulling in a JSON
@@ -18,8 +16,7 @@ import javax.inject.Singleton
  * the ASCII unit/record separator control characters, which can never
  * appear in a Riot id or a region name, so there is no escaping to get wrong.
  */
-@Singleton
-class RecentSearchRepositoryImpl @Inject constructor(
+class RecentSearchRepositoryImpl constructor(
     private val dataStore: DataStore<Preferences>,
 ) : RecentSearchRepository {
 

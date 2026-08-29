@@ -1,10 +1,11 @@
 package com.venom7t.lolguide.domain.champion.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.model.ChampionFilter
 import com.venom7t.lolguide.domain.champion.model.DamageType
 import com.venom7t.lolguide.domain.champion.model.Difficulty
-import javax.inject.Inject
 
 /**
  * Applies the list filters.
@@ -14,7 +15,8 @@ import javax.inject.Inject
  * players expect from filter chips, and the opposite convention makes multi-
  * select useless — selecting a second role would narrow to nothing.
  */
-class FilterChampionsUseCase @Inject constructor() {
+@Factory
+class FilterChampionsUseCase() {
 
     operator fun invoke(
         champions: List<Champion>,

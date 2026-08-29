@@ -22,10 +22,7 @@ import androidx.glance.unit.ColorProvider
 import com.venom7t.lolguide.MainActivity
 import com.venom7t.lolguide.R
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
+import org.koin.core.context.GlobalContext
 
 /**
  * Home-screen widget shell (Phase 3 plan §Widgets).
@@ -40,25 +37,16 @@ import dagger.hilt.components.SingletonComponent
 class PatchStatusWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        // GlanceAppWidget is not constructed by Hilt, so its dependencies are
-        // pulled through an EntryPoint rather than @Inject -- the standard
-        // pattern for classes outside Hilt's own construction, such as
-        // widgets and content providers.
-        val entryPoint = EntryPointAccessors.fromApplication(
-            context.applicationContext,
-            WidgetEntryPoint::class.java,
-        )
-        val patch = entryPoint.resolvePatchUseCase().invoke().getOrNull()
+        // GlanceAppWidget is not constructed by Koin, so its dependency is
+        // pulled from the global Koin instance rather than by constructor
+        // injection -- the standard pattern for classes outside Koin's own
+        // construction, such as widgets and content providers.
+        val resolvePatch = GlobalContext.get().get<ResolvePatchUseCase>()
+        val patch = resolvePatch().getOrNull()
 
         provideContent {
             WidgetContent(patchVersion = patch?.version)
         }
-    }
-
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    interface WidgetEntryPoint {
-        fun resolvePatchUseCase(): ResolvePatchUseCase
     }
 }
 

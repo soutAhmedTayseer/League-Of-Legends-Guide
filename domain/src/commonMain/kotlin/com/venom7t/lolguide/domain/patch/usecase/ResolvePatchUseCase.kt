@@ -1,7 +1,8 @@
 package com.venom7t.lolguide.domain.patch.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.patch.repository.PatchRepository
-import javax.inject.Inject
 
 /**
  * The single source of the patch version every other call is parameterised by.
@@ -13,7 +14,8 @@ import javax.inject.Inject
  *  3. If both fail there is nothing honest to show, so this fails rather than
  *     inventing a version (AGENTS.md §1).
  */
-class ResolvePatchUseCase @Inject constructor(
+@Factory
+class ResolvePatchUseCase(
     private val patchRepository: PatchRepository,
 ) {
 

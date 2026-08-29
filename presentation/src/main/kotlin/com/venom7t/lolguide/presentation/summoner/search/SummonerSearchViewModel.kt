@@ -7,7 +7,7 @@ import com.venom7t.lolguide.domain.summoner.model.RecentSummonerSearch
 import com.venom7t.lolguide.domain.summoner.repository.RecentSearchRepository
 import com.venom7t.lolguide.domain.summoner.usecase.SearchSummonerUseCase
 import com.venom7t.lolguide.presentation.common.toUiText
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,15 +18,14 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * Resolves a "Name#TAG" search into a [com.venom7t.lolguide.domain.summoner.model.Summoner]
  * before navigating, so the profile screen never has to handle "not found"
  * itself -- it always opens on a summoner that is known to exist.
  */
-@HiltViewModel
-class SummonerSearchViewModel @Inject constructor(
+@KoinViewModel
+class SummonerSearchViewModel (
     private val searchSummoner: SearchSummonerUseCase,
     private val recentSearchRepository: RecentSearchRepository,
     private val onboardingRepository: OnboardingRepository,

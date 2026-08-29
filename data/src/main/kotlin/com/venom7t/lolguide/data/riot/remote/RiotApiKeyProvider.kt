@@ -6,8 +6,6 @@ import com.venom7t.lolguide.domain.settings.repository.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * The Riot API key every request actually uses: the user's own pasted key
@@ -22,8 +20,7 @@ import javax.inject.Singleton
  * this keeps a plain, always-up-to-date field rather than re-querying
  * DataStore (which is asynchronous) per request.
  */
-@Singleton
-class RiotApiKeyProvider @Inject constructor(
+class RiotApiKeyProvider constructor(
     @RiotApiKey private val bundledKey: String,
     settingsRepository: SettingsRepository,
     @ApplicationScope scope: CoroutineScope,

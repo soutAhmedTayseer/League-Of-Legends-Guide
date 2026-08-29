@@ -19,7 +19,7 @@ import com.venom7t.lolguide.domain.game.usecase.SubmitGuessUseCase
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
 import com.venom7t.lolguide.presentation.common.toUiText
 import com.venom7t.lolguide.presentation.navigation.GameRoundRoute
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,10 +30,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class GameRoundViewModel @Inject constructor(
+@KoinViewModel
+class GameRoundViewModel (
     savedStateHandle: SavedStateHandle,
     private val observeChampions: ObserveChampionsUseCase,
     private val searchChampions: SearchChampionsUseCase,

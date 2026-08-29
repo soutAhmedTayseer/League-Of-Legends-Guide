@@ -13,11 +13,8 @@ import com.venom7t.lolguide.domain.status.model.ServerStatus
 import com.venom7t.lolguide.domain.status.repository.ServerStatusRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class ServerStatusRepositoryImpl @Inject constructor(
+class ServerStatusRepositoryImpl constructor(
     private val api: RiotApi,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : ServerStatusRepository {

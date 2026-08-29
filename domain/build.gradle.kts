@@ -7,12 +7,19 @@
 // exactly as before.
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
     jvm {
         compilerOptions {
             jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+        }
+        compilations.all {
+            compileJavaTaskProvider?.configure {
+                sourceCompatibility = "11"
+                targetCompatibility = "11"
+            }
         }
     }
 
@@ -22,8 +29,20 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.javax.inject)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.koin.core)
+            implementation(libs.koin.annotations)
         }
     }
+}
+
+// Phase 2 (Hilt -> Koin): Koin Annotations' KSP processor scans this
+// module's classes for @Factory/@Single and generates a Koin module --
+// the KMP equivalent of what Hilt's codegen did automatically for any
+// @Inject-constructor class. Only wired for the jvm target for now: the iOS
+// targets are disabled on this (Windows) machine anyway (see
+// kmpSpike/PHASE0_FINDINGS.md), and the generated module is only consumed
+// by the Android app today.
+dependencies {
+    add("kspJvm", libs.koin.ksp.compiler)
 }

@@ -18,8 +18,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Offline-first champion repository (AGENTS.md §7.1).
@@ -28,8 +26,7 @@ import javax.inject.Singleton
  * feeds the UI directly. That is what makes the list render instantly on a
  * cold start with no connection.
  */
-@Singleton
-class ChampionRepositoryImpl @Inject constructor(
+class ChampionRepositoryImpl constructor(
     private val api: DataDragonApi,
     private val dao: ChampionDao,
     private val snapshots: PreviousPatchSnapshotRepository,

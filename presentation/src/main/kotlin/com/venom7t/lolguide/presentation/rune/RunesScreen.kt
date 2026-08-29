@@ -30,7 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.venom7t.lolguide.domain.rune.model.Rune
@@ -46,7 +46,7 @@ import com.venom7t.lolguide.presentation.theme.AppTheme
 fun RunesScreenRoot(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: RunesViewModel = hiltViewModel(),
+    viewModel: RunesViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

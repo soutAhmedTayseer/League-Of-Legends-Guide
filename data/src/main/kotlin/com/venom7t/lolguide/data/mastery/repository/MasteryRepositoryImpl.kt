@@ -10,11 +10,8 @@ import com.venom7t.lolguide.domain.mastery.repository.MasteryRepository
 import com.venom7t.lolguide.domain.onboarding.model.Region
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class MasteryRepositoryImpl @Inject constructor(
+class MasteryRepositoryImpl constructor(
     private val api: RiotApi,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : MasteryRepository {

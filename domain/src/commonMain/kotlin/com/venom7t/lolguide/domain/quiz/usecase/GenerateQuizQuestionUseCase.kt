@@ -1,10 +1,11 @@
 package com.venom7t.lolguide.domain.quiz.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.repository.ChampionRepository
 import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.quiz.model.QuizQuestion
-import javax.inject.Inject
 import kotlin.random.Random
 
 private const val OPTION_COUNT = 4
@@ -17,7 +18,8 @@ private const val OPTION_COUNT = 4
  * malformed question when the cache is too small (e.g. right after a cold
  * start, before the champion list has finished its first load).
  */
-class GenerateQuizQuestionUseCase @Inject constructor(
+@Factory
+class GenerateQuizQuestionUseCase(
     private val championRepository: ChampionRepository,
 ) {
 

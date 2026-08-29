@@ -1,5 +1,7 @@
 package com.venom7t.lolguide.domain.sync.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.auth.usecase.EnsureSignedInUseCase
 import com.venom7t.lolguide.domain.builds.repository.SavedBuildRepository
 import com.venom7t.lolguide.domain.favourite.repository.FavouritesRepository
@@ -7,7 +9,6 @@ import com.venom7t.lolguide.domain.followed.repository.FollowedSummonerRepositor
 import com.venom7t.lolguide.domain.game.repository.GameProgressRepository
 import com.venom7t.lolguide.domain.sync.repository.SyncRepository
 import kotlinx.coroutines.flow.first
-import javax.inject.Inject
 
 /**
  * Pulls remote favourites/followed-summoners and merges them additively into
@@ -19,7 +20,8 @@ import javax.inject.Inject
  * surfaced: sync is a background convenience, not something that should
  * block or error the app's normal offline-first startup.
  */
-class SyncOnStartUseCase @Inject constructor(
+@Factory
+class SyncOnStartUseCase(
     private val ensureSignedIn: EnsureSignedInUseCase,
     private val syncRepository: SyncRepository,
     private val favouritesRepository: FavouritesRepository,

@@ -1,9 +1,10 @@
 package com.venom7t.lolguide.domain.champion.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.model.ChampionStatCalculator
 import com.venom7t.lolguide.domain.champion.model.ScaledStats
-import javax.inject.Inject
 
 /**
  * Builds a side-by-side comparison at a chosen level.
@@ -12,7 +13,8 @@ import javax.inject.Inject
  * weak at level 1 and dominant at 18. Comparing at a level the user picks is
  * the only honest way to do it.
  */
-class CompareChampionsUseCase @Inject constructor() {
+@Factory
+class CompareChampionsUseCase() {
 
     operator fun invoke(left: Champion, right: Champion, level: Int): ChampionComparison =
         ChampionComparison(

@@ -39,7 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -58,7 +58,7 @@ fun AccountScreenRoot(
     onBack: () -> Unit,
     onNavigateToApiKeyPortal: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AccountViewModel = hiltViewModel(),
+    viewModel: AccountViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current

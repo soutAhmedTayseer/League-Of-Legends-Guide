@@ -1,15 +1,12 @@
 package com.venom7t.lolguide.data.patch.worker
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.venom7t.lolguide.domain.champion.usecase.RefreshChampionsUseCase
 import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.item.usecase.RefreshItemsUseCase
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import timber.log.Timber
 
 /**
@@ -26,10 +23,9 @@ import timber.log.Timber
  * an error for. The existing foreground refresh path (Phase 0's
  * ChampionListViewModel) is what surfaces a real failure if one occurs.
  */
-@HiltWorker
-class PatchSyncWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted workerParams: WorkerParameters,
+class PatchSyncWorker(
+    context: Context,
+    workerParams: WorkerParameters,
     private val resolvePatch: ResolvePatchUseCase,
     private val refreshChampions: RefreshChampionsUseCase,
     private val refreshItems: RefreshItemsUseCase,

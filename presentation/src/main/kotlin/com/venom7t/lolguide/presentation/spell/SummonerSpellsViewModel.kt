@@ -9,7 +9,7 @@ import com.venom7t.lolguide.domain.spell.model.SummonerSpell
 import com.venom7t.lolguide.domain.spell.repository.SummonerSpellRepository
 import com.venom7t.lolguide.presentation.common.UiText
 import com.venom7t.lolguide.presentation.common.toUiText
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @Immutable
 data class SummonerSpellsState(
@@ -38,8 +37,8 @@ sealed interface SummonerSpellsEvent {
     data object Retry : SummonerSpellsEvent
 }
 
-@HiltViewModel
-class SummonerSpellsViewModel @Inject constructor(
+@KoinViewModel
+class SummonerSpellsViewModel (
     private val spellRepository: SummonerSpellRepository,
     private val resolvePatch: ResolvePatchUseCase,
     private val locale: AppLocale,

@@ -7,9 +7,6 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.venom7t.lolguide.domain.lptracker.usecase.LpChange
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.math.abs
 
 /**
@@ -20,9 +17,8 @@ import kotlin.math.abs
  * notification (Phase 5 plan's "not built this phase" note on Cloud
  * Functions / real server-sent push).
  */
-@Singleton
-class LpChangeNotifier @Inject constructor(
-    @ApplicationContext private val context: Context,
+class LpChangeNotifier(
+    private val context: Context,
 ) {
 
     fun notify(change: LpChange) {

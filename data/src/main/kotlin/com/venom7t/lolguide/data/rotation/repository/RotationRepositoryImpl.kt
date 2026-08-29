@@ -10,11 +10,8 @@ import com.venom7t.lolguide.domain.rotation.model.ChampionRotation
 import com.venom7t.lolguide.domain.rotation.repository.RotationRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class RotationRepositoryImpl @Inject constructor(
+class RotationRepositoryImpl constructor(
     private val api: RiotApi,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : RotationRepository {

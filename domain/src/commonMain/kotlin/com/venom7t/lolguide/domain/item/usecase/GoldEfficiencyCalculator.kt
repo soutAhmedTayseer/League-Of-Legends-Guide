@@ -1,8 +1,9 @@
 package com.venom7t.lolguide.domain.item.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.item.model.Item
 import com.venom7t.lolguide.domain.item.model.ItemStats
-import javax.inject.Inject
 
 /**
  * Gold value of a single unit of each stat, derived from the current patch.
@@ -53,7 +54,8 @@ data class GoldEfficiency(
     val hasUnpublishedStats: Boolean,
 )
 
-class GoldEfficiencyCalculator @Inject constructor() {
+@Factory
+class GoldEfficiencyCalculator() {
 
     /**
      * Derives the price table from basic items in [items].

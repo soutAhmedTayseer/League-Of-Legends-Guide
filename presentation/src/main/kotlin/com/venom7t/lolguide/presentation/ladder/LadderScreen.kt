@@ -31,7 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.domain.ladder.model.LadderEntry
 import com.venom7t.lolguide.domain.onboarding.model.Region
@@ -49,7 +49,7 @@ import com.venom7t.lolguide.presentation.theme.AppTheme
 fun LadderScreenRoot(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LadderViewModel = hiltViewModel(),
+    viewModel: LadderViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

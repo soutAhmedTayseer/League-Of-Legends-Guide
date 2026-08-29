@@ -1,12 +1,14 @@
 package com.venom7t.lolguide.domain.summoner.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.onboarding.model.Region
 import com.venom7t.lolguide.domain.summoner.model.RankedEntry
 import com.venom7t.lolguide.domain.summoner.model.Summoner
 import com.venom7t.lolguide.domain.summoner.repository.SummonerRepository
-import javax.inject.Inject
 
-class SearchSummonerUseCase @Inject constructor(
+@Factory
+class SearchSummonerUseCase(
     private val repository: SummonerRepository,
 ) {
     /**
@@ -25,14 +27,16 @@ class SearchSummonerUseCase @Inject constructor(
     }
 }
 
-class GetSummonerByPuuidUseCase @Inject constructor(
+@Factory
+class GetSummonerByPuuidUseCase(
     private val repository: SummonerRepository,
 ) {
     suspend operator fun invoke(puuid: String, region: Region): Result<Summoner> =
         repository.getByPuuid(puuid, region)
 }
 
-class GetRankedEntriesUseCase @Inject constructor(
+@Factory
+class GetRankedEntriesUseCase(
     private val repository: SummonerRepository,
 ) {
     suspend operator fun invoke(summoner: Summoner): Result<List<RankedEntry>> =

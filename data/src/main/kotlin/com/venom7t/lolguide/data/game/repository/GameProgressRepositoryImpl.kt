@@ -13,8 +13,6 @@ import com.venom7t.lolguide.domain.game.repository.GameProgressRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Round-in-progress and lifetime stats, one JSON blob per mode in the shared
@@ -22,8 +20,7 @@ import javax.inject.Singleton
  * just its own keys. No new table: this is small, per-mode state, not
  * something that benefits from Room's query surface (Phase 6 plan §6.3).
  */
-@Singleton
-class GameProgressRepositoryImpl @Inject constructor(
+class GameProgressRepositoryImpl constructor(
     private val dataStore: DataStore<Preferences>,
     private val json: Json,
 ) : GameProgressRepository {

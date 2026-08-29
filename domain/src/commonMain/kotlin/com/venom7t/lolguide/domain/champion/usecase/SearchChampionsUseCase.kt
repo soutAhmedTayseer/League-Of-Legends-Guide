@@ -1,9 +1,10 @@
 package com.venom7t.lolguide.domain.champion.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.model.ChampionAliases
 import com.venom7t.lolguide.domain.champion.model.ChampionAliases.normalise
-import javax.inject.Inject
 
 /**
  * Ranked champion search.
@@ -16,7 +17,8 @@ import javax.inject.Inject
  * Wukong at all because his Data Dragon id is `MonkeyKing`. Ranking by match
  * quality is what makes the first result the one the player meant.
  */
-class SearchChampionsUseCase @Inject constructor() {
+@Factory
+class SearchChampionsUseCase() {
 
     operator fun invoke(champions: List<Champion>, query: String): List<Champion> {
         val normalised = query.normalise()

@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.usecase.ObserveChampionsUseCase
 import com.venom7t.lolguide.domain.champion.usecase.RandomChampionUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @Immutable
 data class RouletteState(
@@ -44,8 +43,8 @@ sealed interface RouletteEffect {
     data object NavigateBack : RouletteEffect
 }
 
-@HiltViewModel
-class RouletteViewModel @Inject constructor(
+@KoinViewModel
+class RouletteViewModel (
     private val observeChampions: ObserveChampionsUseCase,
     private val randomChampion: RandomChampionUseCase,
 ) : ViewModel() {

@@ -44,7 +44,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.venom7t.lolguide.domain.game.model.Clue
@@ -67,7 +67,7 @@ import com.venom7t.lolguide.presentation.theme.AppTheme
 fun GameRoundScreenRoot(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: GameRoundViewModel = hiltViewModel(),
+    viewModel: GameRoundViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

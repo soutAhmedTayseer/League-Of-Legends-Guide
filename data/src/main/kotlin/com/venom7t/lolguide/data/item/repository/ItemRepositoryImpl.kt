@@ -17,11 +17,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class ItemRepositoryImpl @Inject constructor(
+class ItemRepositoryImpl constructor(
     private val api: DataDragonApi,
     private val dao: ItemDao,
     private val snapshots: PreviousPatchSnapshotRepository,

@@ -10,8 +10,6 @@ import com.venom7t.lolguide.domain.game.model.GameStats
 import com.venom7t.lolguide.domain.onboarding.model.Region
 import com.venom7t.lolguide.domain.sync.repository.SyncRepository
 import kotlinx.coroutines.tasks.await
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Firestore-backed sync for favourites and followed summoners, keyed under
@@ -22,8 +20,7 @@ import javax.inject.Singleton
  * rather than silently no-oping, so a caller that forgot to run
  * `EnsureSignedInUseCase` first sees why nothing synced.
  */
-@Singleton
-class SyncRepositoryImpl @Inject constructor(
+class SyncRepositoryImpl constructor(
     private val firebaseAuth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
 ) : SyncRepository {

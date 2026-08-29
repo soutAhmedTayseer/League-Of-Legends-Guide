@@ -1,11 +1,12 @@
 package com.venom7t.lolguide.domain.champion.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.model.ChampionDetail
 import com.venom7t.lolguide.domain.champion.repository.ChampionRepository
 import com.venom7t.lolguide.domain.common.AppError
 import com.venom7t.lolguide.domain.common.AppLocale
-import javax.inject.Inject
 
 /**
  * Loads everything the detail screen needs as one unit.
@@ -15,7 +16,8 @@ import javax.inject.Inject
  * screen must never show a champion's stats on one patch beside its abilities
  * on another (AGENTS.md §1).
  */
-class GetChampionDetailUseCase @Inject constructor(
+@Factory
+class GetChampionDetailUseCase(
     private val championRepository: ChampionRepository,
 ) {
 

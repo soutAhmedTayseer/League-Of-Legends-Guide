@@ -12,11 +12,8 @@ import com.venom7t.lolguide.domain.summoner.model.Summoner
 import com.venom7t.lolguide.domain.summoner.repository.SummonerRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class SummonerRepositoryImpl @Inject constructor(
+class SummonerRepositoryImpl constructor(
     private val api: RiotApi,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : SummonerRepository {

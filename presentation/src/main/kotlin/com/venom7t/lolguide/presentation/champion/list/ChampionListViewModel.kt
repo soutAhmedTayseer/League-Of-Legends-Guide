@@ -14,7 +14,7 @@ import com.venom7t.lolguide.domain.favourite.usecase.ObserveFavouriteIdsUseCase
 import com.venom7t.lolguide.domain.favourite.usecase.ToggleFavouriteUseCase
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
 import com.venom7t.lolguide.presentation.common.toUiText
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableSet
 import kotlinx.coroutines.channels.Channel
@@ -26,10 +26,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ChampionListViewModel @Inject constructor(
+@KoinViewModel
+class ChampionListViewModel (
     private val observeChampions: ObserveChampionsUseCase,
     private val refreshChampions: RefreshChampionsUseCase,
     private val searchChampions: SearchChampionsUseCase,

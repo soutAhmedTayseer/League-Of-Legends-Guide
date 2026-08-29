@@ -12,8 +12,7 @@ import com.venom7t.lolguide.domain.voiceline.model.VoiceLineAvailability
 import com.venom7t.lolguide.domain.voiceline.repository.VoiceLineRepository
 import com.venom7t.lolguide.presentation.common.UiText
 import com.venom7t.lolguide.presentation.common.toUiText
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -22,7 +21,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @Immutable
 data class VoiceLinePlayerState(
@@ -44,9 +42,9 @@ sealed interface VoiceLinePlayerEvent {
  * line panel. Released in [onCleared] -- an undisposed player leaks the
  * underlying media codec resources for the lifetime of the process.
  */
-@HiltViewModel
-class VoiceLinePlayerViewModel @Inject constructor(
-    @ApplicationContext context: Context,
+@KoinViewModel
+class VoiceLinePlayerViewModel (
+    context: Context,
     private val voiceLineRepository: VoiceLineRepository,
 ) : ViewModel() {
 

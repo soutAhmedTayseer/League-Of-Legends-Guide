@@ -1,31 +1,14 @@
 package com.venom7t.lolguide.di
 
-import android.content.Context
 import androidx.room.Room
-import com.venom7t.lolguide.data.builds.local.SavedBuildDao
-import com.venom7t.lolguide.data.champion.local.ChampionDao
 import com.venom7t.lolguide.data.common.local.LolGuideDatabase
-import com.venom7t.lolguide.data.favourite.local.FavouriteChampionDao
-import com.venom7t.lolguide.data.followed.local.FollowedSummonerDao
-import com.venom7t.lolguide.data.item.local.ItemDao
-import com.venom7t.lolguide.data.lptracker.local.LpSnapshotDao
-import com.venom7t.lolguide.data.match.local.MatchDao
-import com.venom7t.lolguide.data.patch.local.PreviousPatchSnapshotDao
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import org.koin.android.ext.koin.androidContext
+import org.koin.dsl.module
 
-@Module
-@InstallIn(SingletonComponent::class)
-object DatabaseModule {
+val databaseModule = module {
 
-    @Provides
-    @Singleton
-    fun provideDatabase(@ApplicationContext context: Context): LolGuideDatabase =
-        Room.databaseBuilder(context, LolGuideDatabase::class.java, LolGuideDatabase.NAME)
+    single {
+        Room.databaseBuilder(androidContext(), LolGuideDatabase::class.java, LolGuideDatabase.NAME)
             // Destructive fallback was acceptable in Phase 0 when the only
             // content was a rebuildable CDN cache. Favourites are user-authored
             // and cannot be re-downloaded, so schema changes migrate properly
@@ -39,31 +22,14 @@ object DatabaseModule {
                 LolGuideDatabase.MIGRATION_6_7,
             )
             .build()
+    }
 
-    @Provides
-    fun provideChampionDao(database: LolGuideDatabase): ChampionDao = database.championDao()
-
-    @Provides
-    fun provideFavouriteChampionDao(database: LolGuideDatabase): FavouriteChampionDao =
-        database.favouriteChampionDao()
-
-    @Provides
-    fun provideItemDao(database: LolGuideDatabase): ItemDao = database.itemDao()
-
-    @Provides
-    fun providePreviousPatchSnapshotDao(database: LolGuideDatabase): PreviousPatchSnapshotDao =
-        database.previousPatchSnapshotDao()
-
-    @Provides
-    fun provideMatchDao(database: LolGuideDatabase): MatchDao = database.matchDao()
-
-    @Provides
-    fun provideFollowedSummonerDao(database: LolGuideDatabase): FollowedSummonerDao =
-        database.followedSummonerDao()
-
-    @Provides
-    fun provideLpSnapshotDao(database: LolGuideDatabase): LpSnapshotDao = database.lpSnapshotDao()
-
-    @Provides
-    fun provideSavedBuildDao(database: LolGuideDatabase): SavedBuildDao = database.savedBuildDao()
+    single { get<LolGuideDatabase>().championDao() }
+    single { get<LolGuideDatabase>().favouriteChampionDao() }
+    single { get<LolGuideDatabase>().itemDao() }
+    single { get<LolGuideDatabase>().previousPatchSnapshotDao() }
+    single { get<LolGuideDatabase>().matchDao() }
+    single { get<LolGuideDatabase>().followedSummonerDao() }
+    single { get<LolGuideDatabase>().lpSnapshotDao() }
+    single { get<LolGuideDatabase>().savedBuildDao() }
 }

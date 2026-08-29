@@ -1,7 +1,8 @@
 package com.venom7t.lolguide.domain.champion.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.champion.model.Champion
-import javax.inject.Inject
 import kotlin.random.Random
 
 /**
@@ -11,7 +12,8 @@ import kotlin.random.Random
  * jungler" are just the roulette applied to the list screen's active filter --
  * no second filtering path to keep in sync.
  */
-class RandomChampionUseCase @Inject constructor() {
+@Factory
+class RandomChampionUseCase() {
 
     /**
      * @param excludeId the previous result, so pressing reroll twice does not

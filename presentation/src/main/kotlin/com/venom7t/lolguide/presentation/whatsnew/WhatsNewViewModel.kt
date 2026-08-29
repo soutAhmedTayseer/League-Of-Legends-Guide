@@ -8,14 +8,13 @@ import com.venom7t.lolguide.domain.item.usecase.ObservePurchasableItemsUseCase
 import com.venom7t.lolguide.domain.patch.model.PatchDiff
 import com.venom7t.lolguide.domain.patch.usecase.ComputePatchDiffUseCase
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @Immutable
 data class WhatsNewState(
@@ -27,8 +26,8 @@ sealed interface WhatsNewEvent {
     data object ScreenOpened : WhatsNewEvent
 }
 
-@HiltViewModel
-class WhatsNewViewModel @Inject constructor(
+@KoinViewModel
+class WhatsNewViewModel (
     private val resolvePatch: ResolvePatchUseCase,
     private val observeChampions: ObserveChampionsUseCase,
     private val observeItems: ObservePurchasableItemsUseCase,

@@ -13,14 +13,13 @@ import com.venom7t.lolguide.domain.onboarding.repository.OnboardingRepository
 import com.venom7t.lolguide.domain.patch.usecase.ComputePatchDiffUseCase
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
 import com.venom7t.lolguide.domain.rotation.usecase.GetCurrentRotationUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @Immutable
 data class HomeState(
@@ -60,8 +59,8 @@ sealed interface HomeEvent {
     data object ScreenOpened : HomeEvent
 }
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+@KoinViewModel
+class HomeViewModel (
     private val resolvePatch: ResolvePatchUseCase,
     private val observeChampions: ObserveChampionsUseCase,
     private val observeItems: ObservePurchasableItemsUseCase,

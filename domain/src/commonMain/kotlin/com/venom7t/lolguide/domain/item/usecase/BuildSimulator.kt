@@ -1,10 +1,11 @@
 package com.venom7t.lolguide.domain.item.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.model.ChampionStatCalculator
 import com.venom7t.lolguide.domain.item.model.Item
 import com.venom7t.lolguide.domain.item.model.ItemStats
-import javax.inject.Inject
 
 /**
  * Champion + level + items, totalled up.
@@ -67,7 +68,8 @@ enum class DpsAssumption {
     }
 }
 
-class BuildSimulator @Inject constructor() {
+@Factory
+class BuildSimulator() {
 
     fun simulate(champion: Champion, items: List<Item>, level: Int): BuildResult {
         val base = ChampionStatCalculator.statsAtLevel(champion.stats, level)

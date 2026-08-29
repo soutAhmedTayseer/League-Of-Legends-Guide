@@ -33,7 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.domain.item.model.Item
 import com.venom7t.lolguide.domain.item.model.ItemStats
@@ -54,7 +54,7 @@ fun ItemDetailScreenRoot(
     onNavigateBack: () -> Unit,
     onNavigateToItem: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ItemDetailViewModel = hiltViewModel(),
+    viewModel: ItemDetailViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

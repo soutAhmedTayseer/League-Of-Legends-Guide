@@ -40,7 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.domain.spell.model.SummonerSpell
 import com.venom7t.lolguide.domain.timer.model.EnemyLane
@@ -60,7 +60,7 @@ import com.venom7t.lolguide.presentation.theme.AppTheme
 fun GameTimersScreenRoot(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: GameTimersViewModel = hiltViewModel(),
+    viewModel: GameTimersViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

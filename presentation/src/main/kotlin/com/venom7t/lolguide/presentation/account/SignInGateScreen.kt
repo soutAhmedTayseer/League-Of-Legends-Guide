@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.presentation.R
 import com.venom7t.lolguide.presentation.common.components.CutSurface
@@ -53,7 +53,7 @@ import kotlinx.coroutines.launch
 fun SignInGateScreenRoot(
     onSignedIn: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AccountViewModel = hiltViewModel(),
+    viewModel: AccountViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current

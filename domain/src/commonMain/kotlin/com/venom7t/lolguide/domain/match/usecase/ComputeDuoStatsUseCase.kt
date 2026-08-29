@@ -1,9 +1,10 @@
 package com.venom7t.lolguide.domain.match.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.match.model.DuoStats
 import com.venom7t.lolguide.domain.match.repository.MatchRepository
 import com.venom7t.lolguide.domain.onboarding.model.Region
-import javax.inject.Inject
 
 /**
  * Aggregates duo win rates from the summoner's already-fetched match
@@ -15,7 +16,8 @@ import javax.inject.Inject
  * already looked at (match data is immutable once played, AGENTS.md §8.3),
  * so this does not fan out fresh network calls per match under normal use.
  */
-class ComputeDuoStatsUseCase @Inject constructor(
+@Factory
+class ComputeDuoStatsUseCase(
     private val matchRepository: MatchRepository,
 ) {
     suspend operator fun invoke(

@@ -7,7 +7,7 @@ import com.venom7t.lolguide.domain.onboarding.model.Region
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
 import com.venom7t.lolguide.domain.summoner.usecase.GetSummonerByPuuidUseCase
 import com.venom7t.lolguide.presentation.common.toUiText
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,10 +15,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class LadderViewModel @Inject constructor(
+@KoinViewModel
+class LadderViewModel (
     private val getChallengerLadder: GetChallengerLadderUseCase,
     private val getSummonerByPuuid: GetSummonerByPuuidUseCase,
     private val resolvePatch: ResolvePatchUseCase,

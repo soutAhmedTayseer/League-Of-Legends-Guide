@@ -11,7 +11,7 @@ import com.venom7t.lolguide.domain.timer.model.EnemyLane
 import com.venom7t.lolguide.domain.timer.model.GameTimer
 import com.venom7t.lolguide.domain.timer.model.GameTimerPreset
 import com.venom7t.lolguide.domain.timer.model.SpellTimer
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
@@ -24,7 +24,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /** Which lane/slot a spell picker or cancel-confirm dialog is acting on. */
 data class SpellSlotTarget(val lane: EnemyLane, val slotIndex: Int)
@@ -67,8 +66,8 @@ sealed interface GameTimersEvent {
  * lives in the ViewModel rather than the Composable so a configuration
  * change (rotation) does not restart either kind of timer.
  */
-@HiltViewModel
-class GameTimersViewModel @Inject constructor(
+@KoinViewModel
+class GameTimersViewModel (
     private val spellRepository: SummonerSpellRepository,
     private val resolvePatch: ResolvePatchUseCase,
     private val locale: AppLocale,

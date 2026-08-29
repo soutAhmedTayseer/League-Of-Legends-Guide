@@ -1,8 +1,9 @@
 package com.venom7t.lolguide.domain.game.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.game.model.GameMode
-import javax.inject.Inject
 import kotlin.math.absoluteValue
 
 /**
@@ -23,7 +24,8 @@ import kotlin.math.absoluteValue
  * Riot ships a champion, which shifts the modulo and can change what a past
  * day's answer was. Acceptable for a local game with no shared leaderboard.
  */
-class PickDailyChampionUseCase @Inject constructor() {
+@Factory
+class PickDailyChampionUseCase() {
 
     operator fun invoke(champions: List<Champion>, mode: GameMode, epochDay: Long): Champion? {
         if (champions.isEmpty()) return null

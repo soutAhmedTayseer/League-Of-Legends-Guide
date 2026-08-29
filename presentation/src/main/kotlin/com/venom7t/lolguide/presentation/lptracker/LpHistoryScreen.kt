@@ -25,7 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.domain.lptracker.model.LpSnapshot
 import com.venom7t.lolguide.domain.summoner.model.RankedQueue
@@ -38,7 +38,7 @@ import com.venom7t.lolguide.presentation.theme.AppTheme
 fun LpHistoryScreenRoot(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: LpHistoryViewModel = hiltViewModel(),
+    viewModel: LpHistoryViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 

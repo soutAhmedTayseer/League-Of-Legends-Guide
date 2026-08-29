@@ -37,7 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.venom7t.lolguide.domain.onboarding.model.Region
 import com.venom7t.lolguide.presentation.R
@@ -50,7 +50,7 @@ fun SummonerSearchScreenRoot(
     onNavigateToProfile: (name: String, tagline: String, region: Region) -> Unit,
     onNavigateToAccount: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SummonerSearchViewModel = hiltViewModel(),
+    viewModel: SummonerSearchViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }

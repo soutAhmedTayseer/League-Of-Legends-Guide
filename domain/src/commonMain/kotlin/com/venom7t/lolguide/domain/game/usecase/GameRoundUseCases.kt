@@ -1,5 +1,7 @@
 package com.venom7t.lolguide.domain.game.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.game.model.GameMode
 import com.venom7t.lolguide.domain.game.model.GameStats
@@ -9,14 +11,14 @@ import com.venom7t.lolguide.domain.game.model.RoundProgress
 import com.venom7t.lolguide.domain.game.repository.GameProgressRepository
 import com.venom7t.lolguide.domain.sync.repository.SyncRepository
 import kotlinx.coroutines.flow.first
-import javax.inject.Inject
 
 /**
  * Returns today's round for [mode] -- resuming a saved one if it is still
  * today's, or starting a fresh one otherwise (a new day always means a new
  * answer, so yesterday's unfinished round cannot carry over).
  */
-class StartOrResumeRoundUseCase @Inject constructor(
+@Factory
+class StartOrResumeRoundUseCase(
     private val repository: GameProgressRepository,
     private val pickDailyChampion: PickDailyChampionUseCase,
 ) {
@@ -37,7 +39,8 @@ class StartOrResumeRoundUseCase @Inject constructor(
  * updated round, and rolls lifetime stats forward the moment the round
  * finishes (win or out of guesses).
  */
-class SubmitGuessUseCase @Inject constructor(
+@Factory
+class SubmitGuessUseCase(
     private val repository: GameProgressRepository,
     private val evaluateGuess: EvaluateGuessUseCase,
     private val syncRepository: SyncRepository,
@@ -73,7 +76,8 @@ class SubmitGuessUseCase @Inject constructor(
  * answer. Confirmed in the UI first (AGENTS.md §13) since it forfeits the
  * round's streak the same way running out of guesses used to.
  */
-class GiveUpRoundUseCase @Inject constructor(
+@Factory
+class GiveUpRoundUseCase(
     private val repository: GameProgressRepository,
     private val syncRepository: SyncRepository,
 ) {

@@ -1,5 +1,7 @@
 package com.venom7t.lolguide.domain.lptracker.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.followed.usecase.ObserveFollowedSummonersUseCase
 import com.venom7t.lolguide.domain.lptracker.model.LpSnapshot
 import com.venom7t.lolguide.domain.lptracker.repository.LpTrackerRepository
@@ -8,9 +10,9 @@ import com.venom7t.lolguide.domain.summoner.usecase.GetRankedEntriesUseCase
 import com.venom7t.lolguide.domain.summoner.usecase.SearchSummonerUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import javax.inject.Inject
 
-class ObserveLpHistoryUseCase @Inject constructor(
+@Factory
+class ObserveLpHistoryUseCase(
     private val repository: LpTrackerRepository,
 ) {
     operator fun invoke(puuid: String, queueType: RankedQueue): Flow<List<LpSnapshot>> =
@@ -39,7 +41,8 @@ data class LpChange(
  * single unit of work the LP-tracker WorkManager job runs each interval
  * (Phase 5 plan).
  */
-class PollFollowedSummonersLpUseCase @Inject constructor(
+@Factory
+class PollFollowedSummonersLpUseCase(
     private val observeFollowedSummoners: ObserveFollowedSummonersUseCase,
     private val searchSummoner: SearchSummonerUseCase,
     private val getRankedEntries: GetRankedEntriesUseCase,

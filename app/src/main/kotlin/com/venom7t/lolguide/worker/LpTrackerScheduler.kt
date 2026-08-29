@@ -7,8 +7,6 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.venom7t.lolguide.data.lptracker.worker.LpTrackerWorker
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Schedules [LpTrackerWorker] roughly every 30 minutes -- frequent enough
@@ -17,8 +15,7 @@ import javax.inject.Singleton
  * handful of followed summoners (each poll costs one ACCOUNT-V1 +
  * SUMMONER-V4 + LEAGUE-V4 call per summoner, AGENTS.md section 8.3).
  */
-@Singleton
-class LpTrackerScheduler @Inject constructor(
+class LpTrackerScheduler(
     private val workManager: WorkManager,
 ) {
 

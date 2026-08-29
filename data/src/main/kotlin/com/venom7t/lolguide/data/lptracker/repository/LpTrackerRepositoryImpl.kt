@@ -10,11 +10,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class LpTrackerRepositoryImpl @Inject constructor(
+class LpTrackerRepositoryImpl constructor(
     private val dao: LpSnapshotDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : LpTrackerRepository {

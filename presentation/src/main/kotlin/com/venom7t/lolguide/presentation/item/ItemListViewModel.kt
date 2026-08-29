@@ -10,7 +10,7 @@ import com.venom7t.lolguide.domain.item.usecase.RefreshItemsUseCase
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
 import com.venom7t.lolguide.presentation.common.UiText
 import com.venom7t.lolguide.presentation.common.toUiText
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @Immutable
 data class ItemListState(
@@ -62,8 +61,8 @@ sealed interface ItemListEffect {
     data class NavigateToDetail(val itemId: String) : ItemListEffect
 }
 
-@HiltViewModel
-class ItemListViewModel @Inject constructor(
+@KoinViewModel
+class ItemListViewModel (
     private val observeItems: ObservePurchasableItemsUseCase,
     private val refreshItems: RefreshItemsUseCase,
     private val resolvePatch: ResolvePatchUseCase,

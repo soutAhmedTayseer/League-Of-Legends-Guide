@@ -1,14 +1,16 @@
 package com.venom7t.lolguide.domain.match.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.match.model.DerivedChampionStats
 import com.venom7t.lolguide.domain.match.model.MatchDetail
 import com.venom7t.lolguide.domain.match.model.MatchSummary
 import com.venom7t.lolguide.domain.match.model.MatchTimelineFrame
 import com.venom7t.lolguide.domain.match.repository.MatchRepository
 import com.venom7t.lolguide.domain.onboarding.model.Region
-import javax.inject.Inject
 
-class GetMatchHistoryUseCase @Inject constructor(
+@Factory
+class GetMatchHistoryUseCase(
     private val repository: MatchRepository,
 ) {
     suspend operator fun invoke(
@@ -23,14 +25,16 @@ class GetMatchHistoryUseCase @Inject constructor(
     }
 }
 
-class GetMatchDetailUseCase @Inject constructor(
+@Factory
+class GetMatchDetailUseCase(
     private val repository: MatchRepository,
 ) {
     suspend operator fun invoke(matchId: String, region: Region): Result<MatchDetail> =
         repository.getMatchDetail(matchId, region)
 }
 
-class GetMatchTimelineUseCase @Inject constructor(
+@Factory
+class GetMatchTimelineUseCase(
     private val repository: MatchRepository,
 ) {
     suspend operator fun invoke(matchId: String, region: Region): Result<List<MatchTimelineFrame>> =
@@ -47,7 +51,8 @@ class GetMatchTimelineUseCase @Inject constructor(
  * notice on that type -- this use case must never be tempted to present a
  * derived average as if Riot published it directly.
  */
-class ComputeDerivedChampionStatsUseCase @Inject constructor() {
+@Factory
+class ComputeDerivedChampionStatsUseCase() {
 
     operator fun invoke(matches: List<MatchSummary>, championId: String): DerivedChampionStats? {
         val onChampion = matches.filter { it.championId == championId }

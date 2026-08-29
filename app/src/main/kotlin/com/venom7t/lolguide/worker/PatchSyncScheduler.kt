@@ -8,8 +8,6 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.venom7t.lolguide.data.patch.worker.PatchSyncWorker
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * Schedules [PatchSyncWorker] to run roughly twice a day.
@@ -19,8 +17,7 @@ import javax.inject.Singleton
  * have the cache warm by the time the user next opens the app, not to be a
  * live patch-change notifier.
  */
-@Singleton
-class PatchSyncScheduler @Inject constructor(
+class PatchSyncScheduler(
     private val workManager: WorkManager,
 ) {
 

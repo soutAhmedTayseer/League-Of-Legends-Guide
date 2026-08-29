@@ -1,5 +1,7 @@
 package com.venom7t.lolguide.domain.game.usecase
 
+import org.koin.core.annotation.Factory
+
 import com.venom7t.lolguide.domain.champion.model.Champion
 import com.venom7t.lolguide.domain.champion.model.DamageType
 import com.venom7t.lolguide.domain.champion.model.Difficulty
@@ -7,14 +9,14 @@ import com.venom7t.lolguide.domain.game.model.Clue
 import com.venom7t.lolguide.domain.game.model.ClueAttribute
 import com.venom7t.lolguide.domain.game.model.ClueState
 import com.venom7t.lolguide.domain.game.model.GuessResult
-import javax.inject.Inject
 
 /**
  * Scores one Classic-mode guess against the answer, producing the five clue
  * columns (Phase 6 plan §Clue attributes). Pure and synchronous -- both
  * champions are already in memory, there is nothing to fetch.
  */
-class EvaluateGuessUseCase @Inject constructor() {
+@Factory
+class EvaluateGuessUseCase() {
 
     /** Melee/ranged split point on Data Dragon's attackrange, in game units. */
     private val meleeRangeThreshold = 300.0

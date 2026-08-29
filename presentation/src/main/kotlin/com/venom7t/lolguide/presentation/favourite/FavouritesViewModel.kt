@@ -10,7 +10,7 @@ import com.venom7t.lolguide.domain.common.AppLocale
 import com.venom7t.lolguide.domain.favourite.usecase.ObserveFavouriteIdsUseCase
 import com.venom7t.lolguide.domain.favourite.usecase.ToggleFavouriteUseCase
 import com.venom7t.lolguide.domain.patch.usecase.ResolvePatchUseCase
-import dagger.hilt.android.lifecycle.HiltViewModel
+import org.koin.android.annotation.KoinViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @Immutable
 data class FavouritesState(
@@ -43,8 +42,8 @@ sealed interface FavouritesEffect {
     data class NavigateToDetail(val championId: String) : FavouritesEffect
 }
 
-@HiltViewModel
-class FavouritesViewModel @Inject constructor(
+@KoinViewModel
+class FavouritesViewModel (
     private val observeChampions: ObserveChampionsUseCase,
     private val observeFavouriteIds: ObserveFavouriteIdsUseCase,
     private val toggleFavourite: ToggleFavouriteUseCase,
