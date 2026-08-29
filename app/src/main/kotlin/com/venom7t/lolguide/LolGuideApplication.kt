@@ -9,7 +9,7 @@ import com.venom7t.lolguide.di.databaseModule
 import com.venom7t.lolguide.di.networkModule
 import com.venom7t.lolguide.domain.di.DomainModule
 import com.venom7t.lolguide.domain.sync.usecase.SyncOnStartUseCase
-import com.venom7t.lolguide.presentation.di.PresentationModule
+import com.venom7t.lolguide.presentation.di.presentationModule
 import com.venom7t.lolguide.worker.LpTrackerScheduler
 import com.venom7t.lolguide.worker.PatchSyncScheduler
 import kotlinx.coroutines.CoroutineScope
@@ -50,7 +50,7 @@ class LolGuideApplication : Application(), Configuration.Provider {
                 databaseModule,
                 networkModule,
                 DomainModule().module,
-                PresentationModule().module,
+                presentationModule,
             )
         }
 
