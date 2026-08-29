@@ -27,3 +27,4 @@ include(":app")
 include(":domain")
 include(":data")
 include(":presentation")
+include(":kmpSpike") // Phase 0 CMP/iOS migration spike -- throwaway, see docs/plans
