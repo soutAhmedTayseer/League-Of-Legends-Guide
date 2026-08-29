@@ -139,12 +139,12 @@ DataStore config change. Firebase → GitLive.
   stale; 3.0 turned out to be a separate relocated artifact under
   `androidx.room3`, not the KMP-enabling release.)
 
-  The actual blocker is converting `:data` itself into a KMP module,
+  The actual blocker was converting `:data` itself into a KMP module,
   which is what would let Room's other platforms matter at all — and
-  that conversion runs straight into the unresolved product decision
-  below (WorkManager has no iOS story), not an engineering gap. Owner
-  decision on 2026-08-29: **stop Phase 3 here** rather than push through
-  that decision speculatively. `:data` remains an Android-library.
+  that conversion ran straight into a product decision (WorkManager has
+  no iOS story). **Resolved 2026-08-29: see Phase 6's background-sync
+  decision below** (foreground-only on iOS). `:data`'s KMP conversion
+  is unblocked and is the next piece of work.
 
 **Phase 4 — `:presentation` → CMP (4–6 days)**
 Jetpack Compose → Compose Multiplatform imports. Resource migration (the 324
@@ -155,9 +155,17 @@ Split `:app`. Stand up the Xcode project, Firebase iOS config, iOS entry point.
 First real run on device.
 
 **Phase 6 — iOS-specific work (open-ended)**
-Sign in with Apple. Background-refresh redesign. Then a **full QA pass** — iOS
-gesture handling, scroll physics, keyboard/IME behaviour, safe areas, back-swipe
-and lifecycle all differ enough that "it compiled" is nowhere near "it works."
+Sign in with Apple. Then a **full QA pass** — iOS gesture handling, scroll
+physics, keyboard/IME behaviour, safe areas, back-swipe and lifecycle all
+differ enough that "it compiled" is nowhere near "it works."
+
+**Decision (2026-08-29): background sync degrades to foreground-only on
+iOS.** `PatchSyncWorker` and `LpTrackerWorker` stay exactly as they are on
+Android (WorkManager, unchanged). iOS gets no equivalent background job --
+no periodic patch pre-warm, no LP-change notifications while the app isn't
+open. This unblocks `:data`'s KMP conversion without new backend
+infrastructure; it can be revisited later (e.g. a server-side scheduled job)
+if the degraded iOS experience turns out to matter in practice.
 
 **Realistic total: 3–5 focused weeks**, with Phase 6 genuinely open-ended.
 
