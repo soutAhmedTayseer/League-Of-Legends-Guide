@@ -143,8 +143,23 @@ DataStore config change. Firebase → GitLive.
   which is what would let Room's other platforms matter at all — and
   that conversion ran straight into a product decision (WorkManager has
   no iOS story). **Resolved 2026-08-29: see Phase 6's background-sync
-  decision below** (foreground-only on iOS). `:data`'s KMP conversion
-  is unblocked and is the next piece of work.
+  decision below** (foreground-only on iOS).
+
+  **Attempted 2026-08-29, reverted: `:data` → KMP hits an unresolved
+  upstream tooling bug, not a design question.** AGP 9 requires the new
+  `com.android.kotlin.multiplatform.library` plugin for any KMP module
+  with an Android target (`com.android.library` is flatly rejected
+  alongside the Kotlin Multiplatform plugin as of AGP 9.0). KSP does not
+  yet support that new plugin at all — every Android-target compilation
+  it creates fails a class cast inside Kotlin's own Gradle tooling
+  (`KotlinMultiplatformAndroidCompilationImpl` cannot be cast to
+  `KotlinJvmAndroidCompilation`), tracked upstream as
+  [google/ksp#2476](https://github.com/google/ksp/issues/2476), open and
+  unresolved. Room's annotation processing for all 8 entities/DAOs runs
+  through KSP, so this blocks the conversion outright — not a design
+  choice to revisit, a dependency on Google fixing this upstream first.
+  `:data` remains an `android-library`; re-attempt once that issue is
+  closed and a KSP release ships with the fix.
 
 **Phase 4 — `:presentation` → CMP (4–6 days)**
 Jetpack Compose → Compose Multiplatform imports. Resource migration (the 324
