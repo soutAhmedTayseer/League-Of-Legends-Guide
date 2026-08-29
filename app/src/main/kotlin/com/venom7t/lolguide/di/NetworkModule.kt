@@ -5,25 +5,16 @@ import com.venom7t.lolguide.data.champion.remote.DataDragonApi
 import com.venom7t.lolguide.data.riot.remote.RiotApi
 import com.venom7t.lolguide.data.riot.remote.RiotApiKeyProvider
 import com.venom7t.lolguide.data.riot.remote.RiotAuthInterceptor
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.util.concurrent.TimeUnit
-
-private const val DATA_DRAGON_BASE_URL = "https://ddragon.leagueoflegends.com/"
-
-/**
- * Placeholder base URL only -- every [RiotApi] call supplies its own
- * absolute `@Url`, since Riot's platform/regional host split cannot be
- * expressed as one fixed base (see [RiotApi]'s doc comment). Retrofit still
- * requires a syntactically valid base to construct.
- */
-private const val RIOT_API_PLACEHOLDER_BASE_URL = "https://universal.api.riotgames.com/"
 
 val DATA_DRAGON_RETROFIT = named("dataDragonRetrofit")
 val RIOT_API_RETROFIT = named("riotApiRetrofit")
@@ -56,7 +47,8 @@ val networkModule = module {
 
     // The client for the keyless CDN. Deliberately has no auth interceptor.
     // The Riot API client is a separate instance so a key can never be
-    // attached to a CDN request by accident (AGENTS.md §8.1).
+    // attached to a CDN request by accident (AGENTS.md §8.1). Also used
+    // directly (not through Ktor) by VoiceLineProbe's raw HEAD requests.
     single(DATA_DRAGON_RETROFIT) {
         OkHttpClient.Builder()
             .addInterceptor(get<HttpLoggingInterceptor>())
@@ -66,14 +58,14 @@ val networkModule = module {
     }
 
     single(DATA_DRAGON_RETROFIT) {
-        Retrofit.Builder()
-            .baseUrl(DATA_DRAGON_BASE_URL)
-            .client(get(DATA_DRAGON_RETROFIT))
-            .addConverterFactory(get<Json>().asConverterFactory("application/json".toMediaType()))
-            .build()
+        HttpClient(OkHttp) {
+            engine { preconfigured = get(DATA_DRAGON_RETROFIT) }
+            expectSuccess = true
+            install(ContentNegotiation) { json(get<Json>()) }
+        }
     }
 
-    single { get<Retrofit>(DATA_DRAGON_RETROFIT).create(DataDragonApi::class.java) }
+    single { DataDragonApi(get(DATA_DRAGON_RETROFIT)) }
 
     single(RIOT_API_KEY) { BuildConfig.RIOT_API_KEY }
 
@@ -94,12 +86,12 @@ val networkModule = module {
     }
 
     single(RIOT_API_RETROFIT) {
-        Retrofit.Builder()
-            .baseUrl(RIOT_API_PLACEHOLDER_BASE_URL)
-            .client(get(RIOT_API_RETROFIT))
-            .addConverterFactory(get<Json>().asConverterFactory("application/json".toMediaType()))
-            .build()
+        HttpClient(OkHttp) {
+            engine { preconfigured = get(RIOT_API_RETROFIT) }
+            expectSuccess = true
+            install(ContentNegotiation) { json(get<Json>()) }
+        }
     }
 
-    single { get<Retrofit>(RIOT_API_RETROFIT).create(RiotApi::class.java) }
+    single { RiotApi(get(RIOT_API_RETROFIT)) }
 }

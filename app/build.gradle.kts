@@ -83,8 +83,10 @@ dependencies {
 
     // The Koin module in :app constructs data-layer implementations, so :app
     // needs the libraries those constructors take as parameters.
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.kotlinx.serialization)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
     implementation(libs.kotlinx.serialization.json)
