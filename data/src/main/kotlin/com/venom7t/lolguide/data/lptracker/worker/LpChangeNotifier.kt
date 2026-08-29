@@ -6,6 +6,7 @@ import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.venom7t.lolguide.data.R
 import com.venom7t.lolguide.domain.lptracker.usecase.LpChange
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -35,7 +36,7 @@ class LpChangeNotifier @Inject constructor(
 
         val sign = if (change.leaguePointsDelta > 0) "+" else ""
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("${change.riotIdName}#${change.riotIdTagline}")
             .setContentText(
                 "$sign${change.leaguePointsDelta} LP -- now ${change.newTier} " +
