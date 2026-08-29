@@ -62,6 +62,9 @@ import com.venom7t.lolguide.domain.sync.repository.SyncRepository
 import com.venom7t.lolguide.domain.voiceline.repository.VoiceLineRepository
 import com.venom7t.lolguide.navigation.AppStartViewModel
 import com.venom7t.lolguide.worker.LpTrackerScheduler
+import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.auth.auth
+import dev.gitlive.firebase.firestore.firestore
 import com.venom7t.lolguide.worker.PatchSyncScheduler
 import androidx.work.WorkManager
 import kotlinx.coroutines.CoroutineDispatcher
@@ -102,12 +105,8 @@ val appModule = module {
         CoroutineScope(SupervisorJob() + get<CoroutineDispatcher>(IO_DISPATCHER))
     }
 
-    single {
-        com.google.firebase.auth.FirebaseAuth.getInstance()
-    }
-    single {
-        com.google.firebase.firestore.FirebaseFirestore.getInstance()
-    }
+    single { Firebase.auth }
+    single { Firebase.firestore }
 
     /**
      * The locale to request content in.

@@ -17,8 +17,13 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        // GitLive's Firestore/Auth SDK ships reified inline functions
+        // (get<T>()/set<T>()) compiled with JVM 17 bytecode; inlining those
+        // into a JVM 11 target fails to compile. :app and :presentation
+        // don't call those inline functions directly, so only :data needs
+        // to move.
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
@@ -53,12 +58,14 @@ dependencies {
     implementation(libs.timber)
 
     // Phase 5: live service. :data holds the sync/auth repository impls,
-    // same as every other *RepositoryImpl, so it needs the Firebase SDKs
-    // directly rather than routing calls through :app.
+    // same as every other *RepositoryImpl, so it needs the Firebase SDK
+    // directly rather than routing calls through :app. GitLive's SDK
+    // (Phase 3 of the CMP/iOS migration plan) wraps the native Android SDK
+    // under the hood but exposes a suspend-native, KMP-portable API --
+    // no more Task/.await() bridging needed. The native com.google.firebase
+    // artifacts GitLive pulls in transitively declare no version of their
+    // own -- the BoM is what resolves them, same as :app's direct deps.
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.auth)
-    // Firebase's Android SDK returns com.google.android.gms.tasks.Task, not
-    // a suspend function -- this is what makes .await() on one legal.
-    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.gitlive.firebase.auth)
+    implementation(libs.gitlive.firebase.firestore)
 }

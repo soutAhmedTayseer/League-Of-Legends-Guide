@@ -19,6 +19,7 @@ splashscreen = "1.0.1"
 javaxInject = "1"
 koin = "4.1.1"
 koinAnnotations = "2.3.1"
+gitliveFirebase = "2.6.0"
 
 # --- Network / serialization ---
 okhttp = "5.4.0"
@@ -109,8 +110,8 @@ firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.r
 # KTX functionality merged into the main artifacts as of BoM 33+; the
 # separate -ktx artifacts no longer exist in this BoM version.
 firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
-firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+gitlive-firebase-auth = { group = "dev.gitlive", name = "firebase-auth", version.ref = "gitliveFirebase" }
+gitlive-firebase-firestore = { group = "dev.gitlive", name = "firebase-firestore", version.ref = "gitliveFirebase" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutines" }
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 androidx-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }

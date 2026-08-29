@@ -101,12 +101,14 @@ dependencies {
     implementation(libs.coil3.network)
     implementation(libs.timber)
 
-    // Phase 5: live service. The BoM pins every Firebase artifact's version,
-    // so individual firebase-* libraries below declare no version of their own.
+    // Phase 5: live service. The BoM pins every native Firebase artifact's
+    // version; FCM (LolGuideMessagingService) has no GitLive equivalent and
+    // stays on the native SDK. Auth/Firestore are GitLive's KMP-portable SDK
+    // (Phase 3 of the CMP/iOS migration plan) -- see :data's build file.
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.messaging)
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.auth)
+    implementation(libs.gitlive.firebase.auth)
+    implementation(libs.gitlive.firebase.firestore)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
